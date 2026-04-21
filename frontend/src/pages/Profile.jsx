@@ -1,79 +1,89 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, ShieldCheck, User as UserIcon, Megaphone, Zap } from 'lucide-react';
 
 const Profile = ({ user, setUser }) => {
   const [name, setName] = useState(user.name);
   const [skillsText, setSkillsText] = useState((user.skills || []).join(', '));
   const fileInputRef = useRef(null);
 
-  // Sync state if it updates externally (like when adding a skill from Opportunity details page)
   useEffect(() => {
     setSkillsText((user.skills || []).join(', '));
   }, [user.skills]);
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     const skillsArray = skillsText.split(',').map(s => s.trim()).filter(Boolean);
-    setUser({ ...user, name, skills: skillsArray });
-    alert("Profile details updated successfully!");
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-          alert('File is too large! Please select an image under 2MB.');
-          return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5002/api/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, skills: skillsArray })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        alert("Identity updated successfully!");
       }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUser({ ...user, avatar: reader.result });
-      };
-      reader.readAsDataURL(file);
+    } catch {
+      alert("Network rejection: Link unstable.");
     }
   };
 
+  const getRoleBranding = () => {
+    switch(user.role) {
+        case 'admin': return { label: 'SUPER ADMIN', icon: <ShieldCheck size={40} color="#ef4444"/>, col: '#ef4444' };
+        case 'ngo': return { label: 'MISSION LEAD (MANAGER)', icon: <Megaphone size={40} color="#4ade80"/>, col: '#4ade80' };
+        default: return { label: 'VOLUNTEER ASSET', icon: <Zap size={40} color="#0ca6a6"/>, col: '#0ca6a6' };
+    }
+  };
+
+  const branding = getRoleBranding();
+
   return (
-    <div>
-      <div className="page-header">
-        <h1 className="page-title">Your Volunteer Profile</h1>
-        <p style={{color: 'var(--text-muted)'}}>Keep your skills updated for the best AI-powered recommendations.</p>
+    <div className="profile-cyber" style={{ animation: 'fadeIn 0.5s ease-out' }}>
+      <div className="page-header" style={{ marginBottom: '40px' }}>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'white' }}>PERSONAL <span style={{ color: branding.col }}>ID</span></h1>
       </div>
       
-      <div className="glass-widget" style={{ maxWidth: '600px', marginTop: '30px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px', paddingBottom: '20px', borderBottom: '1px solid #edf2f7' }}>
-          <img src={user.avatar} alt="Profile" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid white', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }} />
-          <div>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '8px', color: 'var(--text-main)' }}>Profile Picture</h3>
-            <button type="button" className="btn btn-primary" style={{ padding: '8px 15px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => fileInputRef.current.click()}>
-              <Upload size={16} /> Upload New Photo
-            </button>
-            <input type="file" accept="image/*" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload} />
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px' }}>
+          
+          {/* identity Status Card */}
+          <div className="cyber-card" style={{ padding: '40px', textAlign: 'center', height: 'fit-content' }}>
+              <div style={{ position: 'relative', width: '120px', height: '120px', margin: '0 auto 30px auto' }}>
+                  <img src={user.avatar} style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: `3px solid ${branding.col}`, boxShadow: `0 0 20px ${branding.col}33` }} />
+                  <div style={{ position: 'absolute', bottom: 0, right: 0, background: 'var(--bg-dark)', padding: '8px', borderRadius: '50%', border: `1px solid ${branding.col}` }}>{branding.icon}</div>
+              </div>
+              <h2 style={{ fontSize: '1.8rem', color: 'white', marginBottom: '5px' }}>{user.name}</h2>
+              <div style={{ fontSize: '0.8rem', fontWeight: '900', letterSpacing: '2px', color: branding.col, background: `${branding.col}1a`, padding: '8px 20px', borderRadius: '20px', display: 'inline-block', border: `1px solid ${branding.col}33` }}>
+                  {branding.label}
+              </div>
+              <hr style={{ margin: '30px 0', borderColor: 'rgba(255,255,255,0.05)' }} />
+              <p style={{ color: '#94a3b8', fontSize: '0.9rem', lineHeight: '1.6' }}>Current Node Activation: Verified.<br/>Clearance Level: Level 5.</p>
           </div>
-        </div>
 
-        <form>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontWeight: '500' }}>Full Name</label>
-            <input type="text" value={name} onChange={(e) => setName(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#fff', border: '1px solid #cbd5e1', color: '#1a202c' }} />
+          {/* Configuration Form */}
+          <div className="cyber-card" style={{ padding: '40px' }}>
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '30px', color: 'white', letterSpacing: '1px' }}>CORE CONFIGURATION</h3>
+              <form onSubmit={handleSave}>
+                  <div style={{ marginBottom: '25px' }}>
+                      <label style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '10px' }}>IDENTITY DESIGNATION</label>
+                      <input type="text" className="cyber-input" style={{ width: '100%' }} value={name} onChange={(e) => setName(e.target.value)} />
+                  </div>
+                  <div style={{ marginBottom: '25px' }}>
+                      <label style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 'bold', display: 'block', marginBottom: '10px' }}>SKILLSET MATRIX (CSV)</label>
+                      <textarea className="cyber-input" style={{ width: '100%', resize: 'none' }} rows="4" value={skillsText} onChange={(e) => setSkillsText(e.target.value)}></textarea>
+                  </div>
+                  <button type="submit" className="cyber-card" style={{ width: '100%', padding: '20px', background: branding.col, border: 'none', color: 'white', fontWeight: '900', letterSpacing: '2px', cursor: 'pointer', boxShadow: `0 0 20px ${branding.col}33` }}>UPDATE TRANSMISSION</button>
+              </form>
           </div>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontWeight: '500' }}>Location</label>
-            <input type="text" defaultValue="San Francisco, CA" style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#fff', border: '1px solid #cbd5e1', color: '#1a202c' }} />
-          </div>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-main)', fontWeight: '500' }}>Skills (comma separated for AI Graph Model)</label>
-            <textarea 
-              rows="3" 
-              value={skillsText} 
-              onChange={(e) => setSkillsText(e.target.value)}
-              style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#fff', border: '1px solid #cbd5e1', color: '#1a202c', resize: 'vertical' }}
-            ></textarea>
-          </div>
-          <button type="button" className="btn btn-primary" onClick={handleSave}>
-            Save Profile Details
-          </button>
-        </form>
+
       </div>
     </div>
   );

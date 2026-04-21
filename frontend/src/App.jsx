@@ -1,60 +1,104 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
-import Dashboard from './pages/Dashboard';
-import OpportunitiesBrowser from './pages/OpportunitiesBrowser';
-import OpportunityDetail from './pages/OpportunityDetail';
-import Profile from './pages/Profile';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom';
+import { 
+  Users, Megaphone, Search, Clapperboard, 
+  LayoutDashboard, LogOut, User as UserIcon, Zap
+} from 'lucide-react';
+
 import Auth from './pages/Auth';
-import NGOPortal from './pages/NGOPortal';
-import { mockOpportunities as initialOpps } from './data/mockOpportunities';
-import './index.css';
+import CampaignBrowser from './pages/CampaignBrowser';
+import CampaignDetail from './pages/CampaignDetail';
+import CampaignDiscover from './pages/CampaignDiscover';
+import CampaignPortal from './pages/CampaignPortal';
+import AdminDashboard from './pages/AdminDashboard';
+import Profile from './pages/Profile';
+import IntroSplash from './components/IntroSplash';
 
 const TopNavbar = ({ user, handleLogout }) => {
   const location = useLocation();
   const isActive = (path) => location.pathname === path ? 'active' : '';
 
   return (
-    <nav className="top-navbar">
-      <div className="logo-container">
-        <div className="logo-icon">✈</div>
-        <div className="logo-text">YOUTH<br/>CONNECT</div>
+    <nav className="top-navbar" style={{ background: 'rgba(9, 15, 29, 0.9)', backdropFilter: 'blur(15px)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '0 40px', height: '80px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 1000 }}>
+      <div className="logo-container" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <div className="logo-icon" style={{ fontSize: '2rem', textShadow: '0 0 10px #0ca6a6' }}>⚡</div>
+        <div className="logo-text" style={{ color: 'white', fontWeight: '900', fontSize: '1rem', lineHeight: '1', letterSpacing: '1px' }}>CAMPAIGN<br/><span style={{ color: '#4ade80' }}>CONNECT</span></div>
       </div>
       
-      <ul className="nav-links">
-        <li><Link to="/" className={isActive('/')}>Dashboard</Link></li>
-        <li><Link to="/opportunities" className={location.pathname.includes('/opportunities') ? 'active' : ''}>Opportunities</Link></li>
-        <li><Link to="/ngo-portal" className={isActive('/ngo-portal')} style={{ color: 'var(--primary)', fontWeight: 'bold' }}>NGO Portal</Link></li>
-        <li><Link to="/profile" className={isActive('/profile')}>Profile</Link></li>
+      <ul className="nav-links" style={{ listStyle: 'none', display: 'flex', gap: '30px' }}>
+        {user?.role === 'admin' && (
+            <li><Link to="/admin-dashboard" style={{ textDecoration: 'none', fontWeight: 'bold', fontSize: '0.9rem', color: isActive('/admin-dashboard') ? '#4ade80' : '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}><LayoutDashboard size={18}/> Admin Hub</Link></li>
+        )}
+
+        {(user?.role === 'ngo' || user?.role === 'admin') && (
+            <li><Link to="/campaign-portal" style={{ textDecoration: 'none', fontWeight: 'bold', fontSize: '0.9rem', color: isActive('/campaign-portal') ? '#4ade80' : '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}><Megaphone size={18}/> Command Center</Link></li>
+        )}
+
+        {(user?.role === 'volunteer' || user?.role === 'admin') && (
+          <>
+            <li><Link to="/campaigns" style={{ textDecoration: 'none', fontWeight: 'bold', fontSize: '0.9rem', color: location.pathname.includes('/campaigns') ? '#4ade80' : '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}><Search size={18}/> Browse</Link></li>
+            <li><Link to="/feed" style={{ textDecoration: 'none', fontWeight: 'bold', fontSize: '0.9rem', color: isActive('/feed') ? '#4ade80' : '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}><Clapperboard size={18}/> Global Feed</Link></li>
+          </>
+        )}
       </ul>
 
-      <div className="user-profile-nav">
-        <img src={user.avatar} alt={user.name} />
-        <span className="name">{user.name}</span>
-        <button onClick={handleLogout} style={{background: 'none', border: 'none', cursor: 'pointer', marginLeft: '15px'}} title="Logout">
-          <LogOut size={20} color="var(--text-muted)" />
+      <div className="user-profile-nav" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <Link to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: 'white' }}>
+            <img src={user?.avatar} alt={user?.name} style={{ width: '40px', height: '40px', borderRadius: '50%', border: '2px solid #0ca6a6', objectFit: 'cover' }} />
+            <div style={{display:'flex', flexDirection:'column'}}>
+                <span className="name" style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{user?.name}</span>
+                <span style={{fontSize:'0.65rem', color:'#4ade80', fontWeight:'900', textTransform:'uppercase'}}>{user?.role === 'ngo' ? 'MANAGER' : user?.role?.toUpperCase()}</span>
+            </div>
+        </Link>
+        <button onClick={handleLogout} style={{background: 'none', border: 'none', cursor: 'pointer', marginLeft: '10px'}} title="Logout">
+          <LogOut size={20} color="#94a3b8" />
         </button>
       </div>
     </nav>
   );
 };
 
-// Wrapper allowing hooks down the active tree layer natively
-const MainNavigation = ({ user, handleLogout }) => {
-    return <TopNavbar user={user} handleLogout={handleLogout} />;
-};
-
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('token') ? true : false;
-  });
-  const [activeOpps, setActiveOpps] = useState(initialOpps);
-  const [applications, setApplications] = useState([]);
-  
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    try {
+      const u = localStorage.getItem('user');
+      return u ? JSON.parse(u) : null;
+    } catch { return null; }
   });
+
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [showSplash, setShowSplash] = useState(true);
+  const [activeCamps, setActiveCamps] = useState([]);
+  const [dashboardData, setDashboardData] = useState(null);
+  const [userApplications, setUserApplications] = useState([]);
+  
+  useEffect(() => {
+    if (isAuthenticated) fetchCampaigns();
+  }, [isAuthenticated, user?.role]);
+
+  const fetchCampaigns = () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const headers = { 'Authorization': `Bearer ${token}` };
+      
+      fetch('http://localhost:5003/api/campaigns', { headers })
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setActiveCamps(data); })
+        .catch(err => console.error(err));
+
+      fetch('http://localhost:5003/api/applications/manage', { headers })
+        .then(res => res.json())
+        .then(data => { if (Array.isArray(data)) setUserApplications(data); })
+        .catch(err => console.error(err));
+
+      if (user?.role === 'admin') {
+          fetch('http://localhost:5003/api/admin/stats', { headers })
+            .then(res => res.json())
+            .then(data => setDashboardData(data))
+            .catch(err => console.error(err));
+      }
+    }
+  };
 
   const handleLogin = (loggedUser, token) => {
     localStorage.setItem('token', token);
@@ -70,28 +114,55 @@ function App() {
     setIsAuthenticated(false);
   };
 
+  if (!isAuthenticated && showSplash) {
+      return <IntroSplash onComplete={() => setShowSplash(false)} />;
+  }
+
   return (
-    <Router>
-      {!isAuthenticated ? (
-        <Routes>
-          <Route path="*" element={<Auth onLogin={handleLogin} />} />
-        </Routes>
-      ) : (
-        <div className="app-container">
-          <MainNavigation user={user} handleLogout={handleLogout} />
-          <main className="main-content">
-            <Routes>
-              <Route path="/" element={<Dashboard user={user} applications={applications} opportunities={activeOpps} />} />
-              <Route path="/opportunities" element={<OpportunitiesBrowser opportunities={activeOpps} />} />
-              <Route path="/opportunities/:id" element={<OpportunityDetail user={user} setUser={setUser} opportunities={activeOpps} applications={applications} setApplications={setApplications} />} />
-              <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
-              <Route path="/ngo-portal" element={<NGOPortal opportunities={activeOpps} setOpportunities={setActiveOpps} />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
+    <div className="app-container" style={{ minHeight: '100vh', background: '#090f1d' }}>
+      {isAuthenticated ? (
+        <>
+          <TopNavbar user={user} handleLogout={handleLogout} />
+          <main className="main-content" style={{ padding: '40px' }}>
+            <div className="content-container" style={{ maxWidth: '1300px', margin: '0 auto' }}>
+              <Routes>
+                  {user?.role === 'admin' && (
+                      <>
+                        <Route path="/admin-dashboard" element={<AdminDashboard user={user} stats={dashboardData} refreshData={fetchCampaigns} />} />
+                        <Route path="/campaign-portal" element={<CampaignPortal user={user} refreshCamps={fetchCampaigns} />} />
+                        <Route path="/campaigns" element={<CampaignBrowser campaigns={activeCamps} />} />
+                        <Route path="/feed" element={<CampaignDiscover campaigns={activeCamps} user={user} />} />
+                        <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
+                        <Route path="*" element={<Navigate to="/admin-dashboard" />} />
+                      </>
+                  )}
+
+                  {user?.role === 'ngo' && (
+                      <>
+                        <Route path="/campaign-portal" element={<CampaignPortal user={user} campaigns={activeCamps} refreshCamps={fetchCampaigns} />} />
+                        <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
+                        <Route path="*" element={<Navigate to="/campaign-portal" />} />
+                      </>
+                  )}
+
+                  {user?.role === 'volunteer' && (
+                      <>
+                        <Route path="/campaigns" element={<CampaignBrowser campaigns={activeCamps} />} />
+                        <Route path="/feed" element={<CampaignDiscover campaigns={activeCamps} user={user} />} />
+                        <Route path="/campaigns/:id" element={<CampaignDetail user={user} setUser={setUser} campaigns={activeCamps} applications={userApplications} setApplications={setUserApplications} />} />
+                        <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
+                        <Route path="*" element={<Navigate to="/feed" />} />
+                      </>
+                  )}
+                  {!user?.role && <Route path="*" element={<button onClick={handleLogout}>Reset Session</button>} />}
+              </Routes>
+            </div>
           </main>
-        </div>
+        </>
+      ) : (
+        <Auth onLogin={handleLogin} />
       )}
-    </Router>
+    </div>
   );
 }
 

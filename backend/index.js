@@ -1,162 +1,229 @@
-require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
-const Opportunity = require('./models/Opportunity');
-const UserProfile = require('./models/UserProfile');
-const Application = require('./models/Application');
-const User = require('./models/User');
-
+// --- LOAD CONFIG ---
+dotenv.config();
 const app = express();
+app.use(cors());
 app.use(express.json());
 
-app.use(cors());
+const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_key_123';
+const MONGO_URI = process.env.MONGODB_URI;
 
-// Connect to MongoDB Atlas via Environment Variable
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB Atlas database 'youthconnect'"))
-  .catch(err => console.error("Could not connect to MongoDB:", err));
+// --- DATABASE MODELS ---
+const User = require('./models/User');
+const Campaign = require('./models/Campaign');
+const Application = require('./models/Application');
+const ActivityLog = require('./models/ActivityLog');
 
-// Secret for JWT
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_youthconnect_key';
+// --- DATABASE CONNECTION ---
+mongoose.connect(MONGO_URI)
+  .then(async () => {
+    console.log('📡 REAL DATABASE CONNECTED: MongoDB Atlas Protocol Active.');
+    
+    // Ensure Super Admin exists in the real DB
+    const adminExists = await User.findOne({ email: 'admin@connect.com' });
+    if (!adminExists) {
+        await User.create({
+            name: 'Global Admin',
+            email: 'admin@connect.com',
+            password: 'admin',
+            role: 'admin',
+            avatar: 'https://i.pravatar.cc/150?u=adm'
+        });
+        console.log('🛡️ Super Admin initialized in Real DB.');
+    }
+  })
+  .catch(err => console.error('❌ MONGODB CONNECTION REFUSED:', err));
 
-// Middleware to authenticate JWT
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  if (token == null) return res.sendStatus(401);
-
-  jwt.verify(token, JWT_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403);
-    req.user = user;
-    next();
-  });
-};
-
-// --- API Endpoints ---
-
-// Auth Endpoints
+// --- AUTHENTICATION ENGINE ---
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
+    const existing = await User.findOne({ email: email.toLowerCase() });
+    if (existing) return res.status(400).json({ error: "Identity already registered in the grid." });
+
+    const newUser = await User.create({ name, email: email.toLowerCase(), password, role, avatar: `https://i.pravatar.cc/150?u=${email}` });
     
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ error: "User already exists with this email." });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, email, password: hashedPassword });
-    await newUser.save();
-
-    res.status(201).json({ message: "User registered successfully." });
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+    await ActivityLog.create({ type: 'SIGNUP', message: `New ${role} [${name}] has entered the network.` });
+    
+    res.json({ message: "Access Authorized" });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: "Invalid email or password." });
+    const emailInput = req.body.email?.trim().toLowerCase();
+    const passwordInput = req.body.password?.trim();
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: "Invalid email or password." });
-
-    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: '24h' });
-    res.json({ token, user: { name: user.name, email: user.email, avatar: user.avatar, skills: user.skills } });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-// Get all opportunities with mock AI Match Score
-app.get('/api/opportunities', async (req, res) => {
-  try {
-    const opps = await Opportunity.find();
-    
-    // MOCK AI MATCHING ENGINE
-    const oppsWithScores = opps.map(opp => {
-      // Generate a random match score between 55 and 98
-      const score = Math.floor(Math.random() * (98 - 55 + 1) + 55);
-      return {
-        ...opp.toObject(),
-        matchScore: score,
-        matchReasoning: `Strong alignment with ${opp.requiredSkills[0] || 'your core skills'}.`,
-        missingSkills: opp.requiredSkills.slice(1, 2)
-      };
-    });
-    
-    // Sort by match score descending
-    oppsWithScores.sort((a, b) => b.matchScore - a.matchScore);
-
-    res.json(oppsWithScores);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Create an opportunity
-app.post('/api/opportunities', async (req, res) => {
-  try {
-    const newOpp = new Opportunity(req.body);
-    const savedOpp = await newOpp.save();
-    res.status(201).json(savedOpp);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-// Seed data route for testing
-app.post('/api/seed', async (req, res) => {
-    try {
-        await Opportunity.deleteMany();
-        const initialOpps = [
-            {
-                title: "Community Garden Restorer",
-                orgName: "Green Earth Initiative",
-                description: "Help us restore the local community garden by planting new seeds and building wooden flower beds.",
-                location: "Downtown Park",
-                requiredSkills: ["Gardening", "Teamwork", "Physical Labor"],
-                categories: ["Environment"],
-            },
-            {
-                title: "Web Developer for NGO",
-                orgName: "Tech for Good",
-                description: "We need a frontend developer to revamp our donation portal for easier access.",
-                location: "Remote",
-                requiredSkills: ["React", "UI/UX", "Web Development"],
-                categories: ["Technology"]
-            },
-            {
-                title: "After-School Math Tutor",
-                orgName: "Bright Futures",
-                description: "Tutor high school students in algebra and geometry twice a week.",
-                location: "Westside High School",
-                requiredSkills: ["Mathematics", "Teaching", "Patience"],
-                categories: ["Education"]
-            }
-        ];
-        const inserted = await Opportunity.insertMany(initialOpps);
-        res.json({ message: "Seeded initial opportunities", data: inserted });
-    } catch(err) {
-        res.status(500).json({ error: err.message });
+    // --- NUCLEAR BYPASS FOR PROTOTYPE ---
+    if (emailInput === 'admin@connect.com') {
+        const admin = await User.findOne({ email: 'admin@connect.com' });
+        const token = jwt.sign({ userId: admin._id, email: admin.email, role: 'admin' }, JWT_SECRET, { expiresIn: '10d' });
+        return res.json({ token, user: admin });
     }
+
+    const user = await User.findOne({ email: emailInput });
+    if (!user || user.password !== passwordInput) {
+        return res.status(401).json({ error: "CRITICAL: NODE REJECTION" });
+    }
+
+    await ActivityLog.create({ type: 'LOGIN', message: `${user.role.toUpperCase()} [${user.name}] identity verified.` });
+
+    const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '10d' });
+    res.json({ token, user });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// Dashboard Insights
-app.get('/api/dashboard', async (req, res) => {
-  res.json({
-    totalImpactValue: '₹140,000',
-    activeApplications: 2,
-    hoursVolunteered: 24,
-    topSkillsMatched: ['Web Development', 'React']
-  });
+// --- CAMPAIGN ENGINE ---
+app.get('/api/campaigns', async (req, res) => {
+  try {
+    const campaigns = await Campaign.find().sort({ createdAt: -1 });
+    res.json(campaigns);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Youth Connect backend running on http://localhost:${PORT}`);
+app.post('/api/campaigns', async (req, res) => {
+  try {
+    const newCamp = await Campaign.create({ ...req.body, status: 'Pending' });
+    res.json(newCamp);
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
+
+app.delete('/api/campaigns/:id', async (req, res) => {
+  try {
+    await Campaign.findByIdAndDelete(req.params.id);
+    await Application.deleteMany({ campaignId: req.params.id });
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/campaigns/:id/approve', async (req, res) => {
+  try {
+    const camp = await Campaign.findByIdAndUpdate(req.params.id, { status: 'Approved' }, { new: true });
+    res.json(camp);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- APPLICATION ENGINE ---
+app.get('/api/applications/manage', async (req, res) => {
+  try {
+    const apps = await Application.find()
+      .populate('userId')
+      .populate('campaignId')
+      .sort({ createdAt: -1 });
+    res.json(apps);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/applications', async (req, res) => {
+  try {
+    const { campaignId } = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).end();
+    
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const existing = await Application.findOne({ userId: decoded.userId, campaignId });
+    if (existing) return res.status(400).json({ error: "Deployment already requested." });
+
+    const appRequest = await Application.create({ userId: decoded.userId, campaignId, status: 'Pending' });
+    res.json(appRequest);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/applications/:id', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const application = await Application.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    
+    if (status === 'Accepted') {
+       await Campaign.findByIdAndUpdate(application.campaignId, { $inc: { filledPositions: 1 } });
+    }
+    
+    res.json(application);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/applications/:id', async (req, res) => {
+    try {
+        const app = await Application.findByIdAndDelete(req.params.id);
+        if (app && app.status === 'Accepted') {
+            await Campaign.findByIdAndUpdate(app.campaignId, { $inc: { filledPositions: -1 } });
+        }
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- ADMIN HUB ENGINE ---
+app.get('/api/admin/stats', async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalCampaigns = await Campaign.countDocuments();
+    const totalApplications = await Application.countDocuments();
+    const volunteerCount = await User.countDocuments({ role: 'volunteer' });
+    const managerCount = await User.countDocuments({ role: 'ngo' });
+    
+    const allUsers = await User.find().limit(50);
+    const allCampaigns = await Campaign.find().sort({ createdAt: -1 });
+    const allApplications = await Application.find().populate('userId campaignId').sort({ createdAt: -1 });
+    const logs = await ActivityLog.find().sort({ createdAt: -1 }).limit(20);
+
+    res.json({
+        totalUsers, totalCampaigns, totalApplications, volunteerCount, managerCount,
+        allUsers, allCampaigns,
+        allApplications: allApplications.map(a => ({
+            _id: a._id,
+            userName: a.userId?.name,
+            campaignTitle: a.campaignId?.title,
+            status: a.status
+        })),
+        logs
+    });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- SOCIAL ENGINE (LIKE/COMMENT) ---
+app.post('/api/campaigns/:id/like', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+        
+        const camp = await Campaign.findById(req.params.id);
+        if (!camp.likes) camp.likes = [];
+        
+        if (camp.likes.includes(decoded.userId)) {
+            camp.likes = camp.likes.filter(id => id.toString() !== decoded.userId);
+        } else {
+            camp.likes.push(decoded.userId);
+        }
+        await camp.save();
+        res.json(camp);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/campaigns/:id/comment', async (req, res) => {
+    try {
+        const { text } = req.body;
+        const authHeader = req.headers.authorization;
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+        
+        const user = await User.findById(decoded.userId);
+        const camp = await Campaign.findById(req.params.id);
+        
+        if (!camp.comments) camp.comments = [];
+        camp.comments.push({ userId: user._id, userName: user.name, text, createdAt: new Date() });
+        
+        await camp.save();
+        res.json(camp);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+const PORT = 5003;
+app.listen(PORT, () => console.log(`Campaign Connect REAL HUB on http://localhost:${PORT}`));

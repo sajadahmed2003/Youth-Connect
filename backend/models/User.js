@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema({
   skills: {
     type: [String],
     default: []
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin', 'volunteer', 'ngo'],
+    default: 'volunteer'
   }
 }, { timestamps: true });
 

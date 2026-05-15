@@ -23,7 +23,7 @@ const CampaignDetail = ({ user, campaigns, applications, setApplications }) => {
   const handleApply = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://youth-connect-backend.onrender.com/api/applications', {
+      const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/applications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

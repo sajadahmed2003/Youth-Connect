@@ -20,7 +20,7 @@ const Profile = ({ user, setUser }) => {
   const fetchMyCampaigns = async () => {
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch('https://youth-connect-backend.onrender.com/api/my-campaigns', {
+        const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/my-campaigns', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {

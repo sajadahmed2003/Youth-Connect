@@ -16,7 +16,7 @@ const Auth = ({ onLogin }) => {
     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
 
     try {
-      const res = await fetch(`http://localhost:5003${endpoint}`, {
+      const res = await fetch(`https://youth-connect-backend.onrender.com${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(isLogin ? { email: formData.email, password: formData.password } : { ...formData, role })

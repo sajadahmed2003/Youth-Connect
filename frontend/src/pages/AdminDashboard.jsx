@@ -15,7 +15,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
   const handleApproveCampaign = async (id) => {
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5003/api/admin/campaigns/${id}`, {
+        const res = await fetch(`https://youth-connect-backend.onrender.com/api/admin/campaigns/${id}`, {
             method: 'PUT',
             headers: { 
                 'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
     if(!window.confirm("Verify: Permanently purge this campaign?")) return;
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5003/api/admin/campaigns/${id}`, {
+        const res = await fetch(`https://youth-connect-backend.onrender.com/api/admin/campaigns/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });

@@ -54,7 +54,7 @@ const TopNavbar = ({ user, handleLogout, applications, setApplications }) => {
     try {
         const token = localStorage.getItem('token');
         for (const app of unreadNotifications) {
-            await fetch(`http://localhost:5003/api/applications/${app._id}`, {
+            await fetch(`https://youth-connect-backend.onrender.com/api/applications/${app._id}`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -172,18 +172,18 @@ function App() {
     if (token) {
       const headers = { 'Authorization': `Bearer ${token}` };
       
-      fetch('http://localhost:5003/api/campaigns', { headers })
+      fetch('https://youth-connect-backend.onrender.com/api/campaigns', { headers })
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setActiveCamps(data); })
         .catch(err => console.error(err));
 
-      fetch('http://localhost:5003/api/applications/manage', { headers })
+      fetch('https://youth-connect-backend.onrender.com/api/applications/manage', { headers })
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setUserApplications(data); })
         .catch(err => console.error(err));
 
       if (user?.role === 'admin') {
-          fetch('http://localhost:5003/api/admin/stats', { headers })
+          fetch('https://youth-connect-backend.onrender.com/api/admin/stats', { headers })
             .then(res => res.json())
             .then(data => setDashboardData(data))
             .catch(err => console.error(err));

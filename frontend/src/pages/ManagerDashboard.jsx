@@ -35,7 +35,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     if (!user) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5003/api/applications/manage', {
+      const res = await fetch('https://youth-connect-backend.onrender.com/api/applications/manage', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if(res.ok){
@@ -45,7 +45,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
         setProcessedApps(data.filter(a => ['Accepted', 'Rejected', 'Removed'].includes(a.status)));
       }
 
-      const resCamps = await fetch('http://localhost:5003/api/my-campaigns', {
+      const resCamps = await fetch('https://youth-connect-backend.onrender.com/api/my-campaigns', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if(resCamps.ok){
@@ -58,7 +58,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
   const handleAction = async (id, status) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5003/api/applications/${id}`, {
+      const res = await fetch(`https://youth-connect-backend.onrender.com/api/applications/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     if(!window.confirm("Remove user from campaign?")) return;
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5003/api/applications/${id}`, {
+        const res = await fetch(`https://youth-connect-backend.onrender.com/api/applications/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -92,7 +92,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     if(!window.confirm("Are you sure you want to delete this campaign permanently?")) return;
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5003/api/campaigns/${id}`, {
+        const res = await fetch(`https://youth-connect-backend.onrender.com/api/campaigns/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -114,7 +114,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     };
     
     try {
-      const res = await fetch('http://localhost:5003/api/campaigns', {
+      const res = await fetch('https://youth-connect-backend.onrender.com/api/campaigns', {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',

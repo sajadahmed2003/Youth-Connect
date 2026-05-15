@@ -19,7 +19,7 @@ const CommunityFeed = ({ user }) => {
 
   const fetchPosts = async () => {
     try {
-      const res = await fetch('http://localhost:5003/api/posts');
+      const res = await fetch('https://youth-connect-backend.onrender.com/api/posts');
       if (res.ok) {
         const data = await res.json();
         setPosts(data);
@@ -70,7 +70,7 @@ const CommunityFeed = ({ user }) => {
 
         // 2. Send data to our Node Backend
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:5003/api/posts', {
+        const res = await fetch('https://youth-connect-backend.onrender.com/api/posts', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ const CommunityFeed = ({ user }) => {
   const handleLike = async (id) => {
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5003/api/posts/${id}/like`, {
+        const res = await fetch(`https://youth-connect-backend.onrender.com/api/posts/${id}/like`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -108,7 +108,7 @@ const CommunityFeed = ({ user }) => {
     if (!window.confirm('Are you sure you want to delete this post?')) return;
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5003/api/posts/${id}`, {
+        const res = await fetch(`https://youth-connect-backend.onrender.com/api/posts/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });

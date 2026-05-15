@@ -18,7 +18,7 @@ const VolunteerHome = ({ user }) => {
 
   const fetchCampaigns = async () => {
     try {
-      const res = await fetch('http://localhost:5003/api/campaigns');
+      const res = await fetch('https://youth-connect-backend.onrender.com/api/campaigns');
       if (res.ok) {
         const data = await res.json();
         setCampaigns(data);
@@ -40,7 +40,7 @@ const VolunteerHome = ({ user }) => {
     ];
     const token = localStorage.getItem('token');
     for (const d of demos) {
-      await fetch('http://localhost:5003/api/campaigns', {
+      await fetch('https://youth-connect-backend.onrender.com/api/campaigns', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ...d, categories: [d.category] })
@@ -59,7 +59,7 @@ const VolunteerHome = ({ user }) => {
     const token = localStorage.getItem('token');
     if(!token) { alert('Please login first.'); navigate('/auth'); return; }
     try {
-        const res = await fetch('http://localhost:5003/api/applications', {
+        const res = await fetch('https://youth-connect-backend.onrender.com/api/applications', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ campaignId: camp._id })
@@ -78,7 +78,7 @@ const VolunteerHome = ({ user }) => {
     e.preventDefault();
     setContactStatus('Sending...');
     try {
-        const res = await fetch('http://localhost:5003/api/contact', {
+        const res = await fetch('https://youth-connect-backend.onrender.com/api/contact', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(contactForm)

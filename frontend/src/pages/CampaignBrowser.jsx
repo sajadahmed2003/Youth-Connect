@@ -20,8 +20,8 @@ const CampaignBrowser = ({ campaigns }) => {
       
       {/* 🔮 TACTICAL SEARCH HEADER */}
       <div className="cyber-card" style={{ padding: '50px', marginBottom: '50px', background: 'linear-gradient(135deg, rgba(12, 166, 166, 0.05) 0%, rgba(9, 15, 29, 0.2) 100%)', border: '1px solid rgba(12, 166, 166, 0.2)' }}>
-        <h1 style={{ fontSize: '3rem', fontWeight: '900', color: 'white', marginBottom: '20px', letterSpacing: '-1px' }}>GLOBAL <span style={{ color: '#0ca6a6' }}>SEARCH</span></h1>
-        <p style={{ color: '#94a3b8', fontSize: '1.2rem', marginBottom: '40px' }}>Filter through the impact grid to find your next mission node.</p>
+        <h1 style={{ fontSize: '3rem', fontWeight: '900', color: 'white', marginBottom: '20px', letterSpacing: '-1px' }}>BROWSE <span style={{ color: '#0ca6a6' }}>CAMPAIGNS</span></h1>
+        <p style={{ color: '#94a3b8', fontSize: '1.2rem', marginBottom: '40px' }}>Find local opportunities and make an impact in your community.</p>
         
         <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
           <div style={{ position: 'relative' }}>
@@ -30,7 +30,7 @@ const CampaignBrowser = ({ campaigns }) => {
               type="text" 
               className="cyber-input" 
               style={{ width: '100%', paddingLeft: '60px', height: '60px', fontSize: '1.1rem' }} 
-              placeholder="Query by title or location..." 
+              placeholder="Search by title or location..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -49,7 +49,7 @@ const CampaignBrowser = ({ campaigns }) => {
         </div>
       </div>
 
-      {/* 🛰️ MISSION NODE GRID */}
+      {/* 🛰️ CAMPAIGN GRID */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '30px' }}>
         {filteredCamps.map(camp => (
           <div key={camp._id} className="cyber-card" style={{ padding: '0', cursor: 'default' }}>
@@ -84,7 +84,7 @@ const CampaignBrowser = ({ campaigns }) => {
 
                 <Link to={`/campaigns/${camp._id}`} style={{ textDecoration: 'none' }}>
                     <button className="cyber-card" style={{ width: '100%', padding: '15px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(12, 166, 166, 0.3)', color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: '0.3s', cursor: 'pointer' }}>
-                        ACTIVATE NODE <ArrowRight size={18} color="#4ade80" />
+                        VIEW DETAILS <ArrowRight size={18} color="#4ade80" />
                     </button>
                 </Link>
             </div>
@@ -94,8 +94,8 @@ const CampaignBrowser = ({ campaigns }) => {
         {filteredCamps.length === 0 && (
           <div style={{ gridColumn: '1 / -1', padding: '100px', textAlign: 'center' }}>
             <Zap size={50} color="#ef4444" style={{ marginBottom: '20px' }} />
-            <h2 style={{ color: 'white', letterSpacing: '2px' }}>NO NODES DETECTED</h2>
-            <p style={{ color: '#94a3b8' }}>Adjust your tactical filters and scan again.</p>
+            <h2 style={{ color: 'white', letterSpacing: '2px' }}>NO CAMPAIGNS FOUND</h2>
+            <p style={{ color: '#94a3b8' }}>Try adjusting your filters and search again.</p>
           </div>
         )}
       </div>

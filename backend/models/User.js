@@ -29,6 +29,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['user', 'admin', 'volunteer', 'ngo'],
     default: 'volunteer'
+  },
+  campaignsJoined: {
+    type: Number,
+    default: 0
+  },
+  campaignsCompleted: {
+    type: Number,
+    default: 0
+  },
+  campaignsPosted: {
+    type: Number,
+    default: 0
   }
 }, { timestamps: true });
 

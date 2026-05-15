@@ -231,3 +231,74 @@ body {
 .animate-float {
   animation: float 6s infinite ease-in-out;
 }
+
+/* RESPONSIVE DESIGN (MOBILE FRIENDLY) */
+@media (max-width: 768px) {
+  .top-navbar {
+    padding: 15px !important;
+    height: auto !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+    justify-content: center !important;
+  }
+
+  .nav-links {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    width: 100%;
+  }
+
+  .nav-links li {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .main-content {
+    padding: 20px 15px !important;
+  }
+
+  /* Force all inline grids to become single column on mobile */
+  [style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  /* Reduce padding on cards for mobile screens */
+  .cyber-card {
+    padding: 20px !important;
+  }
+
+  /* Adjust typography for smaller screens */
+  h1 {
+    font-size: 1.8rem !important;
+  }
+  
+  h2 {
+    font-size: 1.3rem !important;
+  }
+  
+  p, span, div {
+    font-size: 0.95rem;
+  }
+
+  /* Profile and nav elements */
+  .user-profile-nav {
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .logo-container {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Fix absolute positioned modal popups */
+  [style*="position: fixed"][style*="background: rgba(0,0,0,0.85)"] > div {
+    width: 95% !important;
+    padding: 20px !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+}

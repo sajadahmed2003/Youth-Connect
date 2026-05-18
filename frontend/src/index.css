@@ -254,6 +254,10 @@ body {
     text-align: center;
   }
 
+  input, textarea, select {
+    max-width: 100% !important;
+  }
+
   .main-content {
     padding: 20px 15px !important;
   }

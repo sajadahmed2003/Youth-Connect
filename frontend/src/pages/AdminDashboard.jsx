@@ -83,7 +83,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
       {activeTab === 'overview' && (
         <>
             {/* 📊 CORE TELEMETRY */}
-            <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '25px', marginBottom: '40px'}}>
+            <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '25px', marginBottom: '40px'}}>
                 {[
                     { label: 'TOTAL USERS', val: stats.totalUsers, icon: <Users/>, col: '#0ca6a6' },
                     { label: 'TOTAL CAMPAIGNS', val: stats.totalCampaigns, icon: <Megaphone/>, col: '#4ade80' },
@@ -98,7 +98,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
                 ))}
             </div>
 
-            <div style={{display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '30px'}}>
+            <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: '30px'}}>
                 <div className="cyber-card" style={{ padding: '35px' }}>
                     <h2 style={{ fontSize: '1.2rem', marginBottom: '25px', display: 'flex', alignItems: 'center', gap: '12px', color: 'white', letterSpacing: '2px' }}>
                         <Zap size={22} color="#4ade80" /> RECENT ACTIVITY (Signups/Logins)
@@ -141,7 +141,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
       {activeTab === 'users' && (
           <div className="cyber-card" style={{ padding: '40px' }}>
               <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '15px', color: 'white', marginBottom: '40px' }}><UserCheck size={28} color="#0ca6a6"/> REGISTERED USERS</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+              <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
                   {stats.allUsers?.map(u => (
                       <div key={u._id} onClick={() => setSelectedUser(u)} style={{ background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '15px', cursor: 'pointer' }}>
                            <img src={u.avatar} style={{ width: '45px', height: '45px', borderRadius: '50%', border: '2px solid #0ca6a6' }} />
@@ -192,7 +192,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
       {activeTab === 'apps' && (
           <div className="cyber-card" style={{ padding: '40px' }}>
               <h2 style={{ marginBottom: '40px', fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '15px', color: 'white' }}><ClipboardList size={28} color="#0ca6a6"/> EVERY JOIN REQUEST</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+              <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
                   {stats.allApplications?.map(app => (
                       <div key={app._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                          <div>
@@ -227,7 +227,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
                       <div style={{ color: '#0ca6a6', fontWeight: 'bold', fontSize: '0.8rem', marginTop: '5px', letterSpacing: '2px' }}>{(selectedUser.role || 'user').toUpperCase()}</div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+                  <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
                       <div style={{ background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: '12px', textAlign: 'center' }}>
                           <div style={{ color: '#0ca6a6', fontWeight: 'bold', fontSize: '1.2rem' }}>{selectedUser.campaignsJoined || 0}</div>
                           <div style={{ color: '#64748b', fontSize: '0.6rem', letterSpacing: '1px' }}>JOINED</div>

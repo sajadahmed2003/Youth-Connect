@@ -228,7 +228,7 @@ const VolunteerHome = ({ user }) => {
 
       {/* 📖 ABOUT SECTION */}
       <div id="about" style={{ padding: '120px 10%', background: '#0f172a', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
+        <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '80px', alignItems: 'center' }}>
           <div>
             <h2 style={{ fontSize: '3rem', fontWeight: '800', color: 'white', marginBottom: '30px' }}>Empowering the <span style={{ color: '#0ca6a6' }}>Next Generation</span></h2>
             <p style={{ color: '#94a3b8', fontSize: '1.2rem', lineHeight: '1.8', marginBottom: '40px' }}>
@@ -261,7 +261,7 @@ const VolunteerHome = ({ user }) => {
           <h2 style={{ fontSize: '3rem', fontWeight: '800', color: 'white', marginBottom: '20px' }}>Get In <span style={{ color: '#0ca6a6' }}>Touch</span></h2>
           <p style={{ color: '#64748b', fontSize: '1.2rem' }}>Have questions? Our team is here to help you start your journey.</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '60px' }}>
+        <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '60px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
             <div style={{ background: 'rgba(255,255,255,0.02)', padding: '30px', borderRadius: '24px', border: '1px solid rgba(255,255,255,0.05)' }}>
               <Mail color="#0ca6a6" size={30} style={{ marginBottom: '15px' }} />
@@ -280,7 +280,7 @@ const VolunteerHome = ({ user }) => {
             </div>
           </div>
           <form onSubmit={handleContactSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <input type="text" placeholder="Your Name" required value={contactForm.name} onChange={e => setContactForm({...contactForm, name: e.target.value})} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px', color: 'white', outline: 'none' }} />
               <input type="email" placeholder="Your Email" required value={contactForm.email} onChange={e => setContactForm({...contactForm, email: e.target.value})} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '20px', borderRadius: '15px', color: 'white', outline: 'none' }} />
             </div>
@@ -296,7 +296,7 @@ const VolunteerHome = ({ user }) => {
 
       {/* 📍 FOOTER */}
       <footer style={{ background: 'white', borderTop: '1px solid #e2e8f0', padding: '100px 60px 60px 60px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '60px' }}>
+        <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '60px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '30px' }}>
               <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#0ca6a6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>

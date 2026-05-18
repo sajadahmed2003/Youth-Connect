@@ -98,7 +98,7 @@ const Profile = ({ user, setUser }) => {
         )}
       </div>
       
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px' }}>
+      <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px' }}>
           
           {/* identity Status Card */}
           <div className="cyber-card" style={{ padding: '40px', textAlign: 'center', height: 'fit-content' }}>
@@ -112,7 +112,7 @@ const Profile = ({ user, setUser }) => {
               </div>
               <hr style={{ margin: '30px 0', borderColor: 'rgba(255,255,255,0.05)' }} />
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '25px', textAlign: 'left' }}>
+              <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '25px', textAlign: 'left' }}>
                   <div style={{ background: 'rgba(255,255,255,0.02)', padding: '15px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <div style={{ fontSize: '2rem', fontWeight: '900', color: 'white' }}>{user.role === 'ngo' ? (user.campaignsPosted || 0) : (user.campaignsJoined || 0)}</div>
                       <div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 'bold' }}>{user.role === 'ngo' ? 'CAMPAIGNS POSTED' : 'CAMPAIGNS JOINED'}</div>
@@ -136,7 +136,7 @@ const Profile = ({ user, setUser }) => {
               
               <div style={{ textAlign: 'left' }}>
                   <div style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '15px' }}>ACHIEVEMENT BADGES</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
+                  <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px' }}>
                       {/* Badge Logic */}
                       {(user.campaignsJoined >= 1) ? (
                           <div title="Novice Volunteer: Joined 1st Campaign" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>

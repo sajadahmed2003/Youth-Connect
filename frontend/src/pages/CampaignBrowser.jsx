@@ -23,7 +23,7 @@ const CampaignBrowser = ({ campaigns }) => {
         <h1 style={{ fontSize: '3rem', fontWeight: '900', color: 'white', marginBottom: '20px', letterSpacing: '-1px' }}>BROWSE <span style={{ color: '#0ca6a6' }}>CAMPAIGNS</span></h1>
         <p style={{ color: '#94a3b8', fontSize: '1.2rem', marginBottom: '40px' }}>Find local opportunities and make an impact in your community.</p>
         
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
+        <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
           <div style={{ position: 'relative' }}>
             <Search style={{ position: 'absolute', left: '20px', top: '18px', color: '#0ca6a6' }} />
             <input 
@@ -50,7 +50,7 @@ const CampaignBrowser = ({ campaigns }) => {
       </div>
 
       {/* 🛰️ CAMPAIGN GRID */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '30px' }}>
+      <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '30px' }}>
         {filteredCamps.map(camp => (
           <div key={camp._id} className="cyber-card" style={{ padding: '0', cursor: 'default' }}>
             <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>

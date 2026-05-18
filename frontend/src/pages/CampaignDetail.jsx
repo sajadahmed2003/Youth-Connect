@@ -47,7 +47,7 @@ const CampaignDetail = ({ user, campaigns, applications, setApplications }) => {
             <ArrowLeft size={18}/> BACK TO BROWSE
         </button>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '50px' }}>
+        <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '50px' }}>
             
             {/* 📜 MISSION BRIEFING */}
             <div>

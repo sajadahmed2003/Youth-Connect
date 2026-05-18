@@ -102,7 +102,7 @@ const Auth = ({ onLogin }) => {
           {!isLogin && (
             <div style={{ marginBottom: '35px' }}>
               <div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 'bold', marginBottom: '15px', letterSpacing: '1px' }}>SECTOR CLEARANCE</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+              <div className="responsive-grid" className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div onClick={() => setRole('volunteer')} style={{ padding: '12px', textAlign: 'center', borderRadius: '10px', background: role === 'volunteer' ? 'rgba(12, 166, 166, 0.1)' : 'rgba(255,255,255,0.02)', border: `1px solid ${role === 'volunteer' ? '#0ca6a6' : 'rgba(255,255,255,0.05)'}`, color: role === 'volunteer' ? '#4ade80' : '#4b5563', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>VOLUNTEER</div>
                 <div onClick={() => setRole('ngo')} style={{ padding: '12px', textAlign: 'center', borderRadius: '10px', background: role === 'ngo' ? 'rgba(12, 166, 166, 0.1)' : 'rgba(255,255,255,0.02)', border: `1px solid ${role === 'ngo' ? '#0ca6a6' : 'rgba(255,255,255,0.05)'}`, color: role === 'ngo' ? '#4ade80' : '#4b5563', fontSize: '0.8rem', fontWeight: 'bold', cursor: 'pointer', transition: '0.3s' }}>MANAGER</div>
               </div>

@@ -171,7 +171,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
 
       {activeTab === 'dashboard' && (
           <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '40px' }}>
+              <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '40px' }}>
                   <div style={{ background: '#0f172a', borderRadius: '30px', padding: '40px', border: '1px solid rgba(255,255,255,0.05)' }}>
                       <h2 style={{ fontSize: '1.5rem', marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '15px' }}><Users color="#0ca6a6"/> VOLUNTEER MANAGEMENT</h2>
                       
@@ -218,7 +218,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
 
                       <div>
                           <h4 style={{ color: '#64748b', fontSize: '0.8rem', letterSpacing: '2px', marginBottom: '20px' }}>PERSONNEL & DECISIONS</h4>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
+                          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
                               {processedApps.length === 0 && <p style={{ color: '#475569', fontStyle: 'italic' }}>No decisions made yet.</p>}
                                {processedApps.map(app => (
                                    <div key={app._id} style={{ background: 'rgba(255,255,255,0.01)', padding: '20px 25px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -284,7 +284,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
       )}
 
       {activeTab === 'profile' && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', animation: 'fadeIn 0.5s ease-out' }}>
+          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', animation: 'fadeIn 0.5s ease-out' }}>
               <div style={{ background: '#0f172a', borderRadius: '30px', padding: '60px 40px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
                   <div style={{ position: 'relative', width: '180px', height: '180px', margin: '0 auto 30px auto' }}>
                       <img src={user.avatar} style={{ width: '100%', height: '100%', borderRadius: '50%', border: '4px solid #0ca6a6', padding: '10px' }} />
@@ -319,7 +319,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
 
       {activeTab === 'campaigns' && (
           <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', marginBottom: '60px' }}>
+              <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', marginBottom: '60px' }}>
                   <div style={{ background: '#0f172a', borderRadius: '30px', padding: '40px', border: '1px solid rgba(12, 166, 166, 0.2)', height: 'fit-content' }}>
                       <h2 style={{ fontSize: '1.4rem', fontWeight: '900', marginBottom: '30px', color: '#0ca6a6' }}>LAUNCH NEW CAMPAIGN</h2>
                       {success && <div style={{ background: 'rgba(74, 222, 128, 0.1)', color: '#4ade80', padding: '15px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #4ade80', fontSize: '0.8rem' }}>CAMPAIGN POSTED: AWAITING ADMIN APPROVAL</div>}
@@ -336,7 +336,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
                               <input type="text" placeholder="Enter Custom Category" required value={customCategory} onChange={e => setCustomCategory(e.target.value)} style={{ width: '100%', background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white', outline: 'none' }} />
                           )}
                           <textarea placeholder="Description..." rows="4" required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} style={{ background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white', resize: 'none' }}></textarea>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                               <input type="number" placeholder="Spots" required value={formData.neededPositions} onChange={e => setFormData({...formData, neededPositions: e.target.value})} style={{ background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white' }} />
                               <input type="text" placeholder="Location" required value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} style={{ background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white' }} />
                           </div>

@@ -40,7 +40,7 @@ const contentData = {
         <p style={{lineHeight: '1.8', color: '#64748b', marginBottom: '30px'}}>
           See how the Youth Connect community is changing the world, one campaign at a time.
         </p>
-        <div style={{display: 'grid', gridTemplateColumns: '1fr', gap: '20px'}}>
+        <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px'}}>
           <div style={{padding: '30px', background: '#fff', border: '1px solid #e2e8f0', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.02)'}}>
             <p style={{fontStyle: 'italic', color: '#475569', marginBottom: '20px'}}>"Thanks to Youth Connect, our Ocean Cleanup drive got 50+ volunteers in just two days. The energy was incredible!"</p>
             <div style={{fontWeight: 'bold', color: '#0ca6a6'}}>- Sarah Jenkins, Environmental NGO</div>

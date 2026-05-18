@@ -106,7 +106,7 @@ const TopNavbar = ({ user, handleLogout, applications, setApplications }) => {
 
             {showNotifications && (
                 <div style={{ position: 'absolute', top: '50px', right: '0', width: '320px', background: '#0f172a', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)', padding: '20px', zIndex: 2000 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                    <div className="responsive-flex-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                         <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'white' }}>Campaign Updates</h4>
                         <button onClick={markAllRead} style={{ background: 'none', border: 'none', color: '#0ca6a6', fontSize: '0.7rem', cursor: 'pointer', fontWeight: 'bold' }}>Mark all read</button>
                     </div>

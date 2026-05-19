@@ -117,7 +117,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
           <h1 style={{ fontSize: '4.5rem', fontWeight: '900', marginBottom: '24px', letterSpacing: '-2px', textShadow: '0 20px 40px rgba(0,0,0,0.3)' }}>Join Ongoing <span style={{ color: '#4ade80' }}>Campaigns</span></h1>
           <p style={{ fontSize: '1.4rem', color: '#94a3b8', maxWidth: '800px', margin: '0 auto 60px auto', lineHeight: '1.6' }}>Discover opportunities to volunteer, connect with global NGOs, and make a real tangible impact in society today.</p>
           
-          <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', background: 'white', padding: '10px', borderRadius: '80px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
+          <div className="search-container" style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', background: 'white', padding: '10px', borderRadius: '80px', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
             <div style={{ display: 'flex', alignItems: 'center', padding: '0 30px', flex: 1 }}>
               <Search size={22} color="#0ca6a6" style={{ marginRight: '15px' }} />
               <input 
@@ -134,7 +134,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
       </div>
 
       {/* 🧬 FILTERS */}
-      <div style={{ padding: '60px 60px 0 60px', display: 'flex', justifyContent: 'center', gap: '15px' }}>
+      <div className="filters-container" style={{ padding: '60px 60px 0 60px', display: 'flex', justifyContent: 'center', gap: '15px' }}>
         {categories.map(cat => (
           <button 
             key={cat}

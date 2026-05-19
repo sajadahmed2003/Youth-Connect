@@ -319,7 +319,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
             {/* Impact 2 */}
             <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
                 <div style={{ order: 1 }}>
-                    <img src="https://images.unsplash.com/photo-1618477461853-cf6ed80fbfc9?auto=format&fit=crop&q=80&w=1000" alt="Ocean Cleanup" style={{ width: '100%', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.05)' }} />
+                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=1000" alt="Ocean Cleanup" style={{ width: '100%', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.05)' }} />
                 </div>
                 <div style={{ order: 2 }}>
                     <h3 style={{ color: 'white', fontSize: '2.5rem', fontWeight: '900', marginBottom: '20px' }}>Massive <span style={{ color: '#0ca6a6' }}>Ocean Cleanup</span></h3>

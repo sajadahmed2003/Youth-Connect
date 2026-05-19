@@ -231,7 +231,7 @@ function App() {
 
                   {user?.role === 'ngo' && (
                       <>
-                        <Route path="/home" element={<VolunteerHome user={user} />} />
+                        <Route path="/home" element={<VolunteerHome user={user} applications={userApplications} setApplications={setUserApplications} />} />
                         <Route path="/campaign-portal" element={<ManagerDashboard user={user} campaigns={activeCamps} refreshCamps={fetchCampaigns} />} />
                         <Route path="/feed" element={<CommunityFeed user={user} />} />
                         <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />
@@ -241,7 +241,7 @@ function App() {
 
                   {user?.role === 'volunteer' && (
                       <>
-                        <Route path="/home" element={<VolunteerHome user={user} />} />
+                        <Route path="/home" element={<VolunteerHome user={user} applications={userApplications} setApplications={setUserApplications} />} />
                         <Route path="/feed" element={<CommunityFeed campaigns={activeCamps} user={user} />} />
                         <Route path="/campaigns/:id" element={<CampaignDetail user={user} setUser={setUser} campaigns={activeCamps} applications={userApplications} setApplications={setUserApplications} />} />
                         <Route path="/profile" element={<Profile user={user} setUser={setUser} />} />

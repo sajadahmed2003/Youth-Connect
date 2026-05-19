@@ -196,8 +196,8 @@ app.get('/api/applications/manage', async (req, res) => {
     let apps;
     if (decoded.role === 'admin') {
       apps = await Application.find().populate('userId campaignId').sort({ createdAt: -1 });
-    } else {
-      // Find campaigns created by this manager (using ID or Name for fallback)
+    } else if (decoded.role === 'ngo') {
+      // Find campaigns created by this manager
       const myCampaignIds = await Campaign.find({ 
           $or: [
               { creatorId: decoded.userId },
@@ -205,6 +205,9 @@ app.get('/api/applications/manage', async (req, res) => {
           ]
       }).distinct('_id');
       apps = await Application.find({ campaignId: { $in: myCampaignIds } }).populate('userId campaignId').sort({ createdAt: -1 });
+    } else {
+      // Volunteer: fetch applications submitted by them
+      apps = await Application.find({ userId: decoded.userId }).populate('campaignId').sort({ createdAt: -1 });
     }
     res.json(apps);
   } catch (err) { res.status(500).json({ error: err.message }); }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Tag, Filter, Globe, Zap, ArrowRight, Target, CheckCircle, X, Mail, Phone, ShieldCheck, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const VolunteerHome = ({ user }) => {
+const VolunteerHome = ({ user, applications = [], setApplications }) => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
@@ -65,6 +65,8 @@ const VolunteerHome = ({ user }) => {
             body: JSON.stringify({ campaignId: camp._id })
         });
         if(res.ok) {
+            const newApp = await res.json();
+            if (setApplications) setApplications([...applications, newApp]);
             setSelectedCamp(camp);
             setShowModal(true);
         } else {
@@ -151,7 +153,7 @@ const VolunteerHome = ({ user }) => {
       </div>
 
       {/* 📦 CAMPAIGN GRID */}
-      <div id="campaigns" style={{ padding: '60px' }}>
+      <div id="campaigns" style={{ padding: '60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
         {campaigns.length === 0 && (
             <div style={{ textAlign: 'center', gridColumn: '1/-1', padding: '100px' }}>
                 <p style={{ color: '#1e293b', fontSize: '1.2rem', marginBottom: '20px' }}>No live campaigns found.</p>
@@ -174,7 +176,9 @@ const VolunteerHome = ({ user }) => {
                 )}
             </div>
         )}
-        {filtered.map(camp => (
+        {filtered.map(camp => {
+          const myApp = applications?.find(app => (app.campaignId?._id === camp._id || app.campaignId === camp._id));
+          return (
           <div key={camp._id} className="premium-campaign-card" style={{ 
             background: 'white', 
             borderRadius: '30px', 
@@ -199,31 +203,50 @@ const VolunteerHome = ({ user }) => {
               </div>
               <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: '1.8', marginBottom: '40px', flex: 1 }}>{camp.description || camp.desc}</p>
               
-              <button 
-                onClick={() => handleJoin(camp)}
-                style={{ 
+              {myApp ? (
+                <div style={{ 
                   width: '100%', 
                   padding: '20px', 
-                  background: '#f1f5f9', 
-                  border: 'none', 
+                  background: myApp.status === 'Accepted' ? 'rgba(74, 222, 128, 0.1)' : 'rgba(245, 158, 11, 0.1)', 
+                  border: `1px solid ${myApp.status === 'Accepted' ? 'rgba(74, 222, 128, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`, 
                   borderRadius: '20px', 
-                  color: '#1e293b', 
+                  color: myApp.status === 'Accepted' ? '#4ade80' : '#f59e0b', 
                   fontWeight: '900', 
                   fontSize: '1rem', 
-                  cursor: 'pointer', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
-                  gap: '12px',
-                  transition: '0.3s'
-                }}
-                className="join-btn-hover"
-              >
-                JOIN NOW <ArrowRight size={20} color="#0ca6a6" />
-              </button>
+                  gap: '12px' 
+                }}>
+                  <CheckCircle size={20} /> {myApp.status === 'Pending' ? 'REQUEST SENT' : myApp.status.toUpperCase()}
+                </div>
+              ) : (
+                <button 
+                  onClick={() => handleJoin(camp)}
+                  style={{ 
+                    width: '100%', 
+                    padding: '20px', 
+                    background: '#f1f5f9', 
+                    border: 'none', 
+                    borderRadius: '20px', 
+                    color: '#1e293b', 
+                    fontWeight: '900', 
+                    fontSize: '1rem', 
+                    cursor: 'pointer', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    gap: '12px',
+                    transition: '0.3s'
+                  }}
+                  className="join-btn-hover"
+                >
+                  JOIN NOW <ArrowRight size={20} color="#0ca6a6" />
+                </button>
+              )}
             </div>
           </div>
-        ))}
+        )})}
       </div>
 
       {/* 📖 ABOUT SECTION */}

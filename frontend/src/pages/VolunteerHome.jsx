@@ -9,8 +9,13 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
   const [campaigns, setCampaigns] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedCamp, setSelectedCamp] = useState(null);
+  const [expandedCards, setExpandedCards] = useState({});
   const [contactForm, setContactForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [contactStatus, setContactStatus] = useState('');
+
+  const toggleReadMore = (id) => {
+      setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   useEffect(() => {
     fetchCampaigns();
@@ -201,7 +206,21 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#64748b', fontSize: '0.9rem', marginBottom: '20px' }}>
                 <MapPin size={16} color="#0ca6a6" /> {camp.location}
               </div>
-              <p style={{ color: '#64748b', fontSize: '1rem', lineHeight: '1.8', marginBottom: '40px', flex: 1 }}>{camp.description || camp.desc}</p>
+              <div style={{ color: '#64748b', fontSize: '1rem', lineHeight: '1.8', marginBottom: '40px', flex: 1 }}>
+                {(camp.description || camp.desc || '').length > 150 ? (
+                  <>
+                    {expandedCards[camp._id] ? (camp.description || camp.desc) : `${(camp.description || camp.desc).substring(0, 150)}...`}
+                    <span 
+                      onClick={() => toggleReadMore(camp._id)} 
+                      style={{ color: '#0ca6a6', cursor: 'pointer', fontWeight: 'bold', marginLeft: '8px' }}
+                    >
+                      {expandedCards[camp._id] ? 'Show less' : 'Read more'}
+                    </span>
+                  </>
+                ) : (
+                  (camp.description || camp.desc)
+                )}
+              </div>
               
               {myApp ? (
                 <div style={{ 

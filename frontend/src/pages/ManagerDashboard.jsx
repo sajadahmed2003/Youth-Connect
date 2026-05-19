@@ -103,13 +103,27 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     } catch(err) { console.error(err); }
   };
 
+  const handleFileUpload = (e, type) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024 && type === 'videoUrl') {
+         alert("Warning: Video is large. It might take a while to upload.");
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, [type]: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
     const newCamp = {
       ...formData,
       creatorName: user.name,
-      requiredSkills: formData.skills.split(',').map(s => s.trim()).filter(Boolean),
+      requiredSkills: formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(Boolean) : [],
       categories: [formData.category === 'Others' ? customCategory : formData.category]
     };
     
@@ -125,7 +139,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
       
       if(res.ok) {
         setSuccess(true);
-        setFormData({title: '', category: 'Environment', location: '', description: '', skills: '', neededPositions: 10});
+        setFormData({title: '', category: 'Environment', location: '', description: '', skills: '', neededPositions: 10, image: '', videoUrl: ''});
         setCustomCategory('');
         fetchData();
         setTimeout(() => { setSuccess(false); }, 3000);
@@ -340,6 +354,20 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
                               <input type="number" placeholder="Spots" required value={formData.neededPositions} onChange={e => setFormData({...formData, neededPositions: e.target.value})} style={{ background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white' }} />
                               <input type="text" placeholder="Location" required value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} style={{ background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white' }} />
                           </div>
+                          
+                          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                              <div>
+                                  <label style={{ color: '#64748b', fontSize: '0.8rem', marginBottom: '8px', display: 'block', fontWeight: 'bold' }}>Upload Campaign Image (Required)</label>
+                                  <input type="file" required accept="image/*" onChange={(e) => handleFileUpload(e, 'image')} style={{ width: '100%', background: '#090f1d', border: '1px solid #1e293b', padding: '12px', borderRadius: '12px', color: 'white' }} />
+                              </div>
+                              <div>
+                                  <label style={{ color: '#64748b', fontSize: '0.8rem', marginBottom: '8px', display: 'block', fontWeight: 'bold' }}>Upload Campaign Video (Optional)</label>
+                                  <input type="file" accept="video/*" onChange={(e) => handleFileUpload(e, 'videoUrl')} style={{ width: '100%', background: '#090f1d', border: '1px solid #1e293b', padding: '12px', borderRadius: '12px', color: 'white' }} />
+                              </div>
+                          </div>
+
+                          {formData.image && <img src={formData.image} alt="Preview" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '12px', border: '1px solid #0ca6a6' }} />}
+                          
                           <button type="submit" style={{ width: '100%', padding: '18px', background: 'linear-gradient(90deg, #0ca6a6 0%, #4ade80 100%)', border: 'none', borderRadius: '15px', color: 'white', fontWeight: '900', cursor: 'pointer' }}>POST CAMPAIGN</button>
                       </form>
                   </div>
@@ -348,19 +376,26 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
                       <h2 style={{ fontSize: '1.5rem', marginBottom: '30px', color: '#94a3b8' }}>MY CAMPAIGNS</h2>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
                           {myCampaigns.map(camp => (
-                              <div key={camp._id} style={{ background: '#0f172a', borderRadius: '24px', padding: '30px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-                                      <h3 style={{ margin: 0, fontSize: '1.3rem' }}>{camp.title}</h3>
-                                      <button onClick={() => handleDeleteCampaign(camp._id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}><Trash2 size={18}/></button>
-                                  </div>
-                                  <div style={{ marginBottom: '20px' }}>
-                                      <span style={{ padding: '5px 12px', borderRadius: '8px', fontSize: '0.65rem', fontWeight: 'bold', background: camp.status === 'Approved' ? '#0ca6a61a' : '#f59e0b1a', color: camp.status === 'Approved' ? '#0ca6a6' : '#f59e0b', border: `1px solid ${camp.status === 'Approved' ? '#0ca6a633' : '#f59e0b33'}` }}>{(camp.status || 'Pending').toUpperCase()}</span>
-                                  </div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                      <div style={{ flex: 1, height: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', overflow: 'hidden' }}>
-                                          <div style={{ height: '100%', width: `${(camp.filledPositions/camp.neededPositions)*100}%`, background: '#0ca6a6', boxShadow: '0 0 10px #0ca6a6' }}></div>
+                              <div key={camp._id} style={{ background: '#0f172a', borderRadius: '24px', padding: '30px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '20px' }}>
+                                  {camp.image ? (
+                                      <img src={camp.image} style={{ width: '120px', height: '120px', borderRadius: '15px', objectFit: 'cover' }} alt={camp.title} />
+                                  ) : (
+                                      <div style={{ width: '120px', height: '120px', borderRadius: '15px', background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.7rem', textAlign: 'center', padding: '10px' }}>No Image</div>
+                                  )}
+                                  <div style={{ flex: 1 }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                                          <h3 style={{ margin: 0, fontSize: '1.3rem' }}>{camp.title}</h3>
+                                          <button onClick={() => handleDeleteCampaign(camp._id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', padding: '5px' }}><Trash2 size={18}/></button>
                                       </div>
-                                      <span style={{ fontWeight: 'bold', color: '#0ca6a6' }}>{Math.round((camp.filledPositions/camp.neededPositions)*100)}%</span>
+                                      <div style={{ marginBottom: '15px' }}>
+                                          <span style={{ padding: '5px 12px', borderRadius: '8px', fontSize: '0.65rem', fontWeight: 'bold', background: camp.status === 'Approved' ? '#0ca6a61a' : '#f59e0b1a', color: camp.status === 'Approved' ? '#0ca6a6' : '#f59e0b', border: `1px solid ${camp.status === 'Approved' ? '#0ca6a633' : '#f59e0b33'}` }}>{(camp.status || 'Pending').toUpperCase()}</span>
+                                      </div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                          <div style={{ flex: 1, height: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', overflow: 'hidden' }}>
+                                              <div style={{ height: '100%', width: `${(camp.filledPositions/camp.neededPositions)*100}%`, background: '#0ca6a6', boxShadow: '0 0 10px #0ca6a6' }}></div>
+                                          </div>
+                                          <span style={{ fontWeight: 'bold', color: '#0ca6a6' }}>{Math.round((camp.filledPositions/camp.neededPositions)*100)}%</span>
+                                      </div>
                                   </div>
                               </div>
                           ))}

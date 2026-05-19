@@ -10,6 +10,7 @@ const campaignSchema = new mongoose.Schema({
   categories: [{ type: String }],
   neededPositions: { type: Number, default: 10 },
   filledPositions: { type: Number, default: 0 },
+  image: { type: String, default: '' },
   videoUrl: { type: String, default: '' },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   comments: [{

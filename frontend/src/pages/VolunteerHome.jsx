@@ -278,6 +278,60 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
         </div>
       </div>
 
+      {/* 🌟 IMPACT GALLERY SECTION */}
+      <div id="impact" style={{ padding: '120px 10%', background: '#090f1d' }}>
+        <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+          <h2 style={{ fontSize: '3rem', fontWeight: '900', color: 'white', marginBottom: '20px' }}>Our <span style={{ color: '#0ca6a6' }}>Real Impact</span></h2>
+          <p style={{ color: '#64748b', fontSize: '1.2rem', maxWidth: '800px', margin: '0 auto' }}>Witness the powerful transformations happening across the globe through the dedicated efforts of our Youth Connect volunteers.</p>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '80px' }}>
+            {/* Impact 1 */}
+            <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
+                <div>
+                    <h3 style={{ color: 'white', fontSize: '2.5rem', fontWeight: '900', marginBottom: '20px' }}>Empowering <span style={{ color: '#4ade80' }}>Rural Education</span></h3>
+                    <p style={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: '1.8' }}>We believe education is a fundamental right, not a privilege. Our volunteers have successfully established over 50 pop-up learning centers in remote villages, providing foundational education, digital literacy, and creative arts workshops to thousands of underprivileged children.</p>
+                </div>
+                <div>
+                    <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&q=80&w=1000" alt="Rural Education" style={{ width: '100%', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.05)' }} />
+                </div>
+            </div>
+
+            {/* Impact 2 */}
+            <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
+                <div style={{ order: 1 }}>
+                    <img src="https://images.unsplash.com/photo-1618477461853-cf6ed80fbfc9?auto=format&fit=crop&q=80&w=1000" alt="Ocean Cleanup" style={{ width: '100%', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.05)' }} />
+                </div>
+                <div style={{ order: 2 }}>
+                    <h3 style={{ color: 'white', fontSize: '2.5rem', fontWeight: '900', marginBottom: '20px' }}>Massive <span style={{ color: '#0ca6a6' }}>Ocean Cleanup</span></h3>
+                    <p style={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: '1.8' }}>Plastic pollution threatens our marine life. Through our coordinated weekend beach cleanup drives, volunteers have successfully removed over 10,000 lbs of plastic waste from coastlines, sorting and sending recyclables to processing plants to protect our oceans.</p>
+                </div>
+            </div>
+
+            {/* Impact 3 */}
+            <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
+                <div>
+                    <h3 style={{ color: 'white', fontSize: '2.5rem', fontWeight: '900', marginBottom: '20px' }}>Urban <span style={{ color: '#4ade80' }}>Tree Plantation</span></h3>
+                    <p style={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: '1.8' }}>Combating climate change starts locally. Our environmental action squads have planted over 25,000 native tree saplings across urban concrete jungles, improving air quality, reducing heat islands, and bringing nature back to our cities.</p>
+                </div>
+                <div>
+                    <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1000" alt="Tree Plantation" style={{ width: '100%', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.05)' }} />
+                </div>
+            </div>
+
+            {/* Impact 4 */}
+            <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
+                <div style={{ order: 1 }}>
+                    <img src="https://images.unsplash.com/photo-1593113580332-ce28859942ff?auto=format&fit=crop&q=80&w=1000" alt="Food Drive" style={{ width: '100%', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.05)' }} />
+                </div>
+                <div style={{ order: 2 }}>
+                    <h3 style={{ color: 'white', fontSize: '2.5rem', fontWeight: '900', marginBottom: '20px' }}>Community <span style={{ color: '#0ca6a6' }}>Food Drives</span></h3>
+                    <p style={{ color: '#94a3b8', fontSize: '1.15rem', lineHeight: '1.8' }}>No one should go to sleep hungry. Working alongside local food banks and NGOs, our rapid-response volunteer teams coordinate weekly food rescue operations, redirecting surplus food to homeless shelters and vulnerable families in the community.</p>
+                </div>
+            </div>
+        </div>
+      </div>
+
       {/* 📧 CONTACT SECTION */}
       <div id="contact" style={{ padding: '120px 10%', background: '#090f1d' }}>
         <div style={{ textAlign: 'center', marginBottom: '80px' }}>

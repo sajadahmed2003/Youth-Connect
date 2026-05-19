@@ -161,8 +161,13 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
               <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '15px', color: 'white', marginBottom: '40px' }}><Megaphone size={28} color="#0ca6a6"/> EVERY CAMPAIGN POSTED</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   {stats.allCampaigns?.map(camp => (
-                      <div key={camp._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                         <div>
+                      <div key={camp._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '20px', alignItems: 'center' }}>
+                         {camp.image ? (
+                             <img src={camp.image} style={{ width: '80px', height: '80px', borderRadius: '10px', objectFit: 'cover' }} alt={camp.title} />
+                         ) : (
+                             <div style={{ width: '80px', height: '80px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.6rem', textAlign: 'center', padding: '5px' }}>No Image</div>
+                         )}
+                         <div style={{ flex: 1 }}>
                             <div style={{ color: 'white', fontWeight: '800', fontSize: '1.1rem' }}>{camp.title}</div>
                              <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
                                 Posted by: 

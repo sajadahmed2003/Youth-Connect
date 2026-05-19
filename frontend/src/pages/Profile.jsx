@@ -210,8 +210,13 @@ const Profile = ({ user, setUser }) => {
                       <h3 style={{ fontSize: '1.2rem', marginBottom: '30px', color: 'white', letterSpacing: '1px' }}>POSTED CAMPAIGNS HISTORY</h3>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                           {myCampaigns.length > 0 ? myCampaigns.map(camp => (
-                              <div key={camp._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <div>
+                              <div key={camp._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '15px', alignItems: 'center' }}>
+                                  {camp.image ? (
+                                      <img src={camp.image} style={{ width: '60px', height: '60px', borderRadius: '10px', objectFit: 'cover' }} alt={camp.title} />
+                                  ) : (
+                                      <div style={{ width: '60px', height: '60px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.6rem', textAlign: 'center' }}>No Image</div>
+                                  )}
+                                  <div style={{ flex: 1 }}>
                                       <div style={{ color: 'white', fontWeight: 'bold' }}>{camp.title}</div>
                                       <div style={{ color: '#64748b', fontSize: '0.7rem' }}>{camp.location} • {new Date(camp.createdAt).toLocaleDateString()}</div>
                                   </div>

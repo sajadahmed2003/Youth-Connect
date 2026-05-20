@@ -43,7 +43,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
     <div className="admin-portal-cyber" style={{ animation: 'fadeIn 0.5s ease-out' }}>
       
       {/* 🌌 GLOBAL OVERRIDE HEADER */}
-      <div style={{ 
+      <div className="dashboard-header" style={{ 
           background: 'linear-gradient(90deg, #1e293b 0%, #0f172a 100%)', 
           borderRadius: '30px', 
           padding: '40px 50px', 
@@ -63,7 +63,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
             <p style={{color: 'var(--text-muted)', fontSize: '1rem', marginTop: '5px'}}>Manage Campaigns, Users, and Requests.</p>
         </div>
         
-        <div style={{ display: 'flex', gap: '10px', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)' }}>
             {['overview', 'users', 'campaigns', 'apps'].map(tab => (
                 <button 
                   key={tab}
@@ -161,12 +161,8 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
               <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '15px', color: 'white', marginBottom: '40px' }}><Megaphone size={28} color="#0ca6a6"/> EVERY CAMPAIGN POSTED</h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                   {stats.allCampaigns?.map(camp => (
-                      <div key={camp._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '20px', alignItems: 'center' }}>
-                         {camp.image ? (
-                             <img src={camp.image} style={{ width: '80px', height: '80px', borderRadius: '10px', objectFit: 'cover' }} alt={camp.title} />
-                         ) : (
-                             <div style={{ width: '80px', height: '80px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.6rem', textAlign: 'center', padding: '5px' }}>No Image</div>
-                         )}
+                      <div key={camp._id} className="responsive-flex-between" style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '20px', alignItems: 'center' }}>
+                         <img src={camp.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800'} style={{ width: '80px', height: '80px', borderRadius: '10px', objectFit: 'cover' }} alt={camp.title} />
                          <div style={{ flex: 1 }}>
                             <div style={{ color: 'white', fontWeight: '800', fontSize: '1.1rem' }}>{camp.title}</div>
                              <div style={{ color: '#94a3b8', fontSize: '0.85rem' }}>

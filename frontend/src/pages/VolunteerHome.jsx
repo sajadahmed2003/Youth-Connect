@@ -195,7 +195,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
             border: '1px solid rgba(0,0,0,0.02)'
           }}>
             <div style={{ position: 'relative', height: '260px', overflow: 'hidden' }}>
-              <img src={camp.image} alt={camp.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.6s' }} className="card-image-hover" />
+              <img src={camp.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800'} alt={camp.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.6s' }} className="card-image-hover" />
               <div style={{ position: 'absolute', top: '25px', left: '25px', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', padding: '8px 18px', borderRadius: '15px', fontWeight: '800', fontSize: '0.75rem', color: '#0ca6a6', letterSpacing: '1px' }}>
                 {(camp.categories?.[0] || 'GENERAL').toUpperCase()}
               </div>
@@ -222,7 +222,41 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
                 )}
               </div>
               
-              {myApp ? (
+              {user?.role === 'admin' ? (
+                <div style={{ 
+                  width: '100%', 
+                  padding: '20px', 
+                  background: 'rgba(12, 166, 166, 0.1)', 
+                  border: '1px solid rgba(12, 166, 166, 0.3)', 
+                  borderRadius: '20px', 
+                  color: '#0ca6a6', 
+                  fontWeight: '900', 
+                  fontSize: '1rem', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '12px' 
+                }}>
+                  ADMIN ACCESS ONLY
+                </div>
+              ) : user?.role === 'ngo' ? (
+                <div style={{ 
+                  width: '100%', 
+                  padding: '20px', 
+                  background: 'rgba(74, 222, 128, 0.1)', 
+                  border: '1px solid rgba(74, 222, 128, 0.3)', 
+                  borderRadius: '20px', 
+                  color: '#4ade80', 
+                  fontWeight: '900', 
+                  fontSize: '1rem', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '12px' 
+                }}>
+                  CAMPAIGN ORGANIZER
+                </div>
+              ) : myApp ? (
                 <div style={{ 
                   width: '100%', 
                   padding: '20px', 

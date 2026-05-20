@@ -340,15 +340,33 @@ body {
   }
 
   /* Profile and nav elements */
-  .user-profile-nav {
-    width: 100%;
-    justify-content: center;
-    margin-top: 10px;
+  .top-navbar {
+    height: auto !important;
+    padding: 20px !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+    align-items: center !important;
   }
-  
+
   .logo-container {
-    width: 100%;
-    justify-content: center;
+    width: 100% !important;
+    justify-content: center !important;
+    display: flex !important;
+  }
+
+  .nav-links {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 15px !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .user-profile-nav {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-top: 10px !important;
+    display: flex !important;
   }
 
   /* Fix absolute positioned modal popups */
@@ -358,4 +376,76 @@ body {
     max-height: 90vh !important;
     overflow-y: auto !important;
   }
+
+  /* Premium Dashboard & Admin Layout Mobile Responsiveness */
+  .manager-dashboard-premium,
+  .admin-portal-cyber,
+  .profile-cyber {
+    padding: 15px !important;
+    box-sizing: border-box !important;
+  }
+
+  .dashboard-header, .page-header {
+    flex-direction: column !important;
+    gap: 25px !important;
+    padding: 25px 20px !important;
+    border-radius: 20px !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .dashboard-header > div, .page-header > div {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 15px !important;
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  .dashboard-header button, .page-header button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Centered Notification Popup on Mobile */
+  .notification-popup {
+    position: fixed !important;
+    top: 90px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: 92% !important;
+    max-width: 350px !important;
+    box-sizing: border-box !important;
+    z-index: 9999 !important;
+  }
+}
+
+/* Premium Pill Navigation Styling (Global) */
+.nav-links li a,
+.nav-links li button {
+  text-decoration: none !important;
+  font-weight: 800 !important;
+  font-size: 0.85rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 20px !important;
+  border-radius: 30px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  box-sizing: border-box !important;
+}
+
+.nav-links li a:hover,
+.nav-links li button:hover {
+  background: rgba(12, 166, 166, 0.08) !important;
+  border-color: rgba(12, 166, 166, 0.3) !important;
+  color: #0ca6a6 !important;
+  transform: translateY(-2px) !important;
 }

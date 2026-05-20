@@ -68,7 +68,7 @@ const Profile = ({ user, setUser }) => {
 
   return (
     <div className="profile-cyber" style={{ animation: 'fadeIn 0.5s ease-out' }}>
-      <div className="page-header" style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="page-header dashboard-header" style={{ marginBottom: '40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: '900', color: 'white', margin: 0 }}>ACCOUNT <span style={{ color: branding.col }}>SETTINGS</span></h1>
         
         {/* 🔥 PROMINENT ACTION BUTTON */}
@@ -211,11 +211,7 @@ const Profile = ({ user, setUser }) => {
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                           {myCampaigns.length > 0 ? myCampaigns.map(camp => (
                               <div key={camp._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '20px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '15px', alignItems: 'center' }}>
-                                  {camp.image ? (
-                                      <img src={camp.image} style={{ width: '60px', height: '60px', borderRadius: '10px', objectFit: 'cover' }} alt={camp.title} />
-                                  ) : (
-                                      <div style={{ width: '60px', height: '60px', borderRadius: '10px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.6rem', textAlign: 'center' }}>No Image</div>
-                                  )}
+                                  <img src={camp.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800'} style={{ width: '60px', height: '60px', borderRadius: '10px', objectFit: 'cover' }} alt={camp.title} />
                                   <div style={{ flex: 1 }}>
                                       <div style={{ color: 'white', fontWeight: 'bold' }}>{camp.title}</div>
                                       <div style={{ color: '#64748b', fontSize: '0.7rem' }}>{camp.location} • {new Date(camp.createdAt).toLocaleDateString()}</div>

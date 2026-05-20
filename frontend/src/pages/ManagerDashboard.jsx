@@ -151,7 +151,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     <div className="manager-dashboard-premium" style={{ background: '#090f1d', minHeight: '100vh', padding: '40px', color: 'white', fontFamily: 'Inter, sans-serif' }}>
       
       {/* 🧭 PREMIUM NAVIGATION BAR */}
-      <div style={{ background: '#0f172a', borderRadius: '24px', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', border: '1px solid rgba(255,255,255,0.05)' }}>
+      <div className="dashboard-header" style={{ background: '#0f172a', borderRadius: '24px', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', border: '1px solid rgba(255,255,255,0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
               <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #0ca6a6 0%, #4ade80 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Zap size={24} fill="white" color="white" />
@@ -159,7 +159,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
               <span style={{ fontWeight: '900', letterSpacing: '1px' }}>YOUTH <span style={{ color: '#0ca6a6' }}>CONNECT</span></span>
           </div>
           
-          <div style={{ display: 'flex', gap: '30px' }}>
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
             {['dashboard', 'campaigns', 'profile'].map(tab => (
                 <button 
                   key={tab} 
@@ -195,7 +195,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                               {pendingApps.map(app => (
                                   <div key={app._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                      <div className="responsive-flex-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                                               <img src={app.userId?.avatar} style={{ width: '60px', height: '60px', borderRadius: '50%', border: '2px solid #0ca6a6', padding: '3px' }} />
                                               <div>
@@ -376,11 +376,11 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
                       <h2 style={{ fontSize: '1.5rem', marginBottom: '30px', color: '#94a3b8' }}>MY CAMPAIGNS</h2>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
                           {myCampaigns.map(camp => (
-                              <div key={camp._id} style={{ background: '#0f172a', borderRadius: '24px', padding: '30px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '20px' }}>
+                              <div key={camp._id} className="responsive-flex-between" style={{ background: '#0f172a', borderRadius: '24px', padding: '30px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '20px' }}>
                                   {camp.image ? (
                                       <img src={camp.image} style={{ width: '120px', height: '120px', borderRadius: '15px', objectFit: 'cover' }} alt={camp.title} />
                                   ) : (
-                                      <div style={{ width: '120px', height: '120px', borderRadius: '15px', background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', fontSize: '0.7rem', textAlign: 'center', padding: '10px' }}>No Image</div>
+                                      <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800" style={{ width: '120px', height: '120px', borderRadius: '15px', objectFit: 'cover' }} alt={camp.title} />
                                   )}
                                   <div style={{ flex: 1 }}>
                                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Heart, MessageCircle, Share2, Trash2, Send, Image as ImageIcon, MoreHorizontal } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { API_BASE } from '../config';
 
 const CLOUDINARY_UPLOAD_PRESET = 'pk1lq4vo'; // Unsigned preset from user
 const CLOUDINARY_CLOUD_NAME = 'dgdqw7ael'; // Updated from user
@@ -19,7 +20,7 @@ const CommunityFeed = ({ user }) => {
 
   const fetchPosts = async () => {
     try {
-      const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/posts');
+      const res = await fetch(`${API_BASE}/api/posts`);
       if (res.ok) {
         const data = await res.json();
         setPosts(data);
@@ -70,7 +71,7 @@ const CommunityFeed = ({ user }) => {
 
         // 2. Send data to our Node Backend
         const token = localStorage.getItem('token');
-        const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/posts', {
+        const res = await fetch(`${API_BASE}/api/posts`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ const CommunityFeed = ({ user }) => {
   const handleLike = async (id) => {
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`https://youth-connect-backend-6dn5.onrender.com/api/posts/${id}/like`, {
+        const res = await fetch(`${API_BASE}/api/posts/${id}/like`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -108,7 +109,7 @@ const CommunityFeed = ({ user }) => {
     if (!window.confirm('Are you sure you want to delete this post?')) return;
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`https://youth-connect-backend-6dn5.onrender.com/api/posts/${id}`, {
+        const res = await fetch(`${API_BASE}/api/posts/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });

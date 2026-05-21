@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Tag, Filter, Globe, Zap, ArrowRight, Target, CheckCircle, X, Mail, Phone, ShieldCheck, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE } from '../config';
 
 const VolunteerHome = ({ user, applications = [], setApplications }) => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
 
   const fetchCampaigns = async () => {
     try {
-      const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/campaigns');
+      const res = await fetch(`${API_BASE}/api/campaigns`);
       if (res.ok) {
         const data = await res.json();
         setCampaigns(data);
@@ -45,7 +46,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
     ];
     const token = localStorage.getItem('token');
     for (const d of demos) {
-      await fetch('https://youth-connect-backend-6dn5.onrender.com/api/campaigns', {
+      await fetch(`${API_BASE}/api/campaigns`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ ...d, categories: [d.category] })
@@ -64,7 +65,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
     const token = localStorage.getItem('token');
     if(!token) { alert('Please login first.'); navigate('/auth'); return; }
     try {
-        const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/applications', {
+        const res = await fetch(`${API_BASE}/api/applications`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
             body: JSON.stringify({ campaignId: camp._id })
@@ -85,7 +86,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
     e.preventDefault();
     setContactStatus('Sending...');
     try {
-        const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/contact', {
+        const res = await fetch(`${API_BASE}/api/contact`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(contactForm)

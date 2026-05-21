@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, ShieldCheck, Zap, ArrowRight, ArrowLeft, ShieldAlert } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const Auth = ({ onLogin }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -16,7 +17,7 @@ const Auth = ({ onLogin }) => {
     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
 
     try {
-      const res = await fetch(`https://youth-connect-backend-6dn5.onrender.com${endpoint}`, {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(isLogin ? { email: formData.email, password: formData.password } : { ...formData, role })

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Upload, ShieldCheck, User as UserIcon, Megaphone, Zap, Award, Star, Trophy, Target, Crown, PlusCircle } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const Profile = ({ user, setUser }) => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const Profile = ({ user, setUser }) => {
   const fetchMyCampaigns = async () => {
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/my-campaigns', {
+        const res = await fetch(`${API_BASE}/api/my-campaigns`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         if (res.ok) {
@@ -36,7 +37,7 @@ const Profile = ({ user, setUser }) => {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5002/api/profile', {
+      const response = await fetch(`${API_BASE}/api/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

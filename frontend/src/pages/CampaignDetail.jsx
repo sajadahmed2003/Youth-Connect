@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Target, MapPin, Users, Zap, ShieldCheck, ArrowLeft, MessageSquare, Briefcase, Star, Clapperboard, CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const CampaignDetail = ({ user, campaigns, applications, setApplications }) => {
   const { id } = useParams();
@@ -23,7 +24,7 @@ const CampaignDetail = ({ user, campaigns, applications, setApplications }) => {
   const handleApply = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/applications', {
+      const res = await fetch(`${API_BASE}/api/applications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

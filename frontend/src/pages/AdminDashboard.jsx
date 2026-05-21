@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Activity, Users, Megaphone, Target, ShieldCheck, Database, ClipboardList, UserCheck, ShieldAlert, Check, X, Server, Zap, Globe, Eye, UserPlus, LogIn } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const AdminDashboard = ({ user, stats, refreshData }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -15,7 +16,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
   const handleApproveCampaign = async (id) => {
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`https://youth-connect-backend-6dn5.onrender.com/api/admin/campaigns/${id}`, {
+        const res = await fetch(`${API_BASE}/api/admin/campaigns/${id}`, {
             method: 'PUT',
             headers: { 
                 'Content-Type': 'application/json',
@@ -31,7 +32,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
     if(!window.confirm("Verify: Permanently purge this campaign?")) return;
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`https://youth-connect-backend-6dn5.onrender.com/api/admin/campaigns/${id}`, {
+        const res = await fetch(`${API_BASE}/api/admin/campaigns/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });

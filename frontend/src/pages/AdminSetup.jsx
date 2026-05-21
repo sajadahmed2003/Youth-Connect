@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShieldAlert, Key } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const AdminSetup = () => {
   const [name, setName] = useState('');
@@ -13,7 +14,7 @@ const AdminSetup = () => {
   const handleSetup = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5002/api/auth/admin-seed', {
+      const response = await fetch(`${API_BASE}/api/auth/admin-seed`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, adminSecret })

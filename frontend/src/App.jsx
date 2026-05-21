@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
+import { API_BASE } from './config';
 import { 
   Users, Megaphone, Search, Clapperboard, 
   LayoutDashboard, LogOut, User as UserIcon, Zap, Bell, CheckCircle, XCircle, Trash2
@@ -54,7 +55,7 @@ const TopNavbar = ({ user, handleLogout, applications, setApplications }) => {
     try {
         const token = localStorage.getItem('token');
         for (const app of unreadNotifications) {
-            await fetch(`https://youth-connect-backend-6dn5.onrender.com/api/applications/${app._id}`, {
+            await fetch(`${API_BASE}/api/applications/${app._id}`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -172,18 +173,18 @@ function App() {
     if (token) {
       const headers = { 'Authorization': `Bearer ${token}` };
       
-      fetch('https://youth-connect-backend-6dn5.onrender.com/api/campaigns', { headers })
+      fetch(`${API_BASE}/api/campaigns`, { headers })
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setActiveCamps(data); })
         .catch(err => console.error(err));
 
-      fetch('https://youth-connect-backend-6dn5.onrender.com/api/applications/manage', { headers })
+      fetch(`${API_BASE}/api/applications/manage`, { headers })
         .then(res => res.json())
         .then(data => { if (Array.isArray(data)) setUserApplications(data); })
         .catch(err => console.error(err));
 
       if (user?.role === 'admin') {
-          fetch('https://youth-connect-backend-6dn5.onrender.com/api/admin/stats', { headers })
+          fetch(`${API_BASE}/api/admin/stats`, { headers })
             .then(res => res.json())
             .then(data => setDashboardData(data))
             .catch(err => console.error(err));

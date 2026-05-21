@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Megaphone, PlusCircle, CheckCircle, Users, Check, X, Trash2, TrendingUp, BarChart3, Calendar, ShieldCheck, Zap, Globe, MessageSquare, MapPin, Target, UserMinus, UserCheck } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { API_BASE } from '../config';
 
 const ManagerDashboard = ({ user, refreshCamps }) => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     if (!user) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/applications/manage', {
+      const res = await fetch(`${API_BASE}/api/applications/manage`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if(res.ok){
@@ -45,7 +46,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
         setProcessedApps(data.filter(a => ['Accepted', 'Rejected', 'Removed'].includes(a.status)));
       }
 
-      const resCamps = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/my-campaigns', {
+      const resCamps = await fetch(`${API_BASE}/api/my-campaigns`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if(resCamps.ok){
@@ -58,7 +59,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
   const handleAction = async (id, status) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://youth-connect-backend-6dn5.onrender.com/api/applications/${id}`, {
+      const res = await fetch(`${API_BASE}/api/applications/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +78,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     if(!window.confirm("Remove user from campaign?")) return;
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`https://youth-connect-backend-6dn5.onrender.com/api/applications/${id}`, {
+        const res = await fetch(`${API_BASE}/api/applications/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -92,7 +93,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     if(!window.confirm("Are you sure you want to delete this campaign permanently?")) return;
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`https://youth-connect-backend-6dn5.onrender.com/api/campaigns/${id}`, {
+        const res = await fetch(`${API_BASE}/api/campaigns/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -128,7 +129,7 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     };
     
     try {
-      const res = await fetch('https://youth-connect-backend-6dn5.onrender.com/api/campaigns', {
+      const res = await fetch(`${API_BASE}/api/campaigns`, {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',

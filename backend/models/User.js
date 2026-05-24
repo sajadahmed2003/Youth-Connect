@@ -19,7 +19,23 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: 'https://i.pravatar.cc/150?img=47' // Default mock avatar
+    default: 'https://i.pravatar.cc/150?img=47'
+  },
+  bio: {
+    type: String,
+    default: 'Active volunteer in the Youth Connect impact stream.'
+  },
+  phone: {
+    type: String,
+    default: ''
+  },
+  location: {
+    type: String,
+    default: ''
+  },
+  website: {
+    type: String,
+    default: ''
   },
   skills: {
     type: [String],
@@ -41,7 +57,19 @@ const userSchema = new mongoose.Schema({
   campaignsPosted: {
     type: Number,
     default: 0
-  }
+  },
+
+  // 🏆 PILLAR 5: Gamification Fields
+  points: {
+    type: Number,
+    default: 0
+  },
+  badges: [{
+    title: String,
+    icon: String,
+    category: String,
+    unlockedAt: { type: Date, default: Date.now }
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

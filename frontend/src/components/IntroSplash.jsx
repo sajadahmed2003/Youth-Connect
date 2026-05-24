@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Zap, ShieldCheck, Globe, Target, Cpu } from 'lucide-react';
 
 const IntroSplash = ({ onComplete }) => {
     const [phase, setPhase] = useState(0);
     const [visibleQuote, setVisibleQuote] = useState(0);
 
-    // Path to the image in the public folder
-    const logoPlate = "/mission_logos.png";
-
     const systemMessages = [
-        "Loading Youth Connect...",
-        "Connecting to database...",
-        "Fetching campaigns...",
-        "Welcome."
+        "Synchronizing Youth Connect Grid...",
+        "Establishing Secure Real Database Stream...",
+        "Fetching Active Campaigns...",
+        "System Ready. Welcome."
     ];
 
     const introQuotes = [
@@ -26,15 +22,15 @@ const IntroSplash = ({ onComplete }) => {
     useEffect(() => {
         const sysInterval = setInterval(() => {
             setPhase(prev => (prev < systemMessages.length - 1 ? prev + 1 : prev));
-        }, 1800);
+        }, 1200);
 
         const quoteInterval = setInterval(() => {
             setVisibleQuote(prev => (prev + 1) % introQuotes.length);
-        }, 2500);
+        }, 2200);
 
         const timer = setTimeout(() => {
             onComplete();
-        }, 9500);
+        }, 5500); // Optimized for faster cinematic load
 
         return () => {
             clearInterval(sysInterval);
@@ -45,103 +41,171 @@ const IntroSplash = ({ onComplete }) => {
 
     return (
         <div style={{
-            height: '100vh', width: '100%', background: '#060a13',
+            height: '100vh', width: '100%', background: '#ffffff', // Clean white background for light mode
             display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden', position: 'fixed', top: 0, left: 0, zIndex: 10000
+            overflow: 'hidden', position: 'fixed', top: 0, left: 0, zIndex: 10000,
+            fontFamily: 'var(--font-body)'
         }}>
 
-            {/* 🌌 DEEP SPACE BACKGROUND */}
-            <div className="neural-bg" style={{ position: 'absolute', inset: 0, opacity: 0.2, zIndex: 1 }}></div>
-
-            {/* 🛸 MASTER BRANDING CENTER */}
-            <div style={{ position: 'relative', width: '100%', maxWidth: '1000px', height: '600px', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-
-                {/* FLOATING HOLOGRAPHIC LOGO PLATES */}
-                <div className="animate-float" style={{ position: 'absolute', top: '5%', left: '10%', animationDelay: '0s' }}>
-                    <div style={{ width: '120px', height: '120px', overflow: 'hidden', borderRadius: '20px', border: '1px solid rgba(12,166,166,0.3)', boxShadow: '0 0 30px rgba(12,166,166,0.2)', background: 'rgba(0,0,0,0.5)' }}>
-                        <img src={logoPlate} style={{ width: '250%', transform: 'translate(-5%, -5%)' }} />
-                    </div>
-                    <div style={{ color: '#0ca6a6', fontSize: '0.6rem', textAlign: 'center', marginTop: '10px', fontWeight: 'bold', letterSpacing: '2px' }}>CORE</div>
-                </div>
-
-                <div className="animate-float" style={{ position: 'absolute', top: '60%', right: '10%', animationDelay: '1.5s' }}>
-                    <div style={{ width: '140px', height: '140px', overflow: 'hidden', borderRadius: '20px', border: '1px solid rgba(74,222,128,0.3)', boxShadow: '0 0 30px rgba(74,222,128,0.2)', background: 'rgba(0,0,0,0.5)' }}>
-                        <img src={logoPlate} style={{ width: '250%', transform: 'translate(-55%, -5%)' }} />
-                    </div>
-                    <div style={{ color: '#4ade80', fontSize: '0.6rem', textAlign: 'center', marginTop: '10px', fontWeight: 'bold', letterSpacing: '2px' }}>ECO</div>
-                </div>
-
-                <div className="animate-float" style={{ position: 'absolute', top: '15%', right: '15%', animationDelay: '0.8s' }}>
-                    <div style={{ width: '110px', height: '110px', overflow: 'hidden', borderRadius: '20px', border: '1px solid rgba(59,130,246,0.3)', boxShadow: '0 0 30px rgba(59,130,246,0.2)', background: 'rgba(0,0,0,0.5)' }}>
-                        <img src={logoPlate} style={{ width: '250%', transform: 'translate(-5%, -55%)' }} />
-                    </div>
-                    <div style={{ color: '#3b82f6', fontSize: '0.6rem', textAlign: 'center', marginTop: '10px', fontWeight: 'bold', letterSpacing: '2px' }}>HEALTH</div>
-                </div>
-
-                {/* Pulsating Hexagon Backframe */}
+            {/* 🌌 DYNAMIC LIGHT METEOR SHARDS IN THE BACKGROUND */}
+            <div className="bg-decor" style={{
+                position: 'absolute', width: '100%', height: '100%',
+                top: 0, left: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 1
+            }}>
                 <div style={{
-                    position: 'absolute', width: '380px', height: '380px',
-                    border: '1px solid rgba(12, 166, 166, 0.1)',
-                    borderRadius: '30px', transform: 'rotate(45deg)',
-                    animation: 'pulseScale 4s infinite ease-in-out'
+                    position: 'absolute', width: '350px', height: '350px',
+                    borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%)',
+                    top: '15%', left: '10%', animation: 'floatDecor 8s infinite alternate'
                 }} />
-
-                {/* MAIN LOGO NODE */}
-                <div className="animate-float" style={{ textAlign: 'center', zIndex: 10 }}>
-                    <Zap size={140} color="#0ca6a6" fill="#0ca6a6" style={{ filter: 'drop-shadow(0 0 50px #0ca6a6)', marginBottom: '15px' }} className="neon-flicker" />
-
-                    <div style={{ marginTop: '10px' }}>
-                        <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '1.1rem', fontWeight: '900', letterSpacing: '14px', textTransform: 'uppercase', marginBottom: '-5px' }}>YOUTH</div>
-                        <div className="neon-text-main" style={{
-                            color: 'white', fontSize: '5.5rem', fontWeight: '900', letterSpacing: '5px',
-                            textShadow: '0 0 10px #0ca6a6, 0 0 20px #0ca6a6, 0 0 50px #4ade80',
-                            animation: 'flicker 3s infinite alternate'
-                        }}>CONNECT</div>
-                    </div>
-                </div>
-
-                <div key={visibleQuote} style={{
-                    position: 'absolute', bottom: '-40px', width: '100%', textAlign: 'center',
-                    color: '#4ade80', fontSize: '1rem', fontWeight: '600', letterSpacing: '2px',
-                    fontFamily: 'inherit', animation: 'quoteIn 2.5s forwards', opacity: 0.8
-                }}>
-                    " {introQuotes[visibleQuote]} "
-                </div>
-
-                {/* EXTRA ORBITING DEBRIS */}
-                <div className="orbit-node" style={{ position: 'absolute', top: '75%', left: '5%', animation: 'float 3.5s infinite ease-in-out' }}><Cpu size={35} color="#f59e0b" /></div>
-                <div className="orbit-node" style={{ position: 'absolute', top: '5%', right: '40%', animation: 'float 6s infinite ease-in-out' }}><Target size={25} color="#ef4444" /></div>
+                <div style={{
+                    position: 'absolute', width: '300px', height: '300px',
+                    borderRadius: '50%', background: 'radial-gradient(circle, rgba(6,182,212,0.04) 0%, transparent 70%)',
+                    bottom: '15%', right: '10%', animation: 'floatDecor 10s infinite alternate-reverse'
+                }} />
             </div>
 
-            {/* 📑 SYSTEM STATUS BAR */}
-            <div style={{ zIndex: 3, marginTop: '120px', textAlign: 'center' }}>
-                <div style={{ color: '#0ca6a6', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '8px', textTransform: 'uppercase' }}>
-                    {systemMessages[phase]}
+            {/* 🛸 MASTER BRANDING PORTAL */}
+            <div className="splash-card" style={{
+                background: 'rgba(255, 255, 255, 0.75)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                borderRadius: '32px',
+                padding: '60px 80px',
+                border: '1px solid rgba(124, 58, 237, 0.12)',
+                boxShadow: '0 20px 60px rgba(124, 58, 237, 0.06), 0 0 0 1px rgba(124, 58, 237, 0.02)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 2,
+                position: 'relative',
+                animation: 'scaleInSplash 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
+            }}>
+
+                {/* LOGO GRID GROUP (MATCHING EXACTLY THE USER REQUESTED BRAND LOGO SCREENSHOT) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '28px', marginBottom: '36px' }}>
+                    {/* Rounded Purple lightning bolt icon */}
+                    <div style={{
+                        width: '90px',
+                        height: '90px',
+                        background: '#7c3aed', // Beautiful purple background from screenshot
+                        borderRadius: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 8px 30px rgba(124, 58, 237, 0.35)',
+                        animation: 'logoPopAndPulse 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) infinite alternate',
+                        position: 'relative'
+                    }}>
+                        {/* Glowing ring */}
+                        <div style={{
+                            position: 'absolute', inset: '-4px', borderRadius: '28px',
+                            border: '2px solid rgba(124, 58, 237, 0.3)',
+                            animation: 'expandRing 2.5s infinite ease-out'
+                        }} />
+                        
+                        {/* ⚡ lightning bolt */}
+                        <span style={{ 
+                            fontSize: '3rem', 
+                            transform: 'skewX(-10deg)', 
+                            color: '#facc15', 
+                            filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.18))',
+                            display: 'inline-block',
+                            animation: 'boltFlicker 3s infinite alternate'
+                        }}>⚡</span>
+                    </div>
+
+                    {/* Logo text side with animated mask slide-in */}
+                    <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.05', textAlign: 'left' }}>
+                        <span style={{
+                            fontFamily: 'var(--font-heading)',
+                            fontSize: '2.4rem',
+                            fontWeight: '900',
+                            color: '#0f172a', // Clean slate-900 for modern light mode
+                            letterSpacing: '1.5px',
+                            textTransform: 'uppercase',
+                            animation: 'slideRight 0.6s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both'
+                        }}>
+                            YOUTH
+                        </span>
+                        <span style={{
+                            fontFamily: 'var(--font-heading)',
+                            fontSize: '2.4rem',
+                            fontWeight: '900',
+                            color: '#06b6d4', // Premium cyan
+                            letterSpacing: '1.5px',
+                            textTransform: 'uppercase',
+                            animation: 'slideRight 0.6s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both'
+                        }}>
+                            CONNECT
+                        </span>
+                    </div>
                 </div>
-                <div style={{ width: '400px', height: '3px', background: 'rgba(255,255,255,0.03)', marginTop: '20px', borderRadius: '10px', overflow: 'hidden', padding: '1px' }}>
-                    <div style={{ height: '100%', width: `${((phase + 1) / systemMessages.length) * 100}%`, background: 'linear-gradient(90deg, #0ca6a6, #4ade80)', transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 0 20px #4ade80' }}></div>
+
+                {/* FLOATING TEXT BLOCK */}
+                <div key={visibleQuote} style={{
+                    minHeight: '44px',
+                    textAlign: 'center',
+                    color: '#64748b',
+                    fontSize: '0.95rem',
+                    fontWeight: '600',
+                    maxWidth: '400px',
+                    lineHeight: '1.5',
+                    animation: 'quoteInSplash 2.2s forwards'
+                }}>
+                    "{introQuotes[visibleQuote]}"
                 </div>
+
+                {/* 📑 PROGRESS LOADER */}
+                <div style={{ marginTop: '36px', width: '100%', maxWidth: '320px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <div style={{ color: '#94a3b8', fontSize: '0.72rem', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>
+                        {systemMessages[phase]}
+                    </div>
+                    <div style={{ width: '100%', height: '5px', background: 'rgba(0,0,0,0.04)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
+                        <div style={{
+                            height: '100%',
+                            width: `${((phase + 1) / systemMessages.length) * 100}%`,
+                            background: 'linear-gradient(90deg, #7c3aed, #06b6d4)',
+                            transition: 'width 0.6s ease-in-out',
+                            boxShadow: '0 0 10px rgba(6,182,212,0.4)'
+                        }}></div>
+                    </div>
+                </div>
+
             </div>
 
             <style>{`
-            @keyframes pulseScale {
-                0%, 100% { transform: rotate(45deg) scale(0.95); opacity: 0.1; }
-                50% { transform: rotate(45deg) scale(1.15); opacity: 0.25; }
-            }
-            @keyframes flicker {
-                0%, 18%, 22%, 25%, 53%, 57%, 100% { text-shadow: 0 0 10px #0ca6a6, 0 0 20px #0ca6a6, 0 0 40px #4ade80, 0 0 60px #0ca6a6; }
-                20%, 24%, 55% { text-shadow: none; opacity: 0.8; }
-            }
-            @keyframes quoteIn {
-                0% { opacity: 0; transform: translateY(15px); filter: blur(8px); }
-                20% { opacity: 1; transform: translateY(0); filter: blur(0); }
-                80% { opacity: 1; transform: translateY(0); filter: blur(0); }
-                100% { opacity: 0; transform: translateY(-15px); filter: blur(8px); }
-            }
-            .animate-float { animation: float 6s infinite ease-in-out; }
-            .neon-flicker { animation: flicker 4s infinite alternate; }
-            .orbit-node { opacity: 0.4; filter: blur(1px); }
-        `}</style>
+                @keyframes scaleInSplash {
+                    from { transform: scale(0.95); opacity: 0; filter: blur(4px); }
+                    to { transform: scale(1); opacity: 1; filter: blur(0); }
+                }
+                @keyframes logoPopAndPulse {
+                    0% { transform: scale(0.9) rotate(-3deg); }
+                    100% { transform: scale(1.05) rotate(3deg); }
+                }
+                @keyframes expandRing {
+                    0% { transform: scale(0.9); opacity: 0.8; }
+                    100% { transform: scale(1.2); opacity: 0; }
+                }
+                @keyframes boltFlicker {
+                    0%, 100% { filter: drop-shadow(0 2px 5px rgba(250, 204, 21, 0.4)); }
+                    50% { filter: drop-shadow(0 4px 15px rgba(250, 204, 21, 0.7)); }
+                }
+                @keyframes slideRight {
+                    from { transform: translateX(-20px); opacity: 0; filter: blur(4px); }
+                    to { transform: translateX(0); opacity: 1; filter: blur(0); }
+                }
+                @keyframes quoteInSplash {
+                    0% { opacity: 0; transform: translateY(8px); filter: blur(4px); }
+                    15% { opacity: 1; transform: translateY(0); filter: blur(0); }
+                    85% { opacity: 1; transform: translateY(0); filter: blur(0); }
+                    100% { opacity: 0; transform: translateY(-8px); filter: blur(4px); }
+                }
+                @keyframes floatDecor {
+                    0% { transform: translateY(0) scale(1); }
+                    100% { transform: translateY(-30px) scale(1.15); }
+                }
+            `}</style>
         </div>
     );
 };

@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Megaphone, PlusCircle, CheckCircle, Users, Check, X, Trash2, TrendingUp, BarChart3, Calendar, ShieldCheck, Zap, Globe, MessageSquare, MapPin, Target, UserMinus, UserCheck } from 'lucide-react';
+import { Megaphone, PlusCircle, CheckCircle, Users, Check, X, Trash2, BarChart3, ShieldCheck, Download, Award, TrendingUp, DollarSign, UserMinus } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { API_BASE } from '../config';
+import Profile from './Profile';
 
-const ManagerDashboard = ({ user, refreshCamps }) => {
+const ManagerDashboard = ({ user, setUser, refreshCamps }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  if(!user) return <div style={{padding: '100px', textAlign: 'center', color: 'white'}}>LOADING DASHBOARD...</div>;
+  
+  if(!user) return <div style={{padding: '100px', textAlign: 'center', color: 'var(--text-primary)'}}>LOADING DASHBOARD...</div>;
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [activeApps, setActiveApps] = useState([]);
   const [pendingApps, setPendingApps] = useState([]);
   const [processedApps, setProcessedApps] = useState([]);
   const [myCampaigns, setMyCampaigns] = useState([]);
-  const [profileData, setProfileData] = useState({ name: user?.name, email: user?.email, skills: '' });
   const [success, setSuccess] = useState(false);
   const [customCategory, setCustomCategory] = useState('');
   const [formData, setFormData] = useState({
@@ -22,7 +23,9 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     location: '',
     description: '',
     skills: '',
-    neededPositions: 10
+    neededPositions: 10,
+    targetAmount: 300000, // default funding target
+    fundingReason: ''
   });
 
   useEffect(() => {
@@ -54,6 +57,36 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
         setMyCampaigns(data);
       }
     } catch(err) { console.error(err); }
+  };
+
+  // 💎 PILLAR 4: CSV EXPORTER ENGINE
+  const handleExportCSV = () => {
+     if (activeApps.length === 0 && processedApps.length === 0) {
+        alert("No volunteer records found to export.");
+        return;
+     }
+
+     const headers = ["Volunteer Name", "Email", "Campaign Applied", "Status", "Skills", "Campaigns Joined Count", "Campaigns Completed Count"];
+     const rows = [...activeApps, ...processedApps].map(app => [
+        `"${app.userId?.name || 'N/A'}"`,
+        `"${app.userId?.email || 'N/A'}"`,
+        `"${app.campaignId?.title || 'N/A'}"`,
+        `"${app.status}"`,
+        `"${app.userId?.skills ? app.userId.skills.join(', ') : 'None'}"`,
+        app.userId?.campaignsJoined || 0,
+        app.userId?.campaignsCompleted || 0
+     ]);
+
+     const csvContent = "data:text/csv;charset=utf-8," 
+        + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+     
+     const encodedUri = encodeURI(csvContent);
+     const link = document.createElement("a");
+     link.setAttribute("href", encodedUri);
+     link.setAttribute("download", `YouthConnect_Volunteer_Report_${Date.now()}.csv`);
+     document.body.appendChild(link);
+     link.click();
+     document.body.removeChild(link);
   };
 
   const handleAction = async (id, status) => {
@@ -107,9 +140,6 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
   const handleFileUpload = (e, type) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024 && type === 'videoUrl') {
-         alert("Warning: Video is large. It might take a while to upload.");
-      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setFormData(prev => ({ ...prev, [type]: reader.result }));
@@ -125,7 +155,8 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
       ...formData,
       creatorName: user.name,
       requiredSkills: formData.skills ? formData.skills.split(',').map(s => s.trim()).filter(Boolean) : [],
-      categories: [formData.category === 'Others' ? customCategory : formData.category]
+      categories: [formData.category === 'Others' ? customCategory : formData.category],
+      targetAmount: Number(formData.targetAmount) || 300000
     };
     
     try {
@@ -136,11 +167,11 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
            'Authorization': `Bearer ${token}`
          },
          body: JSON.stringify(newCamp)
-      });
+       });
       
       if(res.ok) {
         setSuccess(true);
-        setFormData({title: '', category: 'Environment', location: '', description: '', skills: '', neededPositions: 10, image: '', videoUrl: ''});
+        setFormData({title: '', category: 'Environment', location: '', description: '', skills: '', neededPositions: 10, targetAmount: 300000, fundingReason: '', image: '', videoUrl: ''});
         setCustomCategory('');
         fetchData();
         setTimeout(() => { setSuccess(false); }, 3000);
@@ -148,270 +179,275 @@ const ManagerDashboard = ({ user, refreshCamps }) => {
     } catch(err) { console.error(err); }
   };
 
+  // Calculate Crowdfunding Stats dynamically
+  const totalFundsRaised = myCampaigns.reduce((sum, c) => sum + (c.raisedAmount || 0), 0);
+  const platformFeesSaaS = Math.round(totalFundsRaised * 0.035);
+
   return (
-    <div className="manager-dashboard-premium" style={{ background: '#090f1d', minHeight: '100vh', padding: '40px', color: 'white', fontFamily: 'Inter, sans-serif' }}>
+    <div className="manager-dashboard-premium" style={{ background: 'var(--bg-base)', minHeight: '100vh', padding: '40px 24px', color: 'var(--text-primary)', fontFamily: 'var(--font-body)' }}>
       
-      {/* 🧭 PREMIUM NAVIGATION BAR */}
-      <div className="dashboard-header" style={{ background: '#0f172a', borderRadius: '24px', padding: '20px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', border: '1px solid rgba(255,255,255,0.05)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #0ca6a6 0%, #4ade80 100%)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Zap size={24} fill="white" color="white" />
-              </div>
-              <span style={{ fontWeight: '900', letterSpacing: '1px' }}>YOUTH <span style={{ color: '#0ca6a6' }}>CONNECT</span></span>
+      {/* HEADER */}
+      <div className="dashboard-header" style={{ background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)', padding: '16px 36px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="logo-icon" style={{ width: '36px', height: '36px', fontSize: '1rem', background: '#7c3aed', color: 'white', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>⚡</div>
+              <span style={{ fontWeight: '900', letterSpacing: '0.5px', fontSize: '1rem' }}>YOUTH <span style={{ color: 'var(--accent)' }}>CONNECT</span></span>
           </div>
           
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
             {['dashboard', 'campaigns', 'profile'].map(tab => (
-                <button 
-                  key={tab} 
-                  onClick={() => setActiveTab(tab)}
-                  style={{ background: 'none', border: 'none', color: activeTab === tab ? '#0ca6a6' : '#94a3b8', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', transition: '0.3s' }}
-                >
-                    {tab === 'dashboard' && <BarChart3 size={18}/>}
-                    {tab === 'campaigns' && <Megaphone size={18}/>}
-                    {tab === 'profile' && <ShieldCheck size={18}/>}
-                    {tab.toUpperCase()}
-                </button>
+              <button 
+                key={tab} 
+                onClick={() => setActiveTab(tab)}
+                className="btn btn-ghost"
+                style={{ 
+                  background: activeTab === tab ? 'rgba(124, 58, 237, 0.12)' : 'transparent', 
+                  borderColor: activeTab === tab ? 'rgba(124, 58, 237, 0.25)' : 'transparent',
+                  color: activeTab === tab ? 'var(--text-accent)' : 'var(--text-secondary)',
+                  fontWeight: '700',
+                  padding: '8px 18px',
+                  borderRadius: 'var(--radius-full)'
+                }}
+              >
+                {tab.toUpperCase()}
+              </button>
             ))}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{user.name}</div>
-                  <div style={{ fontSize: '0.7rem', color: '#0ca6a6', fontWeight: '900' }}>MANAGER</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ textAlign: 'right', lineHeight: 1.2 }}>
+                  <div style={{ fontWeight: 'bold', fontSize: '0.88rem' }}>{user.name}</div>
+                  <div style={{ fontSize: '0.65rem', color: 'var(--primary-light)', fontWeight: '900', letterSpacing: '0.5px' }}>MANAGER</div>
               </div>
-              <img src={user.avatar} style={{ width: '45px', height: '45px', borderRadius: '50%', border: '2px solid #0ca6a6' }} />
+              <img src={user.avatar} style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid rgba(124, 58, 237, 0.5)', objectFit: 'cover' }} />
           </div>
       </div>
 
       {activeTab === 'dashboard' && (
-          <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
-              <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '40px' }}>
-                  <div style={{ background: '#0f172a', borderRadius: '30px', padding: '40px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                      <h2 style={{ fontSize: '1.5rem', marginBottom: '30px', display: 'flex', alignItems: 'center', gap: '15px' }}><Users color="#0ca6a6"/> VOLUNTEER MANAGEMENT</h2>
-                      
-                      <div style={{ marginBottom: '40px' }}>
-                          <h4 style={{ color: '#64748b', fontSize: '0.8rem', letterSpacing: '2px', marginBottom: '20px' }}>PENDING APPLICATIONS</h4>
-                          {pendingApps.length === 0 && <p style={{ color: '#475569', fontStyle: 'italic' }}>No pending requests.</p>}
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                              {pendingApps.map(app => (
-                                  <div key={app._id} style={{ background: 'rgba(255,255,255,0.02)', padding: '25px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                                      <div className="responsive-flex-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                                              <img src={app.userId?.avatar} style={{ width: '60px', height: '60px', borderRadius: '50%', border: '2px solid #0ca6a6', padding: '3px' }} />
-                                              <div>
-                                                  <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white' }}>{app.userId?.name}</div>
-                                                  <div style={{ fontSize: '0.85rem', color: '#0ca6a6', fontWeight: 'bold' }}>Applying for: {app.campaignId?.title}</div>
-                                                  <div style={{ display: 'flex', gap: '15px', marginTop: '10px' }}>
-                                                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: '#94a3b8', background: 'rgba(255,255,255,0.03)', padding: '4px 12px', borderRadius: '20px' }}>
-                                                          <Zap size={14} color="#0ca6a6" /> {app.userId?.campaignsJoined || 0} Joined
-                                                      </div>
-                                                      <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.75rem', color: '#94a3b8', background: 'rgba(255,255,255,0.03)', padding: '4px 12px', borderRadius: '20px' }}>
-                                                          <CheckCircle size={14} color="#4ade80" /> {app.userId?.campaignsCompleted || 0} Completed
-                                                      </div>
-                                                  </div>
-                                              </div>
-                                          </div>
-                                          <div style={{ display: 'flex', gap: '10px' }}>
-                                              <button onClick={() => handleAction(app._id, 'Accepted')} style={{ background: '#0ca6a6', color: 'white', border: 'none', padding: '10px 25px', borderRadius: '12px', fontWeight: '900', cursor: 'pointer', boxShadow: '0 10px 20px rgba(12, 166, 166, 0.2)' }}>APPROVE</button>
-                                              <button onClick={() => handleAction(app._id, 'Rejected')} style={{ background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '10px 25px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>REJECT</button>
-                                          </div>
-                                      </div>
-
-                                      <div style={{ padding: '15px 20px', background: 'rgba(12, 166, 166, 0.05)', borderRadius: '15px', border: '1px solid rgba(12, 166, 166, 0.1)' }}>
-                                          <div style={{ fontSize: '0.7rem', fontWeight: '900', color: '#0ca6a6', letterSpacing: '1px', marginBottom: '10px' }}>VOLUNTEER SKILLS</div>
-                                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                              {app.userId?.skills && app.userId.skills.length > 0 ? app.userId.skills.map((skill, i) => (
-                                                  <span key={i} style={{ fontSize: '0.7rem', padding: '4px 12px', borderRadius: '8px', background: 'rgba(12, 166, 166, 0.1)', color: '#4ade80', border: '1px solid rgba(12, 166, 166, 0.2)', fontWeight: 'bold' }}>{skill}</span>
-                                              )) : <span style={{ fontSize: '0.75rem', color: '#475569', fontStyle: 'italic' }}>No skills listed by volunteer.</span>}
-                                          </div>
-                                      </div>
-                                  </div>
-                              ))}
-                          </div>
-                      </div>
-
-                      <div>
-                          <h4 style={{ color: '#64748b', fontSize: '0.8rem', letterSpacing: '2px', marginBottom: '20px' }}>PERSONNEL & DECISIONS</h4>
-                          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
-                              {processedApps.length === 0 && <p style={{ color: '#475569', fontStyle: 'italic' }}>No decisions made yet.</p>}
-                               {processedApps.map(app => (
-                                   <div key={app._id} style={{ background: 'rgba(255,255,255,0.01)', padding: '20px 25px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                               <img src={app.userId?.avatar} style={{ width: '45px', height: '45px', borderRadius: '50%', border: `2px solid ${app.status === 'Accepted' ? '#4ade80' : '#ef4444'}` }} />
-                                               <div>
-                                                   <div style={{ color: 'white', fontWeight: 'bold', fontSize: '1rem' }}>{app.userId?.name}</div>
-                                                   <div style={{ fontSize: '0.8rem', color: '#64748b' }}>Campaign: {app.campaignId?.title}</div>
-                                                   <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '4px', display: 'flex', gap: '12px' }}>
-                                                       <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><Zap size={12} color="#0ca6a6"/> {app.userId?.campaignsJoined || 0} Joined</span>
-                                                       <span style={{ display: 'flex', alignItems: 'center', gap: '3px' }}><CheckCircle size={12} color="#4ade80"/> {app.userId?.campaignsCompleted || 0} Completed</span>
-                                                   </div>
-                                               </div>
-                                           </div>
-                                           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                                <span style={{ fontSize: '0.65rem', fontWeight: '900', padding: '6px 15px', borderRadius: '30px', background: app.status === 'Accepted' ? 'rgba(74, 222, 128, 0.1)' : 'rgba(239, 68, 68, 0.1)', color: app.status === 'Accepted' ? '#4ade80' : '#ef4444', border: `1px solid ${app.status === 'Accepted' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(239, 68, 68, 0.2)'}` }}>
-                                                   {app.status.toUpperCase()}
-                                               </span>
-                                               {app.status === 'Accepted' && (
-                                                   <div style={{ display: 'flex', gap: '10px' }}>
-                                                       <button onClick={() => handleAction(app._id, 'Completed')} style={{ background: 'rgba(74, 222, 128, 0.1)', border: 'none', color: '#4ade80', padding: '8px', borderRadius: '10px', cursor: 'pointer' }} title="Mark Completed"><Check size={18}/></button>
-                                                       <button onClick={() => handleRemoveUser(app._id)} style={{ background: 'rgba(239, 68, 68, 0.1)', border: 'none', color: '#ef4444', padding: '8px', borderRadius: '10px', cursor: 'pointer' }} title="Remove Recruit"><UserMinus size={18}/></button>
-                                                   </div>
-                                               )}
-                                           </div>
-                                       </div>
-                                       {app.userId?.skills && app.userId.skills.length > 0 && (
-                                           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                                               {app.userId.skills.slice(0, 5).map((skill, i) => (
-                                                   <span key={i} style={{ fontSize: '0.6rem', padding: '2px 8px', borderRadius: '6px', background: 'rgba(255,255,255,0.03)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.05)' }}>{skill}</span>
-                                               ))}
-                                           </div>
-                                       )}
-                                   </div>
-                               ))}
-                          </div>
-                      </div>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-                      <div style={{ background: 'linear-gradient(135deg, #0ca6a6 0%, #115e5e 100%)', borderRadius: '30px', padding: '40px', textAlign: 'center', boxShadow: '0 20px 40px rgba(12, 166, 166, 0.2)' }}>
-                          <BarChart3 size={40} style={{ marginBottom: '20px' }} />
-                          <h3 style={{ fontSize: '2rem', fontWeight: '900', margin: '0 0 10px 0' }}>{activeApps.length}</h3>
-                          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', letterSpacing: '1px', margin: 0 }}>ACTIVE VOLUNTEERS</p>
-                      </div>
-                      <div style={{ background: '#0f172a', borderRadius: '30px', padding: '40px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                          <h4 style={{ color: '#0ca6a6', fontSize: '0.8rem', letterSpacing: '2px', marginBottom: '20px' }}>QUICK STATS</h4>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <span style={{ color: '#94a3b8' }}>Total Campaigns</span>
-                                  <span style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{myCampaigns.length}</span>
-                              </div>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                  <span style={{ color: '#94a3b8' }}>Pending Approval</span>
-                                  <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: '#f59e0b' }}>{myCampaigns.filter(c => c.status === 'Pending').length}</span>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
+        <div className="animate-fadeIn">
+          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '30px' }}>
+            
+            {/* VOLUNTEER LIST & INCOMING ACTIONS */}
+            <div className="cyber-card" style={{ padding: '36px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '12px' }}>
+                 <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', display: 'flex', alignItems: 'center', gap: '12px', fontWeight: '800', margin: 0 }}><Users color="var(--primary-light)"/> Volunteer Recruits</h2>
+                 
+                 {/* B2B EXPORTER EXPORT BUTTON */}
+                 <button 
+                   onClick={handleExportCSV}
+                   className="btn btn-ghost"
+                   style={{
+                      background: 'rgba(6, 182, 212, 0.08)',
+                      border: '1px solid rgba(6, 182, 212, 0.25)',
+                      color: '#0891b2',
+                      fontWeight: '700',
+                      padding: '8px 16px',
+                      fontSize: '0.82rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                   }}
+                 >
+                    <Download size={14} /> Export Report (CSV)
+                 </button>
               </div>
+              
+              <div style={{ marginBottom: '36px' }}>
+                <div className="section-label" style={{ display: 'inline-flex', marginBottom: '16px' }}>Pending Clearance</div>
+                {pendingApps.length === 0 && <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', fontSize: '0.9rem' }}>No pending volunteer requests.</p>}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {pendingApps.map(app => (
+                    <div key={app._id} style={{ background: 'rgba(255,255,255,0.01)', padding: '20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <div className="responsive-flex-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                          <img src={app.userId?.avatar} style={{ width: '48px', height: '48px', borderRadius: '50%', border: '2px solid var(--accent)', objectFit: 'cover' }} />
+                          <div>
+                            <div style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-primary)' }}>{app.userId?.name}</div>
+                            <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', fontWeight: '600', marginTop: '2px' }}>Applying for: <span style={{ color: 'var(--primary-light)' }}>{app.campaignId?.title}</span></div>
+                            <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+                              <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>{app.userId?.campaignsJoined || 0} Joined</span>
+                              <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.03)', padding: '2px 8px', borderRadius: 'var(--radius-full)' }}>{app.userId?.campaignsCompleted || 0} Done</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button onClick={() => handleAction(app._id, 'Accepted')} className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.8rem', borderRadius: '10px' }}>Approve</button>
+                          <button onClick={() => handleAction(app._id, 'Rejected')} className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '0.8rem', borderRadius: '10px', color: '#f87171', borderColor: 'rgba(239,68,68,0.2)' }}>Reject</button>
+                        </div>
+                      </div>
+
+                      <div style={{ padding: '12px 16px', background: 'rgba(124, 58, 237, 0.04)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(124,58,237,0.1)' }}>
+                        <div style={{ fontSize: '0.68rem', fontWeight: '800', color: 'var(--primary-light)', letterSpacing: '0.5px', marginBottom: '8px', textTransform: 'uppercase' }}>Volunteer Skills</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                          {app.userId?.skills && app.userId.skills.length > 0 ? app.userId.skills.map((skill, i) => (
+                            <span key={i} className="badge badge-primary" style={{ fontSize: '0.62rem', padding: '3px 8px' }}>{skill}</span>
+                          )) : <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>No skills listed.</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="section-label" style={{ display: 'inline-flex', marginBottom: '16px' }}>Decisions & Personnel</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {processedApps.length === 0 && <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', fontSize: '0.9rem' }}>No processed requests yet.</p>}
+                  {processedApps.map(app => (
+                    <div key={app._id} style={{ background: 'rgba(255,255,255,0.01)', padding: '16px 20px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <img src={app.userId?.avatar} style={{ width: '40px', height: '40px', borderRadius: '50%', border: `2px solid ${app.status === 'Accepted' ? 'var(--success)' : 'var(--danger)'}`, objectFit: 'cover' }} />
+                          <div>
+                            <div style={{ color: 'var(--text-primary)', fontWeight: '700', fontSize: '0.95rem' }}>{app.userId?.name}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Campaign: <span style={{ color: 'var(--primary-light)' }}>{app.campaignId?.title}</span></div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span className={`badge ${app.status === 'Accepted' ? 'badge-success' : 'badge-danger'}`} style={{ padding: '4px 12px', fontSize: '0.62rem' }}>
+                            {app.status.toUpperCase()}
+                          </span>
+                          {app.status === 'Accepted' && (
+                            <div style={{ display: 'flex', gap: '6px' }}>
+                              <button onClick={() => handleAction(app._id, 'Completed')} className="btn btn-ghost" style={{ padding: '6px', borderRadius: '8px', color: 'var(--success)', borderColor: 'rgba(16,185,129,0.2)' }} title="Mark Completed"><Check size={14}/></button>
+                              <button onClick={() => handleRemoveUser(app._id)} className="btn btn-ghost" style={{ padding: '6px', borderRadius: '8px', color: '#f87171', borderColor: 'rgba(239,68,68,0.2)' }} title="Remove Recruit"><UserMinus size={14}/></button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* SIDEBAR KPI WIDGETS */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <div className="cyber-card" style={{ padding: '36px', textAlign: 'center', background: 'var(--gradient-primary)', boxShadow: 'var(--shadow-glow)' }}>
+                <BarChart3 size={36} style={{ margin: '0 auto 16px auto', color: 'white' }} />
+                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.5rem', fontWeight: '900', margin: '0 0 4px 0', color: 'white' }}>{activeApps.length}</h3>
+                <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '0.8rem', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase', margin: 0 }}>Active Volunteers</p>
+              </div>
+
+              {/* 💎 PILLAR 1: Crowdfunding Analytics widget */}
+              <div className="cyber-card" style={{ padding: '24px', display: 'flex', gap: '16px', alignItems: 'center', background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(8, 145, 178, 0.04) 100%)', border: '1px solid rgba(6, 182, 212, 0.2)' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#06b6d4', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                   <DollarSign size={24} />
+                </div>
+                <div>
+                   <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: '800', textTransform: 'uppercase' }}>Campaign Funds Raised</div>
+                   <div style={{ fontSize: '1.4rem', fontWeight: '900', color: 'var(--text-primary)', marginTop: '2px' }}>₹{totalFundsRaised.toLocaleString()}</div>
+                   <div style={{ fontSize: '0.68rem', color: '#0891b2', fontWeight: '700', marginTop: '2px' }}>Incl. 3.5% Platform Comm. (₹{platformFeesSaaS.toLocaleString()})</div>
+                </div>
+              </div>
+              
+              <div className="cyber-card" style={{ padding: '28px' }}>
+                <h4 style={{ color: 'var(--primary-light)', fontSize: '0.75rem', letterSpacing: '0.5px', fontWeight: '800', textTransform: 'uppercase', marginBottom: '20px' }}>Quick Stats</h4>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: '12px' }}>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Total Campaigns</span>
+                    <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--text-primary)' }}>{myCampaigns.length}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Pending Approval</span>
+                    <span style={{ fontWeight: '800', fontSize: '1.1rem', color: 'var(--warning)' }}>{myCampaigns.filter(c => c.status === 'Pending').length}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
+        </div>
       )}
 
       {activeTab === 'profile' && (
-          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', animation: 'fadeIn 0.5s ease-out' }}>
-              <div style={{ background: '#0f172a', borderRadius: '30px', padding: '60px 40px', textAlign: 'center', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <div style={{ position: 'relative', width: '180px', height: '180px', margin: '0 auto 30px auto' }}>
-                      <img src={user.avatar} style={{ width: '100%', height: '100%', borderRadius: '50%', border: '4px solid #0ca6a6', padding: '10px' }} />
-                      <div style={{ position: 'absolute', bottom: '10px', right: '10px', background: '#0f172a', padding: '10px', borderRadius: '50%', border: '2px solid #0ca6a6' }}>
-                          <Megaphone size={24} color="#0ca6a6" />
-                      </div>
-                  </div>
-                  <h2 style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '10px' }}>{user.email}</h2>
-                  <div style={{ display: 'inline-block', padding: '6px 20px', background: '#0ca6a61a', borderRadius: '30px', color: '#0ca6a6', fontWeight: '900', fontSize: '0.8rem', letterSpacing: '1px', marginBottom: '30px' }}>CAMPAIGN MANAGER</div>
-                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '30px', color: '#64748b', fontSize: '0.9rem' }}>
-                      Account Status: <span style={{ color: '#4ade80' }}>Verified</span><br/>
-                      Member Since: 2026
-                  </div>
-              </div>
-
-              <div style={{ background: '#0f172a', borderRadius: '30px', padding: '50px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                  <h2 style={{ fontSize: '1.8rem', fontWeight: '900', marginBottom: '40px' }}>PROFILE SETTINGS</h2>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
-                      <div>
-                          <label style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '12px', display: 'block' }}>FULL NAME</label>
-                          <input type="text" value={profileData.name} onChange={e => setProfileData({...profileData, name: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', padding: '15px 25px', borderRadius: '15px', color: 'white', outline: 'none', fontSize: '1rem' }} />
-                      </div>
-                      <div>
-                          <label style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '12px', display: 'block' }}>YOUR SKILLS (Comma separated)</label>
-                          <textarea value={profileData.skills} onChange={e => setProfileData({...profileData, skills: e.target.value})} style={{ width: '100%', background: 'rgba(255,255,255,0.02)', border: '1px solid #0ca6a633', padding: '25px', borderRadius: '20px', color: 'white', outline: 'none', fontSize: '1.1rem', height: '150px', resize: 'none' }} placeholder="Ex: Leadership, Communication, Project Management..."></textarea>
-                      </div>
-                      <button style={{ width: '100%', padding: '20px', background: 'linear-gradient(90deg, #0ca6a6 0%, #4ade80 100%)', border: 'none', borderRadius: '20px', color: 'white', fontWeight: '800', fontSize: '1.1rem', cursor: 'pointer', boxShadow: '0 20px 40px rgba(12, 166, 166, 0.3)' }}>SAVE CHANGES</button>
-                  </div>
-              </div>
-          </div>
+        <Profile user={user} setUser={setUser} hideHeader={true} />
       )}
 
       {activeTab === 'campaigns' && (
-          <div style={{ animation: 'fadeIn 0.5s ease-out' }}>
-              <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '40px', marginBottom: '60px' }}>
-                  <div style={{ background: '#0f172a', borderRadius: '30px', padding: '40px', border: '1px solid rgba(12, 166, 166, 0.2)', height: 'fit-content' }}>
-                      <h2 style={{ fontSize: '1.4rem', fontWeight: '900', marginBottom: '30px', color: '#0ca6a6' }}>LAUNCH NEW CAMPAIGN</h2>
-                      {success && <div style={{ background: 'rgba(74, 222, 128, 0.1)', color: '#4ade80', padding: '15px', borderRadius: '12px', marginBottom: '20px', border: '1px solid #4ade80', fontSize: '0.8rem' }}>CAMPAIGN POSTED: AWAITING ADMIN APPROVAL</div>}
-                      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                          <input type="text" placeholder="Campaign Title" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} style={{ width: '100%', background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white', outline: 'none' }} />
-                          <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} style={{ background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white' }}>
-                              <option value="Environment">Environment</option>
-                              <option value="Education">Education</option>
-                              <option value="Health">Health</option>
-                              <option value="Social">Social</option>
-                              <option value="Others">Others</option>
-                          </select>
-                          {formData.category === 'Others' && (
-                              <input type="text" placeholder="Enter Custom Category" required value={customCategory} onChange={e => setCustomCategory(e.target.value)} style={{ width: '100%', background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white', outline: 'none' }} />
-                          )}
-                          <textarea placeholder="Description..." rows="4" required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} style={{ background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white', resize: 'none' }}></textarea>
-                          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                              <input type="number" placeholder="Spots" required value={formData.neededPositions} onChange={e => setFormData({...formData, neededPositions: e.target.value})} style={{ background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white' }} />
-                              <input type="text" placeholder="Location" required value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} style={{ background: '#090f1d', border: '1px solid #1e293b', padding: '15px', borderRadius: '12px', color: 'white' }} />
-                          </div>
-                          
-                          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                              <div>
-                                  <label style={{ color: '#64748b', fontSize: '0.8rem', marginBottom: '8px', display: 'block', fontWeight: 'bold' }}>Upload Campaign Image (Required)</label>
-                                  <input type="file" required accept="image/*" onChange={(e) => handleFileUpload(e, 'image')} style={{ width: '100%', background: '#090f1d', border: '1px solid #1e293b', padding: '12px', borderRadius: '12px', color: 'white' }} />
-                              </div>
-                              <div>
-                                  <label style={{ color: '#64748b', fontSize: '0.8rem', marginBottom: '8px', display: 'block', fontWeight: 'bold' }}>Upload Campaign Video (Optional)</label>
-                                  <input type="file" accept="video/*" onChange={(e) => handleFileUpload(e, 'videoUrl')} style={{ width: '100%', background: '#090f1d', border: '1px solid #1e293b', padding: '12px', borderRadius: '12px', color: 'white' }} />
-                              </div>
-                          </div>
+        <div className="animate-fadeIn">
+          <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '30px' }}>
+            
+            {/* CAMPAIGN LAUNCH FORM */}
+            <div className="cyber-card" style={{ padding: '32px', height: 'fit-content' }}>
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', fontWeight: '800', marginBottom: '24px', color: 'var(--primary-light)' }}>Launch New Campaign</h2>
+              {success && <div style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success)', padding: '12px', borderRadius: '8px', marginBottom: '20px', border: '1px solid rgba(16,185,129,0.25)', fontSize: '0.8rem', fontWeight: '700' }}>CAMPAIGN POSTED: AWAITING ADMIN APPROVAL</div>}
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <input type="text" placeholder="Campaign Title" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="cyber-input" />
+                <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="cyber-input" style={{ background: 'var(--bg-input)' }}>
+                  <option value="Environment">Environment</option>
+                  <option value="Education">Education</option>
+                  <option value="Health">Health</option>
+                  <option value="Social">Social</option>
+                  <option value="Others">Others</option>
+                </select>
+                {formData.category === 'Others' && (
+                  <input type="text" placeholder="Enter Custom Category" required value={customCategory} onChange={e => setCustomCategory(e.target.value)} className="cyber-input" />
+                )}
+                <textarea placeholder="Campaign description details..." rows="3" required value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="cyber-input" style={{ resize: 'none' }}></textarea>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="responsive-grid">
+                  <input type="number" placeholder="Spots Needed" required value={formData.neededPositions} onChange={e => setFormData({...formData, neededPositions: e.target.value})} className="cyber-input" />
+                  <input type="text" placeholder="Location" required value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="cyber-input" />
+                </div>
 
-                          {formData.image && <img src={formData.image} alt="Preview" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '12px', border: '1px solid #0ca6a6' }} />}
-                          
-                          <button type="submit" style={{ width: '100%', padding: '18px', background: 'linear-gradient(90deg, #0ca6a6 0%, #4ade80 100%)', border: 'none', borderRadius: '15px', color: 'white', fontWeight: '900', cursor: 'pointer' }}>POST CAMPAIGN</button>
-                      </form>
-                  </div>
+                <div style={{ marginBottom: 0 }}>
+                  <label style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '6px', display: 'block', fontWeight: '800' }}>Target Crowdfunding Amount (₹)</label>
+                  <input type="number" placeholder="300000" value={formData.targetAmount} onChange={e => setFormData({...formData, targetAmount: e.target.value})} className="cyber-input" />
+                </div>
 
+                <div style={{ marginBottom: 0 }}>
+                  <label style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '6px', display: 'block', fontWeight: '800' }}>Reason for Crowdfunding (e.g. why do you need these funds?)</label>
+                  <input type="text" placeholder="Ex: To purchase tree saplings, organic soil, and tools." value={formData.fundingReason} onChange={e => setFormData({...formData, fundingReason: e.target.value})} className="cyber-input" />
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }} className="responsive-grid">
                   <div>
-                      <h2 style={{ fontSize: '1.5rem', marginBottom: '30px', color: '#94a3b8' }}>MY CAMPAIGNS</h2>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
-                          {myCampaigns.map(camp => (
-                              <div key={camp._id} className="responsive-flex-between" style={{ background: '#0f172a', borderRadius: '24px', padding: '30px', border: '1px solid rgba(255,255,255,0.05)', display: 'flex', gap: '20px' }}>
-                                  {camp.image ? (
-                                      <img src={camp.image} style={{ width: '120px', height: '120px', borderRadius: '15px', objectFit: 'cover' }} alt={camp.title} />
-                                  ) : (
-                                      <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800" style={{ width: '120px', height: '120px', borderRadius: '15px', objectFit: 'cover' }} alt={camp.title} />
-                                  )}
-                                  <div style={{ flex: 1 }}>
-                                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
-                                          <h3 style={{ margin: 0, fontSize: '1.3rem' }}>{camp.title}</h3>
-                                          <button onClick={() => handleDeleteCampaign(camp._id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', padding: '5px' }}><Trash2 size={18}/></button>
-                                      </div>
-                                      <div style={{ marginBottom: '15px' }}>
-                                          <span style={{ padding: '5px 12px', borderRadius: '8px', fontSize: '0.65rem', fontWeight: 'bold', background: camp.status === 'Approved' ? '#0ca6a61a' : '#f59e0b1a', color: camp.status === 'Approved' ? '#0ca6a6' : '#f59e0b', border: `1px solid ${camp.status === 'Approved' ? '#0ca6a633' : '#f59e0b33'}` }}>{(camp.status || 'Pending').toUpperCase()}</span>
-                                      </div>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                          <div style={{ flex: 1, height: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', overflow: 'hidden' }}>
-                                              <div style={{ height: '100%', width: `${(camp.filledPositions/camp.neededPositions)*100}%`, background: '#0ca6a6', boxShadow: '0 0 10px #0ca6a6' }}></div>
-                                          </div>
-                                          <span style={{ fontWeight: 'bold', color: '#0ca6a6' }}>{Math.round((camp.filledPositions/camp.neededPositions)*100)}%</span>
-                                      </div>
-                                  </div>
-                              </div>
-                          ))}
-                      </div>
+                    <label style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '6px', display: 'block', fontWeight: '800' }}>Campaign Image (Required)</label>
+                    <input type="file" required accept="image/*" onChange={(e) => handleFileUpload(e, 'image')} style={{ width: '100%', color: 'var(--text-secondary)' }} />
                   </div>
-              </div>
-          </div>
-      )}
+                  <div>
+                    <label style={{ color: 'var(--text-muted)', fontSize: '0.72rem', marginBottom: '6px', display: 'block', fontWeight: '800' }}>Campaign Video (Optional)</label>
+                    <input type="file" accept="video/*" onChange={(e) => handleFileUpload(e, 'videoUrl')} style={{ width: '100%', color: 'var(--text-secondary)' }} />
+                  </div>
+                </div>
 
-      <style>{`
-          @keyframes fadeIn {
-              from { opacity: 0; transform: translateY(20px); }
-              to { opacity: 1; transform: translateY(0); }
-          }
-      `}</style>
+                {formData.image && <img src={formData.image} alt="Preview" style={{ width: '100%', maxHeight: '140px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border)', marginTop: '8px' }} />}
+                
+                <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '14px', justifyContent: 'center' }}>Post Campaign</button>
+              </form>
+            </div>
+
+            {/* MY CAMPAIGNS CONTAINER */}
+            <div>
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', marginBottom: '24px', color: 'var(--text-secondary)', fontWeight: '800' }}>My Campaigns</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {myCampaigns.length === 0 && <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic', fontSize: '0.9rem' }}>You haven't posted any campaigns yet.</p>}
+                {myCampaigns.map(camp => (
+                  <div key={camp._id} className="cyber-card responsive-flex-between animate-fadeIn" style={{ padding: '24px', display: 'flex', gap: '20px', alignItems: 'center' }}>
+                    <img src={camp.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800'} style={{ width: '90px', height: '90px', borderRadius: '12px', objectFit: 'cover', flexShrink: 0 }} alt={camp.title} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px' }}>
+                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{camp.title}</h3>
+                        <button onClick={() => handleDeleteCampaign(camp._id)} style={{ color: '#f87171', background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}><Trash2 size={16}/></button>
+                      </div>
+                      <div style={{ margin: '8px 0 12px 0' }}>
+                        <span className={`badge ${camp.status === 'Approved' ? 'badge-success' : 'badge-warning'}`} style={{ padding: '4px 10px', fontSize: '0.62rem' }}>{(camp.status || 'Pending').toUpperCase()}</span>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="progress-bar" style={{ flex: 1 }}>
+                          <div className="progress-fill" style={{ width: `${(camp.filledPositions / camp.neededPositions) * 100}%` }}></div>
+                        </div>
+                        <span style={{ fontWeight: '800', color: 'var(--primary-light)', fontSize: '0.85rem' }}>{Math.round((camp.filledPositions/camp.neededPositions)*100)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };

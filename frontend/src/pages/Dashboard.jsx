@@ -258,13 +258,14 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                 value={newQueryText}
                 onChange={e => setNewQueryText(e.target.value)}
                 placeholder="Ask about points, certificates, badges..." 
+                className="cyber-input"
                 style={{
                   flex: 1,
-                  background: 'rgba(255,255,255,0.03)',
+                  background: 'var(--bg-input)',
                   border: '1px solid var(--border)',
                   borderRadius: '10px',
                   padding: '8px 12px',
-                  color: 'white',
+                  color: 'var(--text-primary)',
                   fontSize: '0.8rem',
                   outline: 'none'
                 }}

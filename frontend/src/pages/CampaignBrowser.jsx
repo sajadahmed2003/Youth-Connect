@@ -16,30 +16,32 @@ const CampaignBrowser = ({ campaigns }) => {
   const uniqueCategories = ['All', ...new Set(campaigns.flatMap(c => c.categories))];
 
   return (
-    <div className="campaign-browser-cyber" style={{ animation: 'fadeIn 0.6s ease-out' }}>
+    <div className="campaign-browser-cyber animate-fadeIn" style={{ fontFamily: 'var(--font-body)', padding: '40px 24px', maxWidth: '1200px', margin: '0 auto', color: 'var(--text-primary)' }}>
       
       {/* 🔮 TACTICAL SEARCH HEADER */}
-      <div className="cyber-card" style={{ padding: '50px', marginBottom: '50px', background: 'linear-gradient(135deg, rgba(12, 166, 166, 0.05) 0%, rgba(9, 15, 29, 0.2) 100%)', border: '1px solid rgba(12, 166, 166, 0.2)' }}>
-        <h1 style={{ fontSize: '3rem', fontWeight: '900', color: 'white', marginBottom: '20px', letterSpacing: '-1px' }}>BROWSE <span style={{ color: '#0ca6a6' }}>CAMPAIGNS</span></h1>
-        <p style={{ color: '#94a3b8', fontSize: '1.2rem', marginBottom: '40px' }}>Find local opportunities and make an impact in your community.</p>
+      <div className="cyber-card" style={{ padding: '40px', marginBottom: '40px', background: 'var(--bg-surface)', border: '1px solid var(--border)' }}>
+        <h1 style={{ fontSize: '2.4rem', fontWeight: '900', color: 'var(--text-primary)', marginBottom: '16px', letterSpacing: '-1px', fontFamily: 'var(--font-heading)' }}>
+          Browse <span style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Campaigns</span>
+        </h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', marginBottom: '32px' }}>Find local opportunities and make a tangible impact in your community.</p>
         
         <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '20px' }}>
           <div style={{ position: 'relative' }}>
-            <Search style={{ position: 'absolute', left: '20px', top: '18px', color: '#0ca6a6' }} />
+            <Search style={{ position: 'absolute', left: '16px', top: '18px', color: 'var(--primary-light)' }} size={20} />
             <input 
               type="text" 
               className="cyber-input" 
-              style={{ width: '100%', paddingLeft: '60px', height: '60px', fontSize: '1.1rem' }} 
+              style={{ width: '100%', paddingLeft: '52px', height: '56px', fontSize: '1rem', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '12px' }} 
               placeholder="Search by title or location..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <div style={{ position: 'relative' }}>
-            <Filter style={{ position: 'absolute', left: '20px', top: '18px', color: '#0ca6a6' }} />
+            <Filter style={{ position: 'absolute', left: '16px', top: '18px', color: 'var(--primary-light)' }} size={20} />
             <select 
               className="cyber-input" 
-              style={{ width: '100%', paddingLeft: '60px', height: '60px', fontSize: '1.1rem', appearance: 'none' }}
+              style={{ width: '100%', paddingLeft: '52px', height: '56px', fontSize: '1rem', background: 'var(--bg-input)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '12px', appearance: 'none' }}
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
             >
@@ -52,50 +54,55 @@ const CampaignBrowser = ({ campaigns }) => {
       {/* 🛰️ CAMPAIGN GRID */}
       <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '30px' }}>
         {filteredCamps.map(camp => (
-          <div key={camp._id} className="cyber-card" style={{ padding: '0', cursor: 'default' }}>
+          <div key={camp._id} className="cyber-card" style={{ padding: '0', cursor: 'default', display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ position: 'relative', height: '180px', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, transparent 0%, #090f1d 90%)', zIndex: 1 }}></div>
-                <div style={{ height: '100%', background: 'rgba(12, 166, 166, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                     <Target size={60} color="#0ca6a6" style={{ opacity: 0.3 }} />
-                </div>
-                <div style={{ position: 'absolute', bottom: '20px', left: '25px', zIndex: 2 }}>
-                    <span style={{ fontSize: '0.65rem', fontWeight: '900', background: 'rgba(74, 222, 128, 0.1)', color: '#4ade80', padding: '5px 12px', borderRadius: '4px', letterSpacing: '1px', border: '1px solid rgba(74, 222, 128, 0.2)' }}>
-                        {camp.categories[0].toUpperCase()}
+                <img 
+                  src={camp.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800'} 
+                  alt={camp.title} 
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                />
+                <div style={{ position: 'absolute', bottom: '16px', left: '20px', zIndex: 2 }}>
+                    <span className="badge badge-primary" style={{ fontSize: '0.62rem', padding: '4px 10px' }}>
+                        {(camp.categories?.[0] || 'GENERAL').toUpperCase()}
                     </span>
                 </div>
             </div>
 
-            <div style={{ padding: '30px', marginTop: '-10px' }}>
-                <h3 style={{ fontSize: '1.4rem', color: 'white', fontWeight: '800', marginBottom: '10px' }}>{camp.title}</h3>
-                <div style={{ color: '#94a3b8', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '25px' }}>
-                    <MapPin size={14} color="#0ca6a6" /> {camp.location}
-                </div>
-                
-                <p style={{ fontSize: '0.95rem', color: '#64748b', lineHeight: '1.6', marginBottom: '30px', height: '4.8em', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
-                    {camp.description}
-                </p>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
-                    <div style={{ flex: 1, height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${(camp.filledPositions/camp.neededPositions)*100}%`, background: '#0ca6a6', boxShadow: '0 0 10px #0ca6a6' }}></div>
+            <div style={{ padding: '24px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                    <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)', fontWeight: '800', marginBottom: '8px', fontFamily: 'var(--font-heading)' }}>{camp.title}</h3>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
+                        <MapPin size={14} color="var(--primary-light)" /> {camp.location}
                     </div>
-                    <span style={{ fontSize: '0.8rem', color: '#4ade80', fontWeight: 'bold' }}>{camp.filledPositions}/{camp.neededPositions}</span>
+                    
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '24px', height: '4.5em', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                        {camp.description}
+                    </p>
                 </div>
 
-                <Link to={`/campaigns/${camp._id}`} style={{ textDecoration: 'none' }}>
-                    <button className="cyber-card" style={{ width: '100%', padding: '15px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(12, 166, 166, 0.3)', color: 'white', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: '0.3s', cursor: 'pointer' }}>
-                        VIEW DETAILS <ArrowRight size={18} color="#4ade80" />
-                    </button>
-                </Link>
+                <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                        <div style={{ flex: 1, height: '6px', background: 'rgba(0,0,0,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${Math.min(100, (camp.filledPositions/camp.neededPositions)*100)}%`, background: 'var(--gradient-primary)', borderRadius: '10px' }}></div>
+                        </div>
+                        <span style={{ fontSize: '0.78rem', color: 'var(--primary-light)', fontWeight: 'bold' }}>{camp.filledPositions}/{camp.neededPositions}</span>
+                    </div>
+
+                    <Link to={`/campaigns/${camp._id}`} style={{ textDecoration: 'none' }}>
+                        <button className="btn btn-primary" style={{ width: '100%', padding: '12px', justifyContent: 'center', gap: '8px', fontSize: '0.85rem' }}>
+                            View Details <ArrowRight size={16} />
+                        </button>
+                    </Link>
+                </div>
             </div>
           </div>
         ))}
 
         {filteredCamps.length === 0 && (
-          <div style={{ gridColumn: '1 / -1', padding: '100px', textAlign: 'center' }}>
-            <Zap size={50} color="#ef4444" style={{ marginBottom: '20px' }} />
-            <h2 style={{ color: 'white', letterSpacing: '2px' }}>NO CAMPAIGNS FOUND</h2>
-            <p style={{ color: '#94a3b8' }}>Try adjusting your filters and search again.</p>
+          <div style={{ gridColumn: '1 / -1', padding: '80px 40px', textAlign: 'center' }}>
+            <Zap size={44} color="var(--primary-light)" style={{ marginBottom: '16px' }} />
+            <h2 style={{ color: 'var(--text-primary)', letterSpacing: '1px', marginBottom: '8px' }}>No Campaigns Found</h2>
+            <p style={{ color: 'var(--text-secondary)' }}>Try adjusting your filters and search again.</p>
           </div>
         )}
       </div>

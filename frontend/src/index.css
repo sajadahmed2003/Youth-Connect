@@ -849,6 +849,82 @@ body {
     width: 92vw !important;
     max-width: 360px !important;
   }
+
+  /* ⚡ Manager Dashboard premium single-line header improvements on mobile */
+  .manager-dashboard-premium .dashboard-header {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 12px !important;
+    padding: 12px 14px !important;
+    border-radius: var(--radius-md) !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .manager-dashboard-premium .dashboard-header::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .manager-dashboard-premium .header-logo-section {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    width: auto !important;
+  }
+  .manager-dashboard-premium .header-logo-section span {
+    font-size: 0.82rem !important;
+    letter-spacing: 0px !important;
+  }
+  
+  .manager-dashboard-premium .header-tabs-section {
+    flex-shrink: 1 !important;
+    width: auto !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 6px !important;
+    padding: 2px 0 !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .manager-dashboard-premium .header-tabs-section::-webkit-scrollbar {
+    display: none;
+  }
+  .manager-dashboard-premium .header-tabs-section button {
+    flex-shrink: 0 !important;
+    padding: 6px 12px !important;
+    font-size: 0.74rem !important;
+  }
+  
+  .manager-dashboard-premium .header-profile-section {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: auto !important;
+    justify-content: flex-end !important;
+  }
+  .manager-dashboard-premium .header-profile-section .profile-text {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
+    text-align: left !important;
+    line-height: 1 !important;
+  }
+  .manager-dashboard-premium .header-profile-section .profile-text span:first-child {
+    font-size: 0.78rem !important;
+    font-weight: bold !important;
+  }
+  .manager-dashboard-premium .header-profile-section .profile-text span:last-child {
+    font-size: 0.58rem !important;
+    padding: 2px 4px !important;
+  }
+  .manager-dashboard-premium .header-profile-section img {
+    width: 28px !important;
+    height: 28px !important;
+  }
 }
 
 /* 🌟 Pillar 6: Cyber social grid animations & scrollbar stylings */

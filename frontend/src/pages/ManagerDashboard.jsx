@@ -214,9 +214,9 @@ const ManagerDashboard = ({ user, setUser, refreshCamps }) => {
           </div>
 
           <div className="header-profile-section" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div className="profile-text" style={{ textAlign: 'right', lineHeight: 1.2 }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '0.88rem' }}>{user.name}</div>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--primary-light)', fontWeight: '900', letterSpacing: '0.5px' }}>MANAGER</div>
+              <div className="profile-text" style={{ display: 'flex', alignItems: 'center', gap: '8px', lineHeight: 1.2 }}>
+                  <span style={{ fontWeight: 'bold', fontSize: '0.88rem', whiteSpace: 'nowrap' }}>{user.name}</span>
+                  <span style={{ fontSize: '0.65rem', color: 'var(--primary-light)', fontWeight: '900', letterSpacing: '0.5px', background: 'rgba(124, 58, 237, 0.08)', padding: '2px 8px', borderRadius: '4px', whiteSpace: 'nowrap' }}>MANAGER</span>
               </div>
               <img src={user.avatar} style={{ width: '36px', height: '36px', borderRadius: '50%', border: '2px solid rgba(124, 58, 237, 0.5)', objectFit: 'cover' }} />
           </div>

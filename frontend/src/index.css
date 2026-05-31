@@ -897,32 +897,16 @@ body {
   .manager-dashboard-premium .header-profile-section {
     flex-shrink: 0 !important;
     display: flex !important;
-    flex-direction: column-reverse !important; /* Visual reverse: Avatar image on top, text details below! */
     align-items: center !important;
-    gap: 4px !important;
     width: auto !important;
-    justify-content: center !important;
+    justify-content: flex-end !important;
   }
   .manager-dashboard-premium .header-profile-section .profile-text {
-    display: flex !important;
-    flex-direction: row !important; /* Side-by-side elements under avatar */
-    align-items: center !important;
-    gap: 4px !important;
-    text-align: center !important;
-    line-height: 1 !important;
-    white-space: nowrap !important;
-  }
-  .manager-dashboard-premium .header-profile-section .profile-text span:first-child {
-    font-size: 0.72rem !important;
-    font-weight: bold !important;
-  }
-  .manager-dashboard-premium .header-profile-section .profile-text span:last-child {
-    font-size: 0.54rem !important;
-    padding: 2px 4px !important;
+    display: none !important; /* Hide profile name and manager badge completely on mobile */
   }
   .manager-dashboard-premium .header-profile-section img {
-    width: 32px !important;
-    height: 32px !important;
+    width: 34px !important;
+    height: 34px !important;
     border: 1px solid rgba(124, 58, 237, 0.4) !important;
   }
 }

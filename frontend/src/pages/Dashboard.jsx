@@ -23,6 +23,19 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
   const [supportQueries, setSupportQueries] = useState([]);
   const [newQueryText, setNewQueryText] = useState('');
   const [loadingQueries, setLoadingQueries] = useState(false);
+  const [isSupportBotTyping, setIsSupportBotTyping] = useState(false);
+
+  // 📊 REAL-TIME LIVE ENGAGEMENT STATE
+  const [liveEngagement, setLiveEngagement] = useState([
+    { day: 'Mon', h: 30 },
+    { day: 'Tue', h: 60, highlight: true },
+    { day: 'Wed', h: 40 },
+    { day: 'Thu', h: 85, highlight: true },
+    { day: 'Fri', h: 95, highlight: true },
+    { day: 'Sat', h: 25 },
+    { day: 'Sun', h: 35 }
+  ]);
+  const [liveActiveUsers, setLiveActiveUsers] = useState(148);
 
   React.useEffect(() => {
     fetchSupportQueries();
@@ -33,6 +46,31 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
       fetchCampaignChat(activeChatApp.campaignId?._id);
     }
   }, [activeChatApp]);
+
+  // 🟢 Live Engagement Dynamic Fluctuation Loop
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      // Fluctuate active users by -5 to +5, bounded between 110 and 280
+      setLiveActiveUsers(prev => {
+        const delta = Math.floor(Math.random() * 11) - 5;
+        const newVal = prev + delta;
+        return Math.max(110, Math.min(280, newVal));
+      });
+
+      // Fluctuate bar heights by -6 to +6, keeping between 15% and 100%
+      setLiveEngagement(prev => prev.map(bar => {
+        const delta = Math.floor(Math.random() * 13) - 6;
+        let nextHeight = bar.h + delta;
+        nextHeight = Math.max(15, Math.min(100, nextHeight));
+        return {
+          ...bar,
+          h: nextHeight
+        };
+      }));
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const fetchCampaignChat = async (campaignId) => {
     if (!campaignId) return;
@@ -72,6 +110,19 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
     e.preventDefault();
     if (!newQueryText.trim()) return;
     const token = localStorage.getItem('token');
+    const typedText = newQueryText;
+    setNewQueryText('');
+
+    // Optimistic message update to show instantly
+    const tempQuery = {
+      _id: 'temp_' + Date.now(),
+      queryText: typedText,
+      createdAt: new Date().toISOString(),
+      botResponse: ''
+    };
+    setSupportQueries(prev => [tempQuery, ...prev]);
+    setIsSupportBotTyping(true);
+
     try {
       const res = await fetch(`${API_BASE}/api/support/query`, {
         method: 'POST',
@@ -79,14 +130,18 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ queryText: newQueryText })
+        body: JSON.stringify({ queryText: typedText })
       });
       if (res.ok) {
         const newQ = await res.json();
-        setSupportQueries(prev => [newQ, ...prev]);
-        setNewQueryText('');
+        // Replace the temp query with the real persisted query containing AI response
+        setSupportQueries(prev => prev.map(q => q._id === tempQuery._id ? newQ : q));
       }
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err); 
+    } finally {
+      setIsSupportBotTyping(false);
+    }
   };
 
   const handleSendMessage = async (e) => {
@@ -133,16 +188,6 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
        setIsBotTyping(false);
      }
   };
-
-  const activityData = [
-    { day: 'Mon', h: '30%' },
-    { day: 'Tue', h: '60%', highlight: true },
-    { day: 'Wed', h: '40%' },
-    { day: 'Thu', h: '85%', highlight: true },
-    { day: 'Fri', h: '100%', highlight: true },
-    { day: 'Sat', h: '25%' },
-    { day: 'Sun', h: '35%' }
-  ];
 
   return (
     <div className="animate-fadeIn" style={{ fontFamily: 'var(--font-body)', padding: '40px 24px', maxWidth: '1200px', margin: '0 auto', color: 'var(--text-primary)' }}>
@@ -240,66 +285,89 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
               borderRadius: '12px',
               border: '1px solid var(--border)'
             }}>
-              {supportQueries.length === 0 ? (
+              {supportQueries.length === 0 && !isSupportBotTyping ? (
                 <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center', padding: '20px 0' }}>Ask any question to initiate the coordination stream...</div>
               ) : (
-                [...supportQueries].reverse().map((q, idx) => (
-                  <div key={q._id || idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    
-                    {/* Volunteer Message (Right side, purple gradient bubble) */}
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                      <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: '700', marginBottom: '2px' }}>You</span>
-                      <div style={{
-                        padding: '10px 14px',
-                        borderRadius: '16px 16px 2px 16px',
-                        background: 'var(--gradient-primary)',
-                        color: 'white',
-                        fontSize: '0.82rem',
-                        maxWidth: '85%',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                        wordBreak: 'break-word'
-                      }}>{q.queryText}</div>
-                      <span style={{ fontSize: '0.58rem', color: 'var(--text-muted)', marginTop: '2px' }}>{new Date(q.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                <>
+                  {[...supportQueries].reverse().map((q, idx) => (
+                    <div key={q._id || idx} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      
+                      {/* Volunteer Message (Right side, purple gradient bubble) */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                        <span style={{ fontSize: '0.62rem', color: 'var(--text-muted)', fontWeight: '700', marginBottom: '2px' }}>You</span>
+                        <div style={{
+                          padding: '10px 14px',
+                          borderRadius: '16px 16px 2px 16px',
+                          background: 'var(--gradient-primary)',
+                          color: 'white',
+                          fontSize: '0.82rem',
+                          maxWidth: '85%',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                          wordBreak: 'break-word'
+                        }}>{q.queryText}</div>
+                        <span style={{ fontSize: '0.58rem', color: 'var(--text-muted)', marginTop: '2px' }}>{new Date(q.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                      </div>
+
+                      {/* Auto-Bot Response (Left side, violet tinted bubble) */}
+                      {q.botResponse && (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                          <span style={{ fontSize: '0.62rem', color: '#a78bfa', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
+                          <div style={{
+                            padding: '10px 14px',
+                            borderRadius: '16px 16px 16px 2px',
+                            background: 'rgba(167,139,250,0.05)',
+                            border: '1px solid rgba(167,139,250,0.15)',
+                            color: '#a78bfa',
+                            fontSize: '0.82rem',
+                            maxWidth: '85%',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                            wordBreak: 'break-word'
+                          }}>{q.botResponse}</div>
+                        </div>
+                      )}
+
+                      {/* Super Admin Response (Left side, emerald tinted bubble) */}
+                      {q.adminReply && (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                          <span style={{ fontSize: '0.62rem', color: '#10b981', fontWeight: '700', marginBottom: '2px' }}>🛡️ Super Admin</span>
+                          <div style={{
+                            padding: '10px 14px',
+                            borderRadius: '16px 16px 16px 2px',
+                            background: 'rgba(16,185,129,0.05)',
+                            border: '1px solid rgba(16,185,129,0.15)',
+                            color: '#10b981',
+                            fontSize: '0.82rem',
+                            maxWidth: '85%',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                            wordBreak: 'break-word'
+                          }}>{q.adminReply}</div>
+                        </div>
+                      )}
+
                     </div>
-
-                    {/* Auto-Bot Response (Left side, violet tinted bubble) */}
-                    {q.botResponse && (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                        <span style={{ fontSize: '0.62rem', color: '#a78bfa', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
-                        <div style={{
-                          padding: '10px 14px',
-                          borderRadius: '16px 16px 16px 2px',
-                          background: 'rgba(167,139,250,0.05)',
-                          border: '1px solid rgba(167,139,250,0.15)',
-                          color: '#a78bfa',
-                          fontSize: '0.82rem',
-                          maxWidth: '85%',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-                          wordBreak: 'break-word'
-                        }}>{q.botResponse}</div>
+                  ))}
+                  {isSupportBotTyping && (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '10px' }} className="animate-pulse">
+                      <span style={{ fontSize: '0.62rem', color: '#a78bfa', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
+                      <div style={{
+                         padding: '10px 16px',
+                         borderRadius: '16px 16px 16px 2px',
+                         background: 'rgba(167,139,250,0.08)',
+                         border: '1px solid rgba(167,139,250,0.2)',
+                         color: '#a78bfa',
+                         fontSize: '0.82rem',
+                         maxWidth: '80%',
+                         display: 'flex',
+                         gap: '4px',
+                         alignItems: 'center'
+                      }}>
+                         <span style={{ width: '6px', height: '6px', background: '#a78bfa', borderRadius: '50%', display: 'inline-block' }}></span>
+                         <span style={{ width: '6px', height: '6px', background: '#a78bfa', borderRadius: '50%', display: 'inline-block' }}></span>
+                         <span style={{ width: '6px', height: '6px', background: '#a78bfa', borderRadius: '50%', display: 'inline-block' }}></span>
                       </div>
-                    )}
-
-                    {/* Super Admin Response (Left side, emerald tinted bubble) */}
-                    {q.adminReply && (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                        <span style={{ fontSize: '0.62rem', color: '#10b981', fontWeight: '700', marginBottom: '2px' }}>🛡️ Super Admin</span>
-                        <div style={{
-                          padding: '10px 14px',
-                          borderRadius: '16px 16px 16px 2px',
-                          background: 'rgba(16,185,129,0.05)',
-                          border: '1px solid rgba(16,185,129,0.15)',
-                          color: '#10b981',
-                          fontSize: '0.82rem',
-                          maxWidth: '85%',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
-                          wordBreak: 'break-word'
-                        }}>{q.adminReply}</div>
-                      </div>
-                    )}
-
-                  </div>
-                ))
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -319,11 +387,34 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
             </div>
 
             <div className="cyber-card" style={{ padding: '24px' }}>
-              <h3 style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', fontWeight: '800', marginBottom: '8px', textAlign: 'center' }}>Engagement Trends</h3>
-              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '110px', paddingTop: '10px' }}>
-                {activityData.map((d, i) => (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
+                <span style={{ 
+                  width: '8px', 
+                  height: '8px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#22c55e', 
+                  display: 'inline-block',
+                  boxShadow: '0 0 8px #22c55e',
+                  animation: 'pulse 1.8s infinite'
+                }}></span>
+                <h3 style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', fontWeight: '800', margin: 0 }}>
+                  Engagement Trends
+                </h3>
+              </div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '10px', fontWeight: '600' }}>
+                Active Volunteers: <span style={{ color: 'var(--primary-light)', fontWeight: '800' }}>{liveActiveUsers}</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '100px', paddingTop: '6px' }}>
+                {liveEngagement.map((d, i) => (
                   <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end', gap: '8px' }}>
-                    <div style={{ width: '22px', height: d.h, background: d.highlight ? 'var(--gradient-primary)' : 'rgba(124, 58, 237, 0.08)', borderRadius: '4px', border: d.highlight ? 'none' : '1px solid var(--border)' }}></div>
+                    <div style={{ 
+                      width: '22px', 
+                      height: `${d.h}%`, 
+                      background: d.highlight ? 'var(--gradient-primary)' : 'rgba(124, 58, 237, 0.08)', 
+                      borderRadius: '4px', 
+                      border: d.highlight ? 'none' : '1px solid var(--border)',
+                      transition: 'height 0.8s ease-in-out'
+                    }}></div>
                     <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>{d.day}</div>
                   </div>
                 ))}

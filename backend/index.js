@@ -1175,34 +1175,77 @@ app.post('/api/support/query', async (req, res) => {
       ? `Auto-Bot: Thanks for reaching out about the "${campaignTitle}" logistics stream! I've logged your campaign query.` 
       : "Auto-Bot: Thanks for reaching out! I've logged your request.";
 
-    let botResponse = `${contextPrefix} The Super Admin is reviewing it and will reply directly in your panel shortly.`;
-    
-    if (textLower.includes('point') || textLower.includes('score')) {
-      botResponse = "Auto-Bot: You earn +10% points for every donation and +100 points for campaign completions! These points unlock rare achievements on your profile page.";
-    } else if (textLower.includes('certificate') || textLower.includes('proof')) {
-      botResponse = "Auto-Bot: Once a manager approves your application, click 'Award: Impact Proof' inside your Personal Hub to download and print your official gold-framed Certificate of Impact!";
-    } else if (textLower.includes('badge') || textLower.includes('medal')) {
-      botResponse = "Auto-Bot: Badges are automatically unlocked when you join campaigns, complete tasks, or support crowdfunding!";
-    } else if (textLower.includes('approve') || textLower.includes('pending')) {
-      botResponse = "Auto-Bot: Campaign Managers review applications under 'Pending Clearance'. You will receive an email as soon as they make a decision!";
-    } else if (textLower.includes('fee') || textLower.includes('commission') || textLower.includes('monetize')) {
-      botResponse = "Auto-Bot: We charge a transparent 3.5% commission fee on crowdfunding donations to cover platform maintenance, secure transactions, and cloud hostings.";
-    } else if (campaignTitle && (textLower.includes('suppl') || textLower.includes('resource') || textLower.includes('tool') || textLower.includes('deliver') || textLower.includes('logistic') || textLower.includes('item'))) {
-      botResponse = `Auto-Bot: For supplies and tools needed for "${campaignTitle}", our managers directly allocate 96.5% of crowdfunding donations to purchase them. You can coordinate drop-offs and allocations with the Super Admin or Campaign Manager here!`;
-    } else if (campaignTitle && (textLower.includes('when') || textLower.includes('start') || textLower.includes('time') || textLower.includes('schedule') || textLower.includes('date'))) {
-      botResponse = `Auto-Bot: The logistics schedule for "${campaignTitle}" is active. Ground activations usually happen on weekends. Please check the campaign cards or wait for the coordinator to drop the exact itinerary here!`;
-    } else if (campaignTitle && (textLower.includes('where') || textLower.includes('location') || textLower.includes('address') || textLower.includes('place') || textLower.includes('map'))) {
-      botResponse = `Auto-Bot: The ground-level activation address is listed on the "${campaignTitle}" details page. When you arrive, look for our purple Youth Connect logistics banners!`;
-    } else if (campaignTitle && (textLower.includes('bring') || textLower.includes('pack') || textLower.includes('wear') || textLower.includes('clothe') || textLower.includes('shoe'))) {
-      botResponse = "Auto-Bot: Wear comfortable volunteer clothing and closed-toe shoes. We recommend bringing a refillable water bottle; gloves, trash bags, and safety equipment are provided on-site!";
-    } else if (campaignTitle && (textLower.includes('help') || textLower.includes('do') || textLower.includes('role') || textLower.includes('task') || textLower.includes('responsib'))) {
-      botResponse = `Auto-Bot: In "${campaignTitle}", tasks include crowd control, supply sorting, and ground logistics setup. On-site coordinators will brief and assign your specific role upon arrival!`;
-    } else if (campaignTitle && (textLower.includes('food') || textLower.includes('eat') || textLower.includes('lunch') || textLower.includes('refresh') || textLower.includes('drink') || textLower.includes('water'))) {
-      botResponse = "Auto-Bot: Yes, pure drinking water and light nutritional snacks are provided for all enlisted volunteers during the campaign session!";
-    } else if (campaignTitle && (textLower.includes('contact') || textLower.includes('phone') || textLower.includes('manager') || textLower.includes('coordinator') || textLower.includes('owner'))) {
-      botResponse = `Auto-Bot: You can wait for the Campaign Manager to reply directly in this logistics stream, or contact them via their profile on the detail card for "${campaignTitle}".`;
-    } else if (campaignTitle) {
-      botResponse = `Auto-Bot: That is a great question about the "${campaignTitle}" campaign! I have logged this request. The Campaign Coordinator or Super Admin will respond to your chat query shortly!`;
+    let botResponse = "";
+
+    // 🤖 HIGH-FIDELITY GOOGLE GEMINI AI ASSISTANT GENERATION
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+        const promptText = `
+          You are the official Youth Connect Auto-Bot, an AI volunteer coordinator and support bot.
+          Volunteer "${decoded.name}" asks the following support query:
+          "${queryText}"
+          
+          Contextual Information:
+          ${campaignTitle ? `- Campaign: This is about "${campaignTitle}"` : "- General platform query"}
+          - Points: Earn +100 on campaign completions, +10% points on donations. Points unlock badges.
+          - Certificates: Click "Award: Impact Proof" once NGO accepts application.
+          - Commissions: 3.5% fee on crowdfunding to maintain platform; 96.5% goes directly to NGO.
+          
+          Respond directly, starting with "Auto-Bot (AI): ". Provide a tailored answer based on their query. Limit to 2-3 sentences.
+        `;
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: promptText }] }]
+          })
+        });
+
+        if (response.ok) {
+          const resData = await response.json();
+          const aiText = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (aiText) {
+            botResponse = aiText.trim();
+          }
+        }
+      } catch (err) {
+        console.error("❌ Google Gemini support bot fetch error:", err);
+      }
+    }
+
+    // Keyword Match Fallback if Gemini key is missing or failed
+    if (!botResponse) {
+      botResponse = `${contextPrefix} The Super Admin is reviewing it and will reply directly in your panel shortly.`;
+      
+      if (textLower.includes('point') || textLower.includes('score')) {
+        botResponse = "Auto-Bot: You earn +10% points for every donation and +100 points for campaign completions! These points unlock rare achievements on your profile page.";
+      } else if (textLower.includes('certificate') || textLower.includes('proof')) {
+        botResponse = "Auto-Bot: Once a manager approves your application, click 'Award: Impact Proof' inside your Personal Hub to download and print your official gold-framed Certificate of Impact!";
+      } else if (textLower.includes('badge') || textLower.includes('medal')) {
+        botResponse = "Auto-Bot: Badges are automatically unlocked when you join campaigns, complete tasks, or support crowdfunding!";
+      } else if (textLower.includes('approve') || textLower.includes('pending')) {
+        botResponse = "Auto-Bot: Campaign Managers review applications under 'Pending Clearance'. You will receive an email as soon as they make a decision!";
+      } else if (textLower.includes('fee') || textLower.includes('commission') || textLower.includes('monetize')) {
+        botResponse = "Auto-Bot: We charge a transparent 3.5% commission fee on crowdfunding donations to cover platform maintenance, secure transactions, and cloud hostings.";
+      } else if (campaignTitle && (textLower.includes('suppl') || textLower.includes('resource') || textLower.includes('tool') || textLower.includes('deliver') || textLower.includes('logistic') || textLower.includes('item'))) {
+        botResponse = `Auto-Bot: For supplies and tools needed for "${campaignTitle}", our managers directly allocate 96.5% of crowdfunding donations to purchase them. You can coordinate drop-offs and allocations with the Super Admin or Campaign Manager here!`;
+      } else if (campaignTitle && (textLower.includes('when') || textLower.includes('start') || textLower.includes('time') || textLower.includes('schedule') || textLower.includes('date'))) {
+        botResponse = `Auto-Bot: The logistics schedule for "${campaignTitle}" is active. Ground activations usually happen on weekends. Please check the campaign cards or wait for the coordinator to drop the exact itinerary here!`;
+      } else if (campaignTitle && (textLower.includes('where') || textLower.includes('location') || textLower.includes('address') || textLower.includes('place') || textLower.includes('map'))) {
+        botResponse = `Auto-Bot: The ground-level activation address is listed on the "${campaignTitle}" details page. When you arrive, look for our purple Youth Connect logistics banners!`;
+      } else if (campaignTitle && (textLower.includes('bring') || textLower.includes('pack') || textLower.includes('wear') || textLower.includes('clothe') || textLower.includes('shoe'))) {
+        botResponse = "Auto-Bot: Wear comfortable volunteer clothing and closed-toe shoes. We recommend bringing a refillable water bottle; gloves, trash bags, and safety equipment are provided on-site!";
+      } else if (campaignTitle && (textLower.includes('help') || textLower.includes('do') || textLower.includes('role') || textLower.includes('task') || textLower.includes('responsib'))) {
+        botResponse = `Auto-Bot: In "${campaignTitle}", tasks include crowd control, supply sorting, and ground logistics setup. On-site coordinators will brief and assign your specific role upon arrival!`;
+      } else if (campaignTitle && (textLower.includes('food') || textLower.includes('eat') || textLower.includes('lunch') || textLower.includes('refresh') || textLower.includes('drink') || textLower.includes('water'))) {
+        botResponse = "Auto-Bot: Yes, pure drinking water and light nutritional snacks are provided for all enlisted volunteers during the campaign session!";
+      } else if (campaignTitle && (textLower.includes('contact') || textLower.includes('phone') || textLower.includes('manager') || textLower.includes('coordinator') || textLower.includes('owner'))) {
+        botResponse = `Auto-Bot: You can wait for the Campaign Manager to reply directly in this logistics stream, or contact them via their profile on the detail card for "${campaignTitle}".`;
+      } else if (campaignTitle) {
+        botResponse = `Auto-Bot: That is a great question about the "${campaignTitle}" campaign! I have logged this request. The Campaign Coordinator or Super Admin will respond to your chat query shortly!`;
+      }
     }
 
     const query = await SupportQuery.create({

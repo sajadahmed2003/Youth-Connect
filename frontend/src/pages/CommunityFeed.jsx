@@ -55,8 +55,10 @@ const CommunityFeed = ({ user }) => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert("Image is too large! Please upload an image smaller than 10MB.");
+      const isVideo = file.type.startsWith('video/');
+      const maxLimit = isVideo ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+      if (file.size > maxLimit) {
+        alert(isVideo ? "Video is too large! Please upload a file smaller than 50MB." : "Image is too large! Please upload a file smaller than 10MB.");
         return;
       }
       setNewPostFile(file);
@@ -76,7 +78,8 @@ const CommunityFeed = ({ user }) => {
         formData.append('file', newPostFile);
         formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
         
-        const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        const uploadType = newPostFile.type.startsWith('video/') ? 'video' : 'image';
+        const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${uploadType}/upload`, {
           method: 'POST',
           body: formData
         });
@@ -381,17 +384,21 @@ const CommunityFeed = ({ user }) => {
                 </div>
               )}
 
-              {/* IMAGE PREVIEW */}
+              {/* IMAGE OR VIDEO PREVIEW */}
               {newPostImagePreview && (
-                <div style={{ marginTop: '16px', position: 'relative', display: 'inline-block' }}>
-                  <img src={newPostImagePreview} alt="Preview" style={{ maxHeight: '280px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', objectFit: 'cover' }} />
-                  <button onClick={() => { setNewPostFile(null); setNewPostImagePreview(''); if(fileInputRef.current) fileInputRef.current.value = ''; }} style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(10, 10, 18, 0.75)', color: 'white', border: 'none', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)', transition: '0.2s' }}>✕</button>
+                <div style={{ marginTop: '16px', position: 'relative', display: 'inline-block', maxWidth: '100%' }}>
+                  {newPostFile && newPostFile.type.startsWith('video/') ? (
+                    <video src={newPostImagePreview} controls style={{ maxHeight: '280px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }} />
+                  ) : (
+                    <img src={newPostImagePreview} alt="Preview" style={{ maxHeight: '280px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', objectFit: 'cover' }} />
+                  )}
+                  <button onClick={() => { setNewPostFile(null); setNewPostImagePreview(''); if(fileInputRef.current) fileInputRef.current.value = ''; }} style={{ position: 'absolute', top: '10px', right: '10px', background: 'rgba(10, 10, 18, 0.75)', color: 'white', border: 'none', borderRadius: '50%', width: '28px', height: '28px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)', transition: '0.2s', zIndex: 10 }}>✕</button>
                 </div>
               )}
               
               <input 
                 type="file" 
-                accept="image/*"
+                accept="image/*,video/*"
                 ref={fileInputRef}
                 onChange={handleImageUpload}
                 style={{ display: 'none' }}
@@ -400,7 +407,7 @@ const CommunityFeed = ({ user }) => {
               {/* ACTION BAR */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
                 <button onClick={() => fileInputRef.current.click()} className="btn btn-ghost" style={{ padding: '8px 16px', borderRadius: 'var(--radius-full)', background: 'rgba(124, 58, 237, 0.08)', color: 'var(--primary-light)', border: '1px solid rgba(124, 58, 237, 0.15)', fontSize: '0.85rem' }}>
-                  <ImageIcon size={16} /> Add Photo
+                  <ImageIcon size={16} /> {newPostMediaType === 'reel' ? 'Add Reel' : 'Add Photo'}
                 </button>
                 
                 <button onClick={handlePost} disabled={isPosting || (!newPostContent.trim() && !newPostFile && !newPostVideoUrl.trim())} className="btn btn-primary" style={{ padding: '10px 24px', borderRadius: 'var(--radius-full)', fontSize: '0.88rem' }}>

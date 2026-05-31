@@ -3,7 +3,8 @@ import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-r
 import { API_BASE } from './config';
 import {
   Users, Megaphone, Search, Clapperboard,
-  LayoutDashboard, LogOut, User as UserIcon, Zap, Bell, CheckCircle, XCircle, Trash2, Heart, MessageSquare, UserCheck, Menu, X
+  LayoutDashboard, LogOut, User as UserIcon, Zap, Bell, CheckCircle, XCircle, Trash2, Heart, MessageSquare, UserCheck, Menu, X,
+  Home as HomeIcon, Info, Mail
 } from 'lucide-react';
 
 import Auth from './pages/Auth';
@@ -192,10 +193,10 @@ const TopNavbar = ({
               {user?.role === 'volunteer' && (
                 <Link to="/dashboard" onClick={() => setShowMobileMenu(false)} style={{ color: isActive('/dashboard') ? '#a78bfa' : 'white', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', background: isActive('/dashboard') ? 'rgba(167,139,250,0.1)' : 'transparent', fontWeight: 'bold' }}><LayoutDashboard size={18} /> Personal Hub</Link>
               )}
-              <button onClick={() => { handleNavClick('home'); setShowMobileMenu(false); }} style={{ color: isActive('/home', 'home') ? '#a78bfa' : 'white', background: 'none', border: 'none', textAlign: 'left', fontSize: '0.9rem', padding: '10px 14px', cursor: 'pointer', borderRadius: '10px', background: isActive('/home', 'home') ? 'rgba(167,139,250,0.1)' : 'transparent', display: 'block', width: '100%', fontFamily: 'inherit', fontWeight: 'bold' }}>Home</button>
+              <button onClick={() => { handleNavClick('home'); setShowMobileMenu(false); }} style={{ color: isActive('/home', 'home') ? '#a78bfa' : 'white', background: 'none', border: 'none', textAlign: 'left', fontSize: '0.9rem', padding: '10px 14px', cursor: 'pointer', borderRadius: '10px', background: isActive('/home', 'home') ? 'rgba(167,139,250,0.1)' : 'transparent', display: 'flex', alignItems: 'center', gap: '8px', width: '100%', fontFamily: 'inherit', fontWeight: 'bold' }}><HomeIcon size={18} /> Home</button>
               <Link to="/feed" onClick={() => { setActiveSection(''); setShowMobileMenu(false); }} style={{ color: isActive('/feed') ? '#a78bfa' : 'white', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', background: isActive('/feed') ? 'rgba(167,139,250,0.1)' : 'transparent', fontWeight: 'bold' }}><Megaphone size={18} /> Activity Feed</Link>
-              <button onClick={() => { handleNavClick('about'); setShowMobileMenu(false); }} style={{ color: isActive(null, 'about') ? '#a78bfa' : 'white', background: 'none', border: 'none', textAlign: 'left', fontSize: '0.9rem', padding: '10px 14px', cursor: 'pointer', borderRadius: '10px', background: isActive(null, 'about') ? 'rgba(167,139,250,0.1)' : 'transparent', display: 'block', width: '100%', fontFamily: 'inherit', fontWeight: 'bold' }}>About Us</button>
-              <button onClick={() => { handleNavClick('contact'); setShowMobileMenu(false); }} style={{ color: isActive(null, 'contact') ? '#a78bfa' : 'white', background: 'none', border: 'none', textAlign: 'left', fontSize: '0.9rem', padding: '10px 14px', cursor: 'pointer', borderRadius: '10px', background: isActive(null, 'contact') ? 'rgba(167,139,250,0.1)' : 'transparent', display: 'block', width: '100%', fontFamily: 'inherit', fontWeight: 'bold' }}>Contact Us</button>
+              <button onClick={() => { handleNavClick('about'); setShowMobileMenu(false); }} style={{ color: isActive(null, 'about') ? '#a78bfa' : 'white', background: 'none', border: 'none', textAlign: 'left', fontSize: '0.9rem', padding: '10px 14px', cursor: 'pointer', borderRadius: '10px', background: isActive(null, 'about') ? 'rgba(167,139,250,0.1)' : 'transparent', display: 'flex', alignItems: 'center', gap: '8px', width: '100%', fontFamily: 'inherit', fontWeight: 'bold' }}><Info size={18} /> About Us</button>
+              <button onClick={() => { handleNavClick('contact'); setShowMobileMenu(false); }} style={{ color: isActive(null, 'contact') ? '#a78bfa' : 'white', background: 'none', border: 'none', textAlign: 'left', fontSize: '0.9rem', padding: '10px 14px', cursor: 'pointer', borderRadius: '10px', background: isActive(null, 'contact') ? 'rgba(167,139,250,0.1)' : 'transparent', display: 'flex', alignItems: 'center', gap: '8px', width: '100%', fontFamily: 'inherit', fontWeight: 'bold' }}><Mail size={18} /> Contact Us</button>
             </>
           )}
         </div>

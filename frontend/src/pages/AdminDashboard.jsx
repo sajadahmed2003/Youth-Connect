@@ -194,7 +194,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.92rem', marginTop: '4px' }}>Control center for campaigns, users, and audit records.</p>
         </div>
         
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '8px', borderRadius: 'var(--radius-full)', border: '1px solid var(--border)' }}>
+        <div className="admin-tabs-container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '8px', borderRadius: 'var(--radius-full)', border: '1px solid var(--border)' }}>
           {['overview', 'users', 'campaigns', 'apps', 'support', 'donations', 'contacts'].map(tab => (
             <button 
               key={tab}

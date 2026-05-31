@@ -188,12 +188,12 @@ const ManagerDashboard = ({ user, setUser, refreshCamps }) => {
       
       {/* HEADER */}
       <div className="dashboard-header" style={{ background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)', padding: '16px 36px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div className="header-logo-section" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div className="logo-icon" style={{ width: '36px', height: '36px', fontSize: '1rem', background: '#7c3aed', color: 'white', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>⚡</div>
               <span style={{ fontWeight: '900', letterSpacing: '0.5px', fontSize: '1rem' }}>YOUTH <span style={{ color: 'var(--accent)' }}>CONNECT</span></span>
           </div>
           
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div className="header-tabs-section" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
             {['dashboard', 'campaigns', 'profile'].map(tab => (
               <button 
                 key={tab} 
@@ -213,8 +213,8 @@ const ManagerDashboard = ({ user, setUser, refreshCamps }) => {
             ))}
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ textAlign: 'right', lineHeight: 1.2 }}>
+          <div className="header-profile-section" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div className="profile-text" style={{ textAlign: 'right', lineHeight: 1.2 }}>
                   <div style={{ fontWeight: 'bold', fontSize: '0.88rem' }}>{user.name}</div>
                   <div style={{ fontSize: '0.65rem', color: 'var(--primary-light)', fontWeight: '900', letterSpacing: '0.5px' }}>MANAGER</div>
               </div>

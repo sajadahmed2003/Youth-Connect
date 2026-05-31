@@ -775,9 +775,69 @@ body {
   .dashboard-header,
   .page-header {
     flex-direction: column !important;
-    gap: 20px !important;
-    padding: 24px 20px !important;
-    align-items: flex-start !important;
+    gap: 16px !important;
+    padding: 20px 16px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .header-logo-section {
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .header-tabs-section {
+    width: 100% !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .header-tabs-section::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-tabs-section button {
+    flex-shrink: 0 !important;
+    padding: 6px 14px !important;
+    font-size: 0.76rem !important;
+  }
+
+  .header-profile-section {
+    width: 100% !important;
+    justify-content: center !important;
+    gap: 10px !important;
+  }
+
+  .header-profile-section .profile-text {
+    text-align: left !important;
+    display: flex !important;
+    flex-direction: column !important;
+    line-height: 1.2 !important;
+  }
+
+  .admin-tabs-container {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    border-radius: var(--radius-md) !important; /* Switch to modern card radius on mobile */
+    padding: 8px 12px !important;
+    gap: 6px !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .admin-tabs-container::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .admin-tabs-container button {
+    flex-shrink: 0 !important;
+    padding: 6px 12px !important;
+    font-size: 0.72rem !important;
   }
 
   .notification-popup {

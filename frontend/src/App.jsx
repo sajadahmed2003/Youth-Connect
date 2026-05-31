@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-router-dom';
 import { API_BASE } from './config';
 import {
   Users, Megaphone, Search, Clapperboard,
-  LayoutDashboard, LogOut, User as UserIcon, Zap, Bell, CheckCircle, XCircle, Trash2
+  LayoutDashboard, LogOut, User as UserIcon, Zap, Bell, CheckCircle, XCircle, Trash2, Heart, MessageSquare, UserCheck
 } from 'lucide-react';
 
 import Auth from './pages/Auth';
@@ -17,13 +17,25 @@ import Dashboard from './pages/Dashboard';
 import IntroSplash from './components/IntroSplash';
 import Home from './pages/Home';
 import InfoPage from './pages/InfoPage';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
-const TopNavbar = ({ user, handleLogout, applications, setApplications }) => {
+const TopNavbar = ({ 
+  user, 
+  handleLogout, 
+  applications, 
+  setApplications,
+  socialNotifications,
+  setSocialNotifications,
+  unreadSocialCount,
+  setUnreadSocialCount,
+  fetchSocialNotifications
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState('home');
+  const [notifTab, setNotifTab] = React.useState('campaign'); // 'campaign', 'social'
+
   const isActive = (path, sectionId = null) => {
     if (sectionId) return activeSection === sectionId;
     if (path === '/home') return (location.pathname === '/home' || location.pathname === '/') && activeSection === 'home';
@@ -50,12 +62,13 @@ const TopNavbar = ({ user, handleLogout, applications, setApplications }) => {
     }
   };
 
-  const unreadNotifications = applications.filter(a => !a.isRead && ['Accepted', 'Rejected', 'Removed'].includes(a.status));
+  const unreadCampaigns = applications.filter(a => !a.isRead && ['Accepted', 'Rejected', 'Removed'].includes(a.status));
+  const totalUnreadCount = unreadCampaigns.length + unreadSocialCount;
 
-  const markAllRead = async () => {
+  const markAllCampaignRead = async () => {
     try {
       const token = localStorage.getItem('token');
-      for (const app of unreadNotifications) {
+      for (const app of unreadCampaigns) {
         await fetch(`${API_BASE}/api/applications/${app._id}`, {
           method: 'PUT',
           headers: {
@@ -65,9 +78,51 @@ const TopNavbar = ({ user, handleLogout, applications, setApplications }) => {
           body: JSON.stringify({ isRead: true })
         });
       }
-      // Update local state
-      setApplications(applications.map(a => unreadNotifications.find(oa => oa._id === a._id) ? { ...a, isRead: true } : a));
-      setShowNotifications(false);
+      setApplications(applications.map(a => unreadCampaigns.find(oa => oa._id === a._id) ? { ...a, isRead: true } : a));
+    } catch (err) { console.error(err); }
+  };
+
+  const handleMarkSocialRead = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setSocialNotifications(socialNotifications.map(n => n._id === id ? { ...n, isRead: true } : n));
+        setUnreadSocialCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  const handleClearAllSocial = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/notifications/read-all`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setSocialNotifications(socialNotifications.map(n => ({ ...n, isRead: true })));
+        setUnreadSocialCount(0);
+        toast.success("Marked all social notifications as read");
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  const handleDeleteSocial = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/notifications/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setSocialNotifications(socialNotifications.filter(n => n._id !== id));
+        toast.success("Notification dismissed");
+        if (fetchSocialNotifications) fetchSocialNotifications();
+      }
     } catch (err) { console.error(err); }
   };
 
@@ -108,7 +163,7 @@ const TopNavbar = ({ user, handleLogout, applications, setApplications }) => {
           <button onClick={() => setShowNotifications(!showNotifications)} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             display: 'flex', alignItems: 'center', position: 'relative',
-            color: unreadNotifications.length > 0 ? '#a78bfa' : 'var(--text-muted)',
+            color: totalUnreadCount > 0 ? '#a78bfa' : 'var(--text-muted)',
             padding: '8px', borderRadius: '10px',
             transition: 'background 0.2s',
           }}
@@ -116,41 +171,109 @@ const TopNavbar = ({ user, handleLogout, applications, setApplications }) => {
             onMouseOut={e => e.currentTarget.style.background = 'none'}
           >
             <Bell size={20} />
-            {unreadNotifications.length > 0 && (
+            {totalUnreadCount > 0 && (
               <span style={{
                 position: 'absolute', top: '4px', right: '4px',
                 background: '#ef4444', color: 'white', borderRadius: '50%',
                 width: '16px', height: '16px', fontSize: '0.6rem',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 border: '2px solid var(--bg-base)', fontWeight: '800',
-              }}>{unreadNotifications.length}</span>
+              }}>{totalUnreadCount}</span>
             )}
           </button>
 
           {showNotifications && (
-            <div className="notification-popup">
-              <div className="responsive-flex-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: '700' }}>Campaign Updates</h4>
-                <button onClick={markAllRead} style={{ background: 'none', border: 'none', color: '#a78bfa', fontSize: '0.72rem', cursor: 'pointer', fontWeight: '700', fontFamily: 'var(--font-body)' }}>Mark all read</button>
+            <div className="notification-popup" style={{ width: '340px', padding: '16px' }}>
+              
+              {/* Dual Tab Headers */}
+              <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: '12px' }}>
+                <button 
+                  onClick={() => setNotifTab('campaign')}
+                  style={{ flex: 1, padding: '8px', border: 'none', background: 'none', borderBottom: notifTab === 'campaign' ? '2px solid var(--primary-light)' : 'none', color: notifTab === 'campaign' ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: '800', fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                  Campaigns ({unreadCampaigns.length})
+                </button>
+                <button 
+                  onClick={() => setNotifTab('social')}
+                  style={{ flex: 1, padding: '8px', border: 'none', background: 'none', borderBottom: notifTab === 'social' ? '2px solid var(--primary-light)' : 'none', color: notifTab === 'social' ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: '800', fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }}
+                >
+                  Social Grid ({unreadSocialCount})
+                </button>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '380px', overflowY: 'auto' }}>
-                {unreadNotifications.length === 0 ? (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', textAlign: 'center', padding: '24px 0' }}>No new updates.</p>
-                ) : (
-                  unreadNotifications.map(app => (
-                    <div key={app._id} style={{ display: 'flex', gap: '12px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-                      <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: app.status === 'Accepted' ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        {app.status === 'Accepted' ? <CheckCircle size={17} color="#10b981" /> : app.status === 'Rejected' ? <XCircle size={17} color="#ef4444" /> : <Trash2 size={17} color="#f87171" />}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: '0.82rem', color: 'var(--text-primary)', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{app.campaignId?.title}</div>
-                        <div style={{ fontSize: '0.72rem', fontWeight: '800', marginTop: '2px', color: app.status === 'Accepted' ? '#10b981' : '#ef4444' }}>{app.status.toUpperCase()}</div>
-                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: '3px' }}>Manager updated your status.</div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
+
+              {/* Campaign Notifications Stream */}
+              {notifTab === 'campaign' && (
+                <>
+                  <div className="responsive-flex-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <h4 style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: '700' }}>Campaign updates</h4>
+                    <button onClick={markAllCampaignRead} style={{ background: 'none', border: 'none', color: '#a78bfa', fontSize: '0.7rem', cursor: 'pointer', fontWeight: '700', fontFamily: 'var(--font-body)' }}>Mark all read</button>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '320px', overflowY: 'auto' }}>
+                    {unreadCampaigns.length === 0 ? (
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center', padding: '24px 0' }}>No campaign updates.</p>
+                    ) : (
+                      unreadCampaigns.map(app => (
+                        <div key={app._id} style={{ display: 'flex', gap: '10px', padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                          <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: app.status === 'Accepted' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            {app.status === 'Accepted' ? <CheckCircle size={15} color="#10b981" /> : <XCircle size={15} color="#ef4444" />}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{app.campaignId?.title}</div>
+                            <div style={{ fontSize: '0.7rem', fontWeight: '800', marginTop: '2px', color: app.status === 'Accepted' ? '#10b981' : '#ef4444' }}>{app.status.toUpperCase()}</div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+
+              {/* Social Grid Notifications Stream */}
+              {notifTab === 'social' && (
+                <>
+                  <div className="responsive-flex-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <h4 style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: '700' }}>Social Interactions</h4>
+                    <button onClick={handleClearAllSocial} style={{ background: 'none', border: 'none', color: '#a78bfa', fontSize: '0.7rem', cursor: 'pointer', fontWeight: '700', fontFamily: 'var(--font-body)' }}>Mark all read</button>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '320px', overflowY: 'auto' }}>
+                    {socialNotifications.length === 0 ? (
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', textAlign: 'center', padding: '24px 0' }}>No social updates.</p>
+                    ) : (
+                      socialNotifications.map(notif => (
+                        <div 
+                          key={notif._id} 
+                          onClick={() => handleMarkSocialRead(notif._id)}
+                          style={{ display: 'flex', gap: '10px', padding: '10px', background: notif.isRead ? 'rgba(255,255,255,0.015)' : 'rgba(124,58,237,0.06)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer', transition: '0.2s', position: 'relative' }}
+                        >
+                          <img 
+                            src={notif.senderAvatar || 'https://i.pravatar.cc/150?img=47'} 
+                            alt="avatar" 
+                            style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} 
+                          />
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-primary)', fontWeight: '700', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              {notif.senderName}
+                            </div>
+                            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '2px', lineHeight: '1.2' }}>
+                              {notif.message}
+                            </div>
+                            <div style={{ fontSize: '0.62rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                              {new Date(notif.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleDeleteSocial(notif._id); }}
+                            style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', display: 'flex', alignItems: 'center', alignSelf: 'center', opacity: 0.6 }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
+
             </div>
           )}
         </div>
@@ -190,9 +313,96 @@ function App() {
   const [dashboardData, setDashboardData] = useState(null);
   const [userApplications, setUserApplications] = useState([]);
 
+  // Social Grid Notification States
+  const [socialNotifications, setSocialNotifications] = useState([]);
+  const [unreadSocialCount, setUnreadSocialCount] = useState(0);
+  const lastNotifIdRef = useRef(null);
+
   useEffect(() => {
     if (isAuthenticated) fetchCampaigns();
   }, [isAuthenticated, user?.role]);
+
+  // Real-Time Social Notifications Polling Engine (6-second intervals)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const checkSocialNotifications = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const res = await fetch(`${API_BASE}/api/notifications/unread-count`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUnreadSocialCount(data.count);
+
+          if (data.latest && data.latest._id !== lastNotifIdRef.current) {
+            lastNotifIdRef.current = data.latest._id;
+
+            // Trigger beautiful real-time cyber-toast popup notification
+            toast.custom((t) => (
+              <div 
+                className="social-toast"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  background: '#0d0d15',
+                  border: '1px solid var(--primary)',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  boxShadow: '0 8px 32px rgba(124, 58, 237, 0.4)',
+                  color: 'white',
+                  fontFamily: 'var(--font-body)',
+                  maxWidth: '350px',
+                  backdropFilter: 'blur(10px)',
+                  transition: '0.3s'
+                }}
+              >
+                <img 
+                  src={data.latest.senderAvatar || 'https://i.pravatar.cc/150?img=47'} 
+                  alt="Sender"
+                  style={{ width: '38px', height: '38px', borderRadius: '50%', border: '2px solid var(--primary)', objectFit: 'cover', flexShrink: 0 }} 
+                />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: '800', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{data.latest.senderName}</div>
+                  <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginTop: '2px', lineHeight: '1.3' }}>{data.latest.message}</div>
+                </div>
+                <button onClick={() => toast.dismiss(t.id)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold', marginLeft: '6px' }}>✕</button>
+              </div>
+            ), { duration: 5000 });
+
+            // Refresh full notifications list
+            fetchSocialNotifications();
+          }
+        }
+      } catch (err) {
+        console.error("Failed to check social notifications:", err);
+      }
+    };
+
+    checkSocialNotifications();
+    fetchSocialNotifications();
+
+    const interval = setInterval(checkSocialNotifications, 6000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
+
+  const fetchSocialNotifications = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const res = await fetch(`${API_BASE}/api/notifications`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSocialNotifications(data);
+      }
+    } catch (err) { console.error("Failed to load notifications list:", err); }
+  };
 
   const fetchCampaigns = () => {
     const token = localStorage.getItem('token');
@@ -250,7 +460,17 @@ function App() {
       {isAuthenticated ? (
         <>
           <Toaster position="top-right" reverseOrder={false} />
-          <TopNavbar user={user} handleLogout={handleLogout} applications={userApplications} setApplications={setUserApplications} />
+          <TopNavbar 
+            user={user} 
+            handleLogout={handleLogout} 
+            applications={userApplications} 
+            setApplications={setUserApplications}
+            socialNotifications={socialNotifications}
+            setSocialNotifications={setSocialNotifications}
+            unreadSocialCount={unreadSocialCount}
+            setUnreadSocialCount={setUnreadSocialCount}
+            fetchSocialNotifications={fetchSocialNotifications}
+          />
           <main className="main-content" style={{ padding: '0' }}>
             <div className="content-container" style={{ maxWidth: '1300px', margin: '0 auto' }}>
               <Routes>

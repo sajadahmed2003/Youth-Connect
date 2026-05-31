@@ -69,7 +69,10 @@ const userSchema = new mongoose.Schema({
     icon: String,
     category: String,
     unlockedAt: { type: Date, default: Date.now }
-  }]
+  }],
+  // 👥 Social Connection Fields
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

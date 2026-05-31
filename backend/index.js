@@ -28,6 +28,7 @@ const ActivityLog = require('./models/ActivityLog');
 const Post = require('./models/Post');
 const SupportQuery = require('./models/SupportQuery');
 const ContactInquiry = require('./models/ContactInquiry');
+const Notification = require('./models/Notification');
 
 // --- NODEMAILER EMAIL ENGINE ---
 const transporter = nodemailer.createTransport({
@@ -90,6 +91,31 @@ const checkAndAwardBadges = async (user) => {
     console.log(`🏆 BADGE UNLOCKED for User [${user.name}]: ${newBadges.map(b => b.title).join(', ')}`);
   }
   return newBadges;
+};
+
+// --- REAL-TIME SOCIAL NOTIFICATION HELPER ---
+const createNotification = async ({ recipient, sender, senderName, senderAvatar, type, postId, commentId, message }) => {
+  try {
+    if (!recipient || !sender) return null;
+    // Don't notify yourself
+    if (recipient.toString() === sender.toString()) return null;
+
+    const notif = await Notification.create({
+      recipient,
+      sender,
+      senderName,
+      senderAvatar: senderAvatar || 'https://i.pravatar.cc/150?img=47',
+      type,
+      postId,
+      commentId,
+      message
+    });
+    console.log(`🔔 Social Notification Created: [Recipient: ${recipient}] [Type: ${type}] [Message: ${message}]`);
+    return notif;
+  } catch (err) {
+    console.error('❌ Error creating social notification:', err);
+    return null;
+  }
 };
 
 // --- DATABASE CONNECTION ---
@@ -488,7 +514,12 @@ app.put('/api/admin/contacts/:id/reply', async (req, res) => {
 // --- COMMUNITY POST ENGINE ---
 app.get('/api/posts', async (req, res) => {
     try {
-        const posts = await Post.find().sort({ createdAt: -1 });
+        const { type } = req.query; // 'post', 'reel', 'video'
+        const filter = {};
+        if (type && ['post', 'reel', 'video'].includes(type)) {
+            filter.mediaType = type;
+        }
+        const posts = await Post.find(filter).sort({ createdAt: -1 });
         res.json(posts);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -503,15 +534,18 @@ app.post('/api/posts', async (req, res) => {
         const user = await User.findById(decoded.userId);
         if (!user) return res.status(404).json({ error: "User identity not found." });
 
-        const { content, image } = req.body;
+        const { content, image, videoUrl, mediaType } = req.body;
         const newPost = await Post.create({
             userId: decoded.userId,
             userName: user.name,
+            userAvatar: user.avatar || 'https://i.pravatar.cc/150?img=47',
             content: content || '',
-            image
+            image,
+            videoUrl: videoUrl || '',
+            mediaType: mediaType || 'post'
         });
         
-        await ActivityLog.create({ type: 'LOG', message: `User [${user.name}] posted in activity feed.` });
+        await ActivityLog.create({ type: 'LOG', message: `User [${user.name}] posted a ${mediaType || 'post'} in activity feed.` });
         res.json(newPost);
     } catch (err) { 
         console.error("🔥 POST ERROR:", err);
@@ -546,15 +580,345 @@ app.post('/api/posts/:id/like', async (req, res) => {
         const decoded = jwt.verify(token, JWT_SECRET);
         
         const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
         if (!post.likes) post.likes = [];
         
-        if (post.likes.includes(decoded.userId)) {
+        const user = await User.findById(decoded.userId);
+        const liked = post.likes.includes(decoded.userId);
+        
+        if (liked) {
             post.likes = post.likes.filter(id => id.toString() !== decoded.userId);
         } else {
             post.likes.push(decoded.userId);
+            // Trigger LIKE_POST Notification to the owner of the post
+            await createNotification({
+                recipient: post.userId,
+                sender: decoded.userId,
+                senderName: user.name,
+                senderAvatar: user.avatar,
+                type: 'LIKE_POST',
+                postId: post._id,
+                message: `${user.name} liked your post.`
+            });
         }
         await post.save();
         res.json(post);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- ADVANCED COMMENTS ENGINE ---
+app.post('/api/posts/:id/comment', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const user = await User.findById(decoded.userId);
+        if (!user) return res.status(404).json({ error: "User identity not found." });
+
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        const { text } = req.body;
+        if (!text || text.trim() === '') {
+            return res.status(400).json({ error: "Comment text is required." });
+        }
+
+        const newComment = {
+            userId: decoded.userId,
+            userName: user.name,
+            userAvatar: user.avatar || 'https://i.pravatar.cc/150?img=47',
+            text,
+            likes: [],
+            replies: [],
+            createdAt: new Date()
+        };
+
+        if (!post.comments) post.comments = [];
+        post.comments.push(newComment);
+        await post.save();
+
+        const savedComment = post.comments[post.comments.length - 1];
+
+        // Trigger COMMENT_POST notification
+        await createNotification({
+            recipient: post.userId,
+            sender: decoded.userId,
+            senderName: user.name,
+            senderAvatar: user.avatar,
+            type: 'COMMENT_POST',
+            postId: post._id,
+            commentId: savedComment._id.toString(),
+            message: `${user.name} commented on your post: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`
+        });
+
+        res.json(post);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/posts/:id/comment/:cid/like', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const user = await User.findById(decoded.userId);
+        if (!user) return res.status(404).json({ error: "User identity not found." });
+
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        const comment = post.comments.id(req.params.cid);
+        if (!comment) return res.status(404).json({ error: "Comment not found" });
+
+        if (!comment.likes) comment.likes = [];
+        const liked = comment.likes.includes(decoded.userId);
+
+        if (liked) {
+            comment.likes = comment.likes.filter(id => id.toString() !== decoded.userId);
+        } else {
+            comment.likes.push(decoded.userId);
+            // Trigger LIKE_COMMENT notification to comment author
+            await createNotification({
+                recipient: comment.userId,
+                sender: decoded.userId,
+                senderName: user.name,
+                senderAvatar: user.avatar,
+                type: 'LIKE_COMMENT',
+                postId: post._id,
+                commentId: comment._id.toString(),
+                message: `${user.name} liked your comment.`
+            });
+        }
+
+        await post.save();
+        res.json(post);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/posts/:id/comment/:cid/reply', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const user = await User.findById(decoded.userId);
+        if (!user) return res.status(404).json({ error: "User identity not found." });
+
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        const comment = post.comments.id(req.params.cid);
+        if (!comment) return res.status(404).json({ error: "Comment not found" });
+
+        const { text } = req.body;
+        if (!text || text.trim() === '') {
+            return res.status(400).json({ error: "Reply text is required." });
+        }
+
+        const newReply = {
+            userId: decoded.userId,
+            userName: user.name,
+            userAvatar: user.avatar || 'https://i.pravatar.cc/150?img=47',
+            text,
+            createdAt: new Date()
+        };
+
+        if (!comment.replies) comment.replies = [];
+        comment.replies.push(newReply);
+        await post.save();
+
+        // Trigger REPLY_COMMENT notification to comment author
+        await createNotification({
+            recipient: comment.userId,
+            sender: decoded.userId,
+            senderName: user.name,
+            senderAvatar: user.avatar,
+            type: 'REPLY_COMMENT',
+            postId: post._id,
+            commentId: comment._id.toString(),
+            message: `${user.name} replied to your comment: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`
+        });
+
+        res.json(post);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/posts/:id/comment/:cid', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+
+        const comment = post.comments.id(req.params.cid);
+        if (!comment) return res.status(404).json({ error: "Comment not found" });
+
+        if (comment.userId.toString() !== decoded.userId && post.userId.toString() !== decoded.userId && decoded.role !== 'admin') {
+            return res.status(403).json({ error: "Unauthorized" });
+        }
+
+        comment.deleteOne();
+        await post.save();
+        res.json(post);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/posts/:id/share', async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+        if (!post) return res.status(404).json({ error: "Post not found" });
+        post.shareCount = (post.shareCount || 0) + 1;
+        await post.save();
+        res.json(post);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- SOCIAL CONNECTIONS ENGINE ---
+app.post('/api/users/:id/follow', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        if (decoded.userId === req.params.id) {
+            return res.status(400).json({ error: "You cannot follow yourself." });
+        }
+
+        const currentUser = await User.findById(decoded.userId);
+        const targetUser = await User.findById(req.params.id);
+
+        if (!currentUser || !targetUser) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        if (!currentUser.following) currentUser.following = [];
+        if (!targetUser.followers) targetUser.followers = [];
+
+        const isFollowing = currentUser.following.includes(targetUser._id);
+
+        if (isFollowing) {
+            currentUser.following = currentUser.following.filter(id => id.toString() !== targetUser._id.toString());
+            targetUser.followers = targetUser.followers.filter(id => id.toString() !== currentUser._id.toString());
+        } else {
+            currentUser.following.push(targetUser._id);
+            targetUser.followers.push(currentUser._id);
+
+            // Trigger FOLLOW notification
+            await createNotification({
+                recipient: targetUser._id,
+                sender: currentUser._id,
+                senderName: currentUser.name,
+                senderAvatar: currentUser.avatar,
+                type: 'FOLLOW',
+                message: `${currentUser.name} started following you.`
+            });
+        }
+
+        await currentUser.save();
+        await targetUser.save();
+
+        res.json({
+            success: true,
+            isFollowing: !isFollowing,
+            followersCount: targetUser.followers.length,
+            followingCount: currentUser.following.length
+        });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/users/:id/profile', async (req, res) => {
+    try {
+        const userObj = await User.findById(req.params.id)
+            .select('-password')
+            .populate('followers', 'name avatar points')
+            .populate('following', 'name avatar points');
+
+        if (!userObj) return res.status(404).json({ error: "Profile not found." });
+
+        const posts = await Post.find({ userId: userObj._id }).sort({ createdAt: -1 });
+
+        res.json({
+            user: userObj,
+            posts
+        });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// --- SOCIAL NOTIFICATION ENGINE ENDPOINTS ---
+app.get('/api/notifications', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const notifications = await Notification.find({ recipient: decoded.userId })
+            .sort({ createdAt: -1 })
+            .limit(50);
+        res.json(notifications);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/notifications/unread-count', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const count = await Notification.countDocuments({ recipient: decoded.userId, isRead: false });
+        const latest = await Notification.findOne({ recipient: decoded.userId, isRead: false })
+            .sort({ createdAt: -1 });
+
+        res.json({ count, latest });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/notifications/read-all', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        await Notification.updateMany({ recipient: decoded.userId }, { isRead: true });
+        res.json({ success: true });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.put('/api/notifications/:id/read', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        const notif = await Notification.findOneAndUpdate(
+            { _id: req.params.id, recipient: decoded.userId },
+            { isRead: true },
+            { new: true }
+        );
+        res.json({ success: true, notification: notif });
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+app.delete('/api/notifications/:id', async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        await Notification.findOneAndDelete({ _id: req.params.id, recipient: decoded.userId });
+        res.json({ success: true });
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
@@ -603,7 +967,9 @@ app.get('/api/profile', async (req, res) => {
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, JWT_SECRET);
     
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(decoded.userId)
+      .populate('followers', 'name avatar points')
+      .populate('following', 'name avatar points');
     res.json({ user });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

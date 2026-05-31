@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   ShieldCheck, Megaphone, Zap, Award, Star, Trophy, PlusCircle, 
-  Camera, User, Phone, MapPin, Globe, Mail, CheckCircle2, AlertCircle 
+  Camera, User, Phone, MapPin, Globe, Mail, CheckCircle2, AlertCircle, Eye
 } from 'lucide-react';
 import { API_BASE } from '../config';
 
@@ -25,6 +25,18 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
   const [myCampaigns, setMyCampaigns] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Connection Networks Modals
+  const [showConnectionsModal, setShowConnectionsModal] = useState(null); // 'followers' | 'following' | null
+  
+  // Media Grid State
+  const [myPosts, setMyPosts] = useState([]);
+  const [activeMediaTab, setActiveMediaTab] = useState('all'); // 'all', 'post', 'reel', 'video'
+
+  useEffect(() => {
+    fetchActiveProfile();
+    fetchMyPosts();
+  }, []);
+
   useEffect(() => {
     setName(user.name || '');
     setSkillsText((user.skills || []).join(', '));
@@ -38,6 +50,29 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
       fetchMyCampaigns();
     }
   }, [user]);
+
+  const fetchActiveProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+      }
+    } catch (err) { console.error("Failed to sync profile:", err); }
+  };
+
+  const fetchMyPosts = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${user._id}/profile`);
+      if (res.ok) {
+        const data = await res.json();
+        setMyPosts(data.posts || []);
+      }
+    } catch (err) { console.error("Failed to load user broadcasts:", err); }
+  };
 
   const fetchMyCampaigns = async () => {
     try {
@@ -269,13 +304,36 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
             />
 
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', color: 'var(--text-primary)', marginBottom: '8px', fontWeight: '900', letterSpacing: '-0.3px' }}>{name}</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '24px' }}>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px' }}>
               <span className={`badge ${branding.badgeClass}`} style={{ padding: '4px 14px', fontSize: '0.65rem', fontWeight: '800' }}>
                 {branding.label}
               </span>
               <span style={{ fontSize: '0.72rem', color: 'var(--success)', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px', background: 'rgba(16,185,129,0.06)', padding: '4px 10px', borderRadius: '99px', border: '1px solid rgba(16,185,129,0.15)' }}>
                 <CheckCircle2 size={12} /> Verified
               </span>
+            </div>
+
+            {/* 👥 CONNECTION STATISTICS ROW */}
+            <div style={{ display: 'flex', gap: '20px', width: '100%', justifyContent: 'space-around', margin: '16px 0 24px 0', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '16px 0' }}>
+              <div 
+                onClick={() => setShowConnectionsModal('followers')}
+                style={{ cursor: 'pointer', textAlign: 'center', flex: 1 }}
+              >
+                <div style={{ fontSize: '1.25rem', fontWeight: '900', color: 'var(--text-primary)' }}>{user.followers?.length || 0}</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800', marginTop: '2px', letterSpacing: '0.5px' }}>Followers</div>
+              </div>
+              <div 
+                onClick={() => setShowConnectionsModal('following')}
+                style={{ cursor: 'pointer', textAlign: 'center', flex: 1, borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)' }}
+              >
+                <div style={{ fontSize: '1.25rem', fontWeight: '900', color: 'var(--text-primary)' }}>{user.following?.length || 0}</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800', marginTop: '2px', letterSpacing: '0.5px' }}>Following</div>
+              </div>
+              <div style={{ textAlign: 'center', flex: 1 }}>
+                <div style={{ fontSize: '1.25rem', fontWeight: '900', color: 'var(--text-primary)' }}>{user.points || 0}</div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: '800', marginTop: '2px', letterSpacing: '0.5px' }}>Points</div>
+              </div>
             </div>
 
             {/* PROFILE STRENGTH METER */}
@@ -513,6 +571,69 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
             </form>
           </div>
 
+          {/* MY ACTIVITY MEDIA GRID */}
+          <div className="cyber-card" style={{ padding: '36px' }}>
+            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', marginBottom: '20px', color: 'var(--text-primary)', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Eye size={18} color={branding.col} /> My Broadcast Activity Grid
+            </h3>
+            
+            {/* Sub-tabs */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
+              {['all', 'post', 'reel', 'video'].map(tab => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveMediaTab(tab)}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '16px',
+                    border: 'none',
+                    background: activeMediaTab === tab ? branding.gradient : 'transparent',
+                    color: activeMediaTab === tab ? 'white' : 'var(--text-muted)',
+                    fontSize: '0.78rem',
+                    fontWeight: '800',
+                    cursor: 'pointer',
+                    textTransform: 'capitalize',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {tab}s
+                </button>
+              ))}
+            </div>
+
+            {/* Posts stream */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '350px', overflowY: 'auto' }}>
+              {myPosts.filter(p => activeMediaTab === 'all' || p.mediaType === activeMediaTab).length > 0 ? (
+                myPosts.filter(p => activeMediaTab === 'all' || p.mediaType === activeMediaTab).map(post => (
+                  <div key={post._id} style={{ background: 'rgba(255, 255, 255, 0.015)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span className="badge" style={{ background: 'rgba(124, 58, 237, 0.1)', color: '#a78bfa', fontSize: '0.62rem', padding: '2px 8px', fontWeight: '800', textTransform: 'uppercase', border: '1px solid rgba(124, 58, 237, 0.2)' }}>
+                        {post.mediaType || 'post'}
+                      </span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                        {new Date(post.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-primary)', margin: '0 0 10px 0', lineHeight: '1.4' }}>{post.content}</p>
+                    {post.image && (
+                      <img src={post.image} alt="Attachment" style={{ maxHeight: '140px', borderRadius: '6px', objectFit: 'cover', border: '1px solid var(--border)' }} />
+                    )}
+                    {post.videoUrl && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                        🔗 Video Link: <span style={{ textDecoration: 'underline', color: 'var(--primary-light)' }}>{post.videoUrl}</span>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                  No social grid posts registered under this quadrant.
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* POSTED CAMPAIGNS FOR NGO / VOLUNTEER ACTIVITY FOR OTHERS */}
           {user.role === 'ngo' && (
             <div className="cyber-card" style={{ padding: '36px' }}>
@@ -543,6 +664,77 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
         </div>
 
       </div>
+
+      {/* 👥 NETWORK CONNECTIONS OVERLAY MODAL */}
+      {showConnectionsModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(5, 5, 8, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '24px'
+        }}>
+          <div className="cyber-card" style={{
+            maxWidth: '400px',
+            width: '100%',
+            padding: '28px',
+            position: 'relative',
+            maxHeight: '80vh',
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <button 
+              onClick={() => setShowConnectionsModal(null)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                fontSize: '1.2rem',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                outline: 'none'
+              }}
+            >
+              ✕
+            </button>
+            
+            <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '1.25rem', marginBottom: '16px', fontWeight: '900', textTransform: 'capitalize' }}>
+              My {showConnectionsModal} Network
+            </h3>
+
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              paddingRight: '4px'
+            }}>
+              {((showConnectionsModal === 'followers' ? user.followers : user.following) || []).length === 0 ? (
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', textAlign: 'center', padding: '32px 0' }}>No nodes registered in this quadrant.</p>
+              ) : (
+                ((showConnectionsModal === 'followers' ? user.followers : user.following) || []).map(node => (
+                  <div key={node._id} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                    <img src={node.avatar || 'https://i.pravatar.cc/150?img=47'} alt={node.name} style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(124,58,237,0.3)', flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{node.name}</div>
+                      <div style={{ fontSize: '0.72rem', color: '#a78bfa', fontWeight: '800', marginTop: '1px' }}>⚡ {node.points || 0} Reputation Pts</div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

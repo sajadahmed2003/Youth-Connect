@@ -571,68 +571,6 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
             </form>
           </div>
 
-          {/* MY ACTIVITY MEDIA GRID */}
-          <div className="cyber-card" style={{ padding: '36px' }}>
-            <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', marginBottom: '20px', color: 'var(--text-primary)', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Eye size={18} color={branding.col} /> My Broadcast Activity Grid
-            </h3>
-            
-            {/* Sub-tabs */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
-              {['all', 'post', 'reel'].map(tab => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveMediaTab(tab)}
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: '16px',
-                    border: 'none',
-                    background: activeMediaTab === tab ? branding.gradient : 'transparent',
-                    color: activeMediaTab === tab ? 'white' : 'var(--text-muted)',
-                    fontSize: '0.78rem',
-                    fontWeight: '800',
-                    cursor: 'pointer',
-                    textTransform: 'capitalize',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  {tab}s
-                </button>
-              ))}
-            </div>
-
-            {/* Posts stream */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight: '350px', overflowY: 'auto' }}>
-              {myPosts.filter(p => activeMediaTab === 'all' || p.mediaType === activeMediaTab).length > 0 ? (
-                myPosts.filter(p => activeMediaTab === 'all' || p.mediaType === activeMediaTab).map(post => (
-                  <div key={post._id} style={{ background: 'rgba(255, 255, 255, 0.015)', padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span className="badge" style={{ background: 'rgba(124, 58, 237, 0.1)', color: '#a78bfa', fontSize: '0.62rem', padding: '2px 8px', fontWeight: '800', textTransform: 'uppercase', border: '1px solid rgba(124, 58, 237, 0.2)' }}>
-                        {post.mediaType || 'post'}
-                      </span>
-                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                        {new Date(post.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p style={{ fontSize: '0.88rem', color: 'var(--text-primary)', margin: '0 0 10px 0', lineHeight: '1.4' }}>{post.content}</p>
-                    {post.image && (
-                      <img src={post.image} alt="Attachment" style={{ maxHeight: '140px', borderRadius: '6px', objectFit: 'cover', border: '1px solid var(--border)' }} />
-                    )}
-                    {post.videoUrl && (
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                        🔗 Video Link: <span style={{ textDecoration: 'underline', color: 'var(--primary-light)' }}>{post.videoUrl}</span>
-                      </div>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-                  No social grid posts registered under this quadrant.
-                </div>
-              )}
-            </div>
-          </div>
 
           {/* POSTED CAMPAIGNS FOR NGO / VOLUNTEER ACTIVITY FOR OTHERS */}
           {user.role === 'ngo' && (

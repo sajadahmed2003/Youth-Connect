@@ -312,13 +312,13 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                       {/* Auto-Bot Response (Left side, violet tinted bubble) */}
                       {q.botResponse && (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                          <span style={{ fontSize: '0.62rem', color: '#a78bfa', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
+                          <span style={{ fontSize: '0.62rem', color: 'var(--primary-dark)', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
                           <div style={{
                             padding: '10px 14px',
                             borderRadius: '16px 16px 16px 2px',
-                            background: 'rgba(167,139,250,0.05)',
-                            border: '1px solid rgba(167,139,250,0.15)',
-                            color: '#a78bfa',
+                            background: 'rgba(124,58,237,0.06)',
+                            border: '1px solid rgba(124,58,237,0.18)',
+                            color: '#4c1d95',
                             fontSize: '0.82rem',
                             maxWidth: '85%',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
@@ -330,13 +330,13 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                       {/* Super Admin Response (Left side, emerald tinted bubble) */}
                       {q.adminReply && (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                          <span style={{ fontSize: '0.62rem', color: '#10b981', fontWeight: '700', marginBottom: '2px' }}>🛡️ Super Admin</span>
+                          <span style={{ fontSize: '0.62rem', color: '#047857', fontWeight: '700', marginBottom: '2px' }}>🛡️ Super Admin</span>
                           <div style={{
                             padding: '10px 14px',
                             borderRadius: '16px 16px 16px 2px',
-                            background: 'rgba(16,185,129,0.05)',
-                            border: '1px solid rgba(16,185,129,0.15)',
-                            color: '#10b981',
+                            background: 'rgba(16,185,129,0.06)',
+                            border: '1px solid rgba(16,185,129,0.18)',
+                            color: '#065f46',
                             fontSize: '0.82rem',
                             maxWidth: '85%',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
@@ -349,22 +349,22 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                   ))}
                   {isSupportBotTyping && (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '10px' }} className="animate-pulse">
-                      <span style={{ fontSize: '0.62rem', color: '#a78bfa', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
+                      <span style={{ fontSize: '0.62rem', color: 'var(--primary-dark)', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
                       <div style={{
                          padding: '10px 16px',
                          borderRadius: '16px 16px 16px 2px',
-                         background: 'rgba(167,139,250,0.08)',
-                         border: '1px solid rgba(167,139,250,0.2)',
-                         color: '#a78bfa',
+                         background: 'rgba(124,58,237,0.08)',
+                         border: '1px solid rgba(124,58,237,0.2)',
+                         color: '#4c1d95',
                          fontSize: '0.82rem',
                          maxWidth: '80%',
                          display: 'flex',
                          gap: '4px',
                          alignItems: 'center'
                       }}>
-                         <span style={{ width: '6px', height: '6px', background: '#a78bfa', borderRadius: '50%', display: 'inline-block' }}></span>
-                         <span style={{ width: '6px', height: '6px', background: '#a78bfa', borderRadius: '50%', display: 'inline-block' }}></span>
-                         <span style={{ width: '6px', height: '6px', background: '#a78bfa', borderRadius: '50%', display: 'inline-block' }}></span>
+                         <span style={{ width: '6px', height: '6px', background: '#4c1d95', borderRadius: '50%', display: 'inline-block' }}></span>
+                         <span style={{ width: '6px', height: '6px', background: '#4c1d95', borderRadius: '50%', display: 'inline-block' }}></span>
+                         <span style={{ width: '6px', height: '6px', background: '#4c1d95', borderRadius: '50%', display: 'inline-block' }}></span>
                       </div>
                     </div>
                   )}
@@ -567,13 +567,13 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                            {/* Auto-Bot Response (Left side, violet tinted bubble) */}
                            {msg.botResponse && (
                               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                 <span style={{ fontSize: '0.62rem', color: '#a78bfa', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
+                                 <span style={{ fontSize: '0.62rem', color: 'var(--primary-dark)', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
                                  <div style={{
                                     padding: '10px 14px',
                                     borderRadius: '16px 16px 16px 2px',
-                                    background: 'rgba(167,139,250,0.05)',
-                                    border: '1px solid rgba(167,139,250,0.15)',
-                                    color: '#a78bfa',
+                                    background: 'rgba(124,58,237,0.06)',
+                                    border: '1px solid rgba(124,58,237,0.18)',
+                                    color: '#4c1d95',
                                     fontSize: '0.82rem',
                                     maxWidth: '85%',
                                     wordBreak: 'break-word',
@@ -587,13 +587,13 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                            {/* Super Admin Response (Left side, emerald tinted bubble) */}
                            {msg.adminReply && (
                               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                 <span style={{ fontSize: '0.62rem', color: '#10b981', fontWeight: '700', marginBottom: '2px' }}>🛡️ Super Admin</span>
+                                 <span style={{ fontSize: '0.62rem', color: '#047857', fontWeight: '700', marginBottom: '2px' }}>🛡️ Super Admin</span>
                                  <div style={{
                                     padding: '10px 14px',
                                     borderRadius: '16px 16px 16px 2px',
-                                    background: 'rgba(16,185,129,0.05)',
-                                    border: '1px solid rgba(16,185,129,0.15)',
-                                    color: '#10b981',
+                                    background: 'rgba(16,185,129,0.06)',
+                                    border: '1px solid rgba(16,185,129,0.18)',
+                                    color: '#065f46',
                                     fontSize: '0.82rem',
                                     maxWidth: '85%',
                                     wordBreak: 'break-word',
@@ -608,22 +608,22 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                   )}
                   {isBotTyping && (
                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '10px' }} className="animate-pulse">
-                        <span style={{ fontSize: '0.62rem', color: '#a78bfa', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
+                        <span style={{ fontSize: '0.62rem', color: 'var(--primary-dark)', fontWeight: '700', marginBottom: '2px' }}>🤖 Auto-Bot (AI)</span>
                         <div style={{
                            padding: '10px 16px',
                            borderRadius: '16px 16px 16px 2px',
-                           background: 'rgba(167,139,250,0.08)',
-                           border: '1px solid rgba(167,139,250,0.2)',
-                           color: '#a78bfa',
+                           background: 'rgba(124,58,237,0.08)',
+                           border: '1px solid rgba(124,58,237,0.2)',
+                           color: '#4c1d95',
                            fontSize: '0.82rem',
                            maxWidth: '80%',
                            display: 'flex',
                            gap: '4px',
                            alignItems: 'center'
                         }}>
-                           <span style={{ width: '6px', height: '6px', background: '#a78bfa', borderRadius: '50%', display: 'inline-block' }}></span>
-                           <span style={{ width: '6px', height: '6px', background: '#a78bfa', borderRadius: '50%', display: 'inline-block' }}></span>
-                           <span style={{ width: '6px', height: '6px', background: '#a78bfa', borderRadius: '50%', display: 'inline-block' }}></span>
+                           <span style={{ width: '6px', height: '6px', background: '#4c1d95', borderRadius: '50%', display: 'inline-block' }}></span>
+                           <span style={{ width: '6px', height: '6px', background: '#4c1d95', borderRadius: '50%', display: 'inline-block' }}></span>
+                           <span style={{ width: '6px', height: '6px', background: '#4c1d95', borderRadius: '50%', display: 'inline-block' }}></span>
                         </div>
                      </div>
                   )}

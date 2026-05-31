@@ -467,27 +467,27 @@ body {
 }
 
 .badge-primary {
-  background: rgba(124, 58, 237, 0.15);
-  color: #a78bfa;
-  border: 1px solid rgba(124, 58, 237, 0.25);
+  background: rgba(124, 58, 237, 0.08);
+  color: #6d28d9; /* High-contrast violet for light theme */
+  border: 1px solid rgba(124, 58, 237, 0.2);
 }
 
 .badge-success {
-  background: rgba(16, 185, 129, 0.12);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.08);
+  color: #059669; /* High-contrast emerald green for light theme */
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .badge-warning {
-  background: rgba(245, 158, 11, 0.12);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  background: rgba(245, 158, 11, 0.08);
+  color: #d97706; /* High-contrast amber for light theme */
+  border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .badge-danger {
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626; /* High-contrast red for light theme */
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .badge-accent {
@@ -856,36 +856,33 @@ body {
     justify-content: space-between !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
-    overflow-x: auto !important;
     gap: 12px !important;
-    padding: 12px 14px !important;
+    padding: 10px 12px !important;
     border-radius: var(--radius-md) !important;
-    -webkit-overflow-scrolling: touch;
-  }
-  .manager-dashboard-premium .dashboard-header::-webkit-scrollbar {
-    display: none;
+    position: relative !important;
   }
   
   .manager-dashboard-premium .header-logo-section {
     flex-shrink: 0 !important;
     display: flex !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 4px !important;
     width: auto !important;
   }
   .manager-dashboard-premium .header-logo-section span {
-    font-size: 0.82rem !important;
-    letter-spacing: 0px !important;
+    font-size: 0.78rem !important;
+    letter-spacing: -0.2px !important;
   }
   
   .manager-dashboard-premium .header-tabs-section {
-    flex-shrink: 1 !important;
-    width: auto !important;
+    flex: 1 !important;
+    min-width: 0 !important; /* Critical to prevent flex layout overflow overlap! */
     justify-content: flex-start !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     gap: 6px !important;
-    padding: 2px 0 !important;
+    padding: 4px 0 !important;
+    margin: 0 4px !important;
     -webkit-overflow-scrolling: touch;
   }
   .manager-dashboard-premium .header-tabs-section::-webkit-scrollbar {
@@ -893,37 +890,40 @@ body {
   }
   .manager-dashboard-premium .header-tabs-section button {
     flex-shrink: 0 !important;
-    padding: 6px 12px !important;
-    font-size: 0.74rem !important;
+    padding: 5px 10px !important;
+    font-size: 0.72rem !important;
   }
   
   .manager-dashboard-premium .header-profile-section {
     flex-shrink: 0 !important;
     display: flex !important;
+    flex-direction: column-reverse !important; /* Visual reverse: Avatar image on top, text details below! */
     align-items: center !important;
-    gap: 8px !important;
+    gap: 4px !important;
     width: auto !important;
-    justify-content: flex-end !important;
+    justify-content: center !important;
   }
   .manager-dashboard-premium .header-profile-section .profile-text {
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: row !important; /* Side-by-side elements under avatar */
     align-items: center !important;
     gap: 4px !important;
-    text-align: left !important;
+    text-align: center !important;
     line-height: 1 !important;
+    white-space: nowrap !important;
   }
   .manager-dashboard-premium .header-profile-section .profile-text span:first-child {
-    font-size: 0.78rem !important;
+    font-size: 0.72rem !important;
     font-weight: bold !important;
   }
   .manager-dashboard-premium .header-profile-section .profile-text span:last-child {
-    font-size: 0.58rem !important;
+    font-size: 0.54rem !important;
     padding: 2px 4px !important;
   }
   .manager-dashboard-premium .header-profile-section img {
-    width: 28px !important;
-    height: 28px !important;
+    width: 32px !important;
+    height: 32px !important;
+    border: 1px solid rgba(124, 58, 237, 0.4) !important;
   }
 }
 

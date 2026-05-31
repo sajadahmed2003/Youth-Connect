@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, Link, useLocation, useNavigate } from 'react-r
 import { API_BASE } from './config';
 import {
   Users, Megaphone, Search, Clapperboard,
-  LayoutDashboard, LogOut, User as UserIcon, Zap, Bell, CheckCircle, XCircle, Trash2, Heart, MessageSquare, UserCheck
+  LayoutDashboard, LogOut, User as UserIcon, Zap, Bell, CheckCircle, XCircle, Trash2, Heart, MessageSquare, UserCheck, Menu, X
 } from 'lucide-react';
 
 import Auth from './pages/Auth';
@@ -33,6 +33,7 @@ const TopNavbar = ({
   const location = useLocation();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = React.useState(false);
+  const [showMobileMenu, setShowMobileMenu] = React.useState(false);
   const [activeSection, setActiveSection] = React.useState('home');
   const [notifTab, setNotifTab] = React.useState('campaign'); // 'campaign', 'social'
 
@@ -134,7 +135,15 @@ const TopNavbar = ({
         <div className="logo-text">YOUTH<br /><span>CONNECT</span></div>
       </div>
 
-      {/* NAV LINKS */}
+      {/* Mobile Hamburger Button */}
+      <button 
+        onClick={() => setShowMobileMenu(!showMobileMenu)}
+        className="mobile-menu-btn"
+      >
+        {showMobileMenu ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* NAV LINKS (DESKTOP) */}
       <ul className="nav-links">
         {user?.role === 'admin' && (
           <li><Link to="/admin-dashboard" style={{ color: isActive('/admin-dashboard') ? '#a78bfa' : undefined }}><LayoutDashboard size={16} /> Admin Hub</Link></li>
@@ -154,6 +163,43 @@ const TopNavbar = ({
           </>
         )}
       </ul>
+
+      {/* MOBILE NAV DROPDOWN */}
+      {showMobileMenu && (
+        <div className="mobile-nav-dropdown" style={{
+          position: 'absolute',
+          top: '72px',
+          left: '0',
+          right: '0',
+          background: 'rgba(10, 10, 15, 0.96)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid var(--border)',
+          padding: '16px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+          zIndex: 999
+        }}>
+          {user?.role === 'admin' && (
+            <Link to="/admin-dashboard" onClick={() => setShowMobileMenu(false)} style={{ color: isActive('/admin-dashboard') ? '#a78bfa' : 'white', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', background: isActive('/admin-dashboard') ? 'rgba(167,139,250,0.1)' : 'transparent', fontWeight: 'bold' }}><LayoutDashboard size={18} /> Admin Hub</Link>
+          )}
+          {(user?.role === 'ngo' || user?.role === 'admin') && (
+            <Link to="/campaign-portal" onClick={() => setShowMobileMenu(false)} style={{ color: isActive('/campaign-portal') ? '#a78bfa' : 'white', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', background: isActive('/campaign-portal') ? 'rgba(167,139,250,0.1)' : 'transparent', fontWeight: 'bold' }}><Megaphone size={18} /> Dashboard</Link>
+          )}
+          {(user?.role === 'volunteer' || user?.role === 'admin' || user?.role === 'ngo') && (
+            <>
+              {user?.role === 'volunteer' && (
+                <Link to="/dashboard" onClick={() => setShowMobileMenu(false)} style={{ color: isActive('/dashboard') ? '#a78bfa' : 'white', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', background: isActive('/dashboard') ? 'rgba(167,139,250,0.1)' : 'transparent', fontWeight: 'bold' }}><LayoutDashboard size={18} /> Personal Hub</Link>
+              )}
+              <button onClick={() => { handleNavClick('home'); setShowMobileMenu(false); }} style={{ color: isActive('/home', 'home') ? '#a78bfa' : 'white', background: 'none', border: 'none', textAlign: 'left', fontSize: '0.9rem', padding: '10px 14px', cursor: 'pointer', borderRadius: '10px', background: isActive('/home', 'home') ? 'rgba(167,139,250,0.1)' : 'transparent', display: 'block', width: '100%', fontFamily: 'inherit', fontWeight: 'bold' }}>Home</button>
+              <Link to="/feed" onClick={() => { setActiveSection(''); setShowMobileMenu(false); }} style={{ color: isActive('/feed') ? '#a78bfa' : 'white', textDecoration: 'none', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 14px', borderRadius: '10px', background: isActive('/feed') ? 'rgba(167,139,250,0.1)' : 'transparent', fontWeight: 'bold' }}><Megaphone size={18} /> Activity Feed</Link>
+              <button onClick={() => { handleNavClick('about'); setShowMobileMenu(false); }} style={{ color: isActive(null, 'about') ? '#a78bfa' : 'white', background: 'none', border: 'none', textAlign: 'left', fontSize: '0.9rem', padding: '10px 14px', cursor: 'pointer', borderRadius: '10px', background: isActive(null, 'about') ? 'rgba(167,139,250,0.1)' : 'transparent', display: 'block', width: '100%', fontFamily: 'inherit', fontWeight: 'bold' }}>About Us</button>
+              <button onClick={() => { handleNavClick('contact'); setShowMobileMenu(false); }} style={{ color: isActive(null, 'contact') ? '#a78bfa' : 'white', background: 'none', border: 'none', textAlign: 'left', fontSize: '0.9rem', padding: '10px 14px', cursor: 'pointer', borderRadius: '10px', background: isActive(null, 'contact') ? 'rgba(167,139,250,0.1)' : 'transparent', display: 'block', width: '100%', fontFamily: 'inherit', fontWeight: 'bold' }}>Contact Us</button>
+            </>
+          )}
+        </div>
+      )}
 
       {/* RIGHT SECTION */}
       <div className="user-profile-nav">

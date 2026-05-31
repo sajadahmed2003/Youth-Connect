@@ -579,7 +579,7 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
             
             {/* Sub-tabs */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid var(--border)', paddingBottom: '10px' }}>
-              {['all', 'post', 'reel', 'video'].map(tab => (
+              {['all', 'post', 'reel'].map(tab => (
                 <button
                   key={tab}
                   type="button"

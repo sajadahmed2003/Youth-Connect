@@ -322,12 +322,6 @@ const CommunityFeed = ({ user }) => {
         >
           <Film size={16} /> Reels
         </button>
-        <button 
-          onClick={() => setActiveTab('video')}
-          style={{ flex: 1, padding: '10px 20px', borderRadius: '30px', border: 'none', background: activeTab === 'video' ? 'var(--gradient-accent)' : 'transparent', color: 'white', fontWeight: '800', cursor: 'pointer', transition: 'all 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.85rem' }}
-        >
-          <Video size={16} /> Videos
-        </button>
       </div>
 
       <div style={{ maxWidth: '640px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -358,16 +352,10 @@ const CommunityFeed = ({ user }) => {
                 >
                   🎬 Reel Clip
                 </span>
-                <span 
-                  onClick={() => setNewPostMediaType('video')}
-                  style={{ cursor: 'pointer', padding: '4px 12px', borderRadius: '12px', fontSize: '0.75rem', fontWeight: '700', background: newPostMediaType === 'video' ? 'rgba(6, 182, 212, 0.2)' : 'rgba(255,255,255,0.05)', color: newPostMediaType === 'video' ? '#22d3ee' : 'var(--text-muted)', border: `1px solid ${newPostMediaType === 'video' ? '#06b6d4' : 'transparent'}` }}
-                >
-                  🎥 Heavy Video
-                </span>
               </div>
 
               <textarea 
-                placeholder={newPostMediaType === 'post' ? "What's on your mind? Share your volunteer grid updates..." : "Share context details for this video content..."}
+                placeholder={newPostMediaType === 'post' ? "What's on your mind? Share your volunteer grid updates..." : "Share details for this reel clip..."}
                 value={newPostContent}
                 onChange={(e) => setNewPostContent(e.target.value)}
                 rows="3"
@@ -375,7 +363,7 @@ const CommunityFeed = ({ user }) => {
               />
               
               {/* VIDEO URL LINK INPUT */}
-              {(newPostMediaType === 'reel' || newPostMediaType === 'video') && (
+              {newPostMediaType === 'reel' && (
                 <div style={{ marginTop: '8px', marginBottom: '16px' }}>
                   <input 
                     type="text"
@@ -416,7 +404,7 @@ const CommunityFeed = ({ user }) => {
                 </button>
                 
                 <button onClick={handlePost} disabled={isPosting || (!newPostContent.trim() && !newPostFile && !newPostVideoUrl.trim())} className="btn btn-primary" style={{ padding: '10px 24px', borderRadius: 'var(--radius-full)', fontSize: '0.88rem' }}>
-                  {isPosting ? 'Uploading...' : 'Deploy Broadcast'} <Send size={14} />
+                  {isPosting ? 'Uploading...' : (newPostMediaType === 'reel' ? 'Share' : 'Post')} <Send size={14} />
                 </button>
               </div>
             </div>

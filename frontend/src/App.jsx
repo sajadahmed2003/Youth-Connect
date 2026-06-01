@@ -64,7 +64,28 @@ const TopNavbar = ({
     }
   };
 
-  const unreadCampaigns = applications.filter(a => !a.isRead && ['Accepted', 'Rejected', 'Removed'].includes(a.status));
+  const unreadCampaigns = applications.filter(a => {
+    if (!a || a.isRead) return false;
+    
+    // If user is volunteer, show only their accepted/rejected/completed/removed ones
+    if (user && (user.role === 'volunteer' || user.role === 'user')) {
+      const isMyApplication = (typeof a.userId === 'object' ? a.userId?._id === user._id : a.userId === user._id);
+      return isMyApplication && ['Accepted', 'Rejected', 'Removed', 'Completed'].includes(a.status);
+    }
+    
+    // If user is NGO/Manager, show pending applications to their campaigns
+    if (user && user.role === 'ngo') {
+      const isMyCampaign = a.campaignId && (a.campaignId.creatorId === user._id || a.campaignId.creatorName === user.name);
+      return isMyCampaign && a.status === 'Pending';
+    }
+    
+    // If user is Super Admin, show all pending applications
+    if (user && user.role === 'admin') {
+      return a.status === 'Pending';
+    }
+    
+    return false;
+  });
   const totalUnreadCount = unreadCampaigns.length + unreadSocialCount;
 
   const markAllCampaignRead = async () => {
@@ -261,12 +282,34 @@ const TopNavbar = ({
                     ) : (
                       unreadCampaigns.map(app => (
                         <div key={app._id} style={{ display: 'flex', gap: '10px', padding: '10px', background: 'rgba(255,255,255,0.02)', borderRadius: '10px', border: '1px solid var(--border)' }}>
-                          <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: app.status === 'Accepted' ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {app.status === 'Accepted' ? <CheckCircle size={15} color="#10b981" /> : <XCircle size={15} color="#ef4444" />}
+                          <div style={{ 
+                            width: '30px', 
+                            height: '30px', 
+                            borderRadius: '8px', 
+                            background: app.status === 'Accepted' ? 'rgba(16,185,129,0.1)' : app.status === 'Pending' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)', 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            flexShrink: 0 
+                          }}>
+                            {app.status === 'Accepted' ? (
+                              <CheckCircle size={15} color="#10b981" />
+                            ) : app.status === 'Pending' ? (
+                              <Bell size={15} color="#f59e0b" />
+                            ) : (
+                              <XCircle size={15} color="#ef4444" />
+                            )}
                           </div>
                           <div style={{ flex: 1, minWidth: 0 }}>
                             <div style={{ fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{app.campaignId?.title}</div>
-                            <div style={{ fontSize: '0.7rem', fontWeight: '800', marginTop: '2px', color: app.status === 'Accepted' ? '#10b981' : '#ef4444' }}>{app.status.toUpperCase()}</div>
+                            <div style={{ 
+                              fontSize: '0.7rem', 
+                              fontWeight: '800', 
+                              marginTop: '2px', 
+                              color: app.status === 'Accepted' ? '#10b981' : app.status === 'Pending' ? '#f59e0b' : '#ef4444' 
+                            }}>
+                              {app.status === 'Pending' ? `NEW REQUEST FROM: ${app.userId?.name || 'VOLUNTEER'}` : app.status.toUpperCase()}
+                            </div>
                           </div>
                         </div>
                       ))

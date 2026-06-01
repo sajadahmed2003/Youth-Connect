@@ -6,6 +6,12 @@ import { API_BASE } from '../config';
 const CLOUDINARY_UPLOAD_PRESET = 'pk1lq4vo';
 const CLOUDINARY_CLOUD_NAME = 'dgdqw7ael';
 
+const isVideoUrl = (url) => {
+  if (!url) return false;
+  return url.includes('/video/upload/') || 
+         url.match(/\.(mp4|webm|ogg|mov|avi|flv|mkv|3gp)($|\?)/i);
+};
+
 const CommunityFeed = ({ user }) => {
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
@@ -320,13 +326,13 @@ const CommunityFeed = ({ user }) => {
       <div style={{ maxWidth: '640px', margin: '0 auto', display: 'flex', gap: '10px', marginBottom: '24px', background: 'rgba(255, 255, 255, 0.03)', padding: '6px', borderRadius: '30px', border: '1px solid var(--border)' }}>
         <button 
           onClick={() => setActiveTab('all')}
-          style={{ flex: 1, padding: '10px 20px', borderRadius: '30px', border: 'none', background: activeTab === 'all' ? 'var(--primary)' : 'transparent', color: 'white', fontWeight: '800', cursor: 'pointer', transition: 'all 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.85rem' }}
+          style={{ flex: 1, padding: '10px 20px', borderRadius: '30px', border: 'none', background: activeTab === 'all' ? 'var(--primary)' : 'transparent', color: activeTab === 'all' ? 'white' : 'var(--text-secondary)', fontWeight: '800', cursor: 'pointer', transition: 'all 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.85rem' }}
         >
           <FileText size={16} /> All Posts
         </button>
         <button 
           onClick={() => setActiveTab('reel')}
-          style={{ flex: 1, padding: '10px 20px', borderRadius: '30px', border: 'none', background: activeTab === 'reel' ? 'var(--gradient-primary)' : 'transparent', color: 'white', fontWeight: '800', cursor: 'pointer', transition: 'all 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.85rem' }}
+          style={{ flex: 1, padding: '10px 20px', borderRadius: '30px', border: 'none', background: activeTab === 'reel' ? 'var(--gradient-primary)' : 'transparent', color: activeTab === 'reel' ? 'white' : 'var(--text-secondary)', fontWeight: '800', cursor: 'pointer', transition: 'all 0.3s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.85rem' }}
         >
           <Film size={16} /> Reels
         </button>
@@ -496,10 +502,14 @@ const CommunityFeed = ({ user }) => {
               {/* VIDEO EMBED IF EXISTS */}
               {post.videoUrl && renderVideoPlayer(post.videoUrl)}
 
-              {/* POST IMAGE */}
+              {/* POST IMAGE OR VIDEO */}
               {post.image && (
-                <div style={{ width: '100%', maxHeight: '420px', overflow: 'hidden', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginBottom: '16px' }}>
-                  <img src={post.image} alt="Post Attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div style={{ width: '100%', maxHeight: '420px', overflow: 'hidden', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginBottom: '16px', background: '#000' }}>
+                  {isVideoUrl(post.image) ? (
+                    <video src={post.image} controls style={{ width: '100%', maxHeight: '400px', display: 'block' }} />
+                  ) : (
+                    <img src={post.image} alt="Post Attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  )}
                 </div>
               )}
 

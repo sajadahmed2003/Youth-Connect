@@ -532,7 +532,6 @@ async function checkContentSafety(text) {
   
   if (process.env.GEMINI_API_KEY && text) {
     try {
-      const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
       const promptText = `
         You are an AI safety moderator. Analyze this post/comment:
         "${text}"
@@ -1130,7 +1129,6 @@ app.post('/api/ai/match', async (req, res) => {
     // Direct REST request to Google Gemini API
     if (process.env.GEMINI_API_KEY) {
        try {
-          const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
           const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -1256,7 +1254,6 @@ app.post('/api/support/query', async (req, res) => {
     // 🤖 HIGH-FIDELITY GOOGLE GEMINI AI ASSISTANT GENERATION
     if (process.env.GEMINI_API_KEY) {
       try {
-        const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
         const promptText = `
           You are the official Youth Connect Auto-Bot, an AI volunteer coordinator and support bot.
           Volunteer "${decoded.name}" asks the following support query:
@@ -1437,7 +1434,6 @@ app.get('/api/ai/recommended-campaigns', async (req, res) => {
 
     if (process.env.GEMINI_API_KEY) {
        try {
-          const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
           const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -1534,7 +1530,6 @@ app.post('/api/ai/generate-campaign', async (req, res) => {
     let generated;
     if (process.env.GEMINI_API_KEY) {
       try {
-        const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

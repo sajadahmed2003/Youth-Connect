@@ -314,12 +314,33 @@ const CommunityFeed = ({ user }) => {
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', padding: '40px 24px', fontFamily: 'var(--font-body)' }}>
         
       {/* HEADER */}
-      <div style={{ maxWidth: '640px', margin: '0 auto', marginBottom: '32px' }}>
-        <div className="section-label" style={{ display: 'inline-flex', marginBottom: '12px' }}>Social Feed & Requests</div>
-        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.2rem', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px', margin: 0 }}>
-          Interactive <span style={{ color: 'var(--primary-light)' }}>Feed</span>
-        </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '4px' }}>Broadcast posts, reels, and video clips in real time.</p>
+      <div style={{ 
+        maxWidth: '640px', 
+        margin: '0 auto', 
+        marginBottom: '32px', 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'flex-start',
+        flexWrap: 'wrap',
+        gap: '16px'
+      }}>
+        <div style={{ flex: 1, minWidth: '280px' }}>
+          <h1 style={{ 
+            fontFamily: 'var(--font-heading)', 
+            fontSize: '2.5rem', 
+            fontWeight: '900', 
+            color: 'var(--text-primary)', 
+            letterSpacing: '-0.8px', 
+            margin: 0,
+            textShadow: '1px 1px 0px rgba(255,255,255,0.8), 2px 2px 0px rgba(124, 58, 237, 0.15), 3px 3px 0px rgba(124, 58, 237, 0.1)'
+          }}>
+            Interactive <span style={{ color: 'var(--primary-light)', textShadow: '1px 1px 0px rgba(255,255,255,0.8), 2px 2px 0px rgba(6, 182, 212, 0.15), 3px 3px 0px rgba(6, 182, 212, 0.1)' }}>Feed</span>
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginTop: '6px', fontWeight: '500' }}>Broadcast posts, reels, and video clips in real time.</p>
+        </div>
+        <div className="section-label" style={{ display: 'inline-flex', marginTop: '8px', alignSelf: 'flex-start' }}>
+          Social Feed & Requests
+        </div>
       </div>
 
       {/* MEDIA FILTER TABS */}

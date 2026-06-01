@@ -650,7 +650,7 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                {/* Modal Header */}
                <div style={{ padding: '20px 24px', background: 'linear-gradient(135deg, #7c3aed, #06b6d4)', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <div>
-                     <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800' }}>Grid Logistics Chat</h3>
+                     <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '800' }}>Logistics Chat</h3>
                      <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>Coordination stream for: {activeChatApp.campaignId?.title}</span>
                   </div>
                   <button onClick={() => setActiveChatApp(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'white' }}><X size={20}/></button>
@@ -783,7 +783,7 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                   </div>
 
                   <h1 style={{ fontFamily: 'Georgia, serif', color: '#1e293b', fontSize: '2.2rem', margin: '0 0 10px 0', letterSpacing: '1px', textTransform: 'uppercase' }}>Certificate of Impact</h1>
-                  <h4 style={{ fontFamily: 'var(--font-heading)', color: '#854d0e', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', margin: '0 0 32px 0' }}>Youth Connect Grid Authority</h4>
+                  <h4 style={{ fontFamily: 'var(--font-heading)', color: '#854d0e', letterSpacing: '3px', textTransform: 'uppercase', fontSize: '0.8rem', margin: '0 0 32px 0' }}>Youth Connect Network Authority</h4>
 
                   <p style={{ fontStyle: 'italic', fontSize: '1rem', color: '#475569', margin: '0 0 12px 0' }}>This officially certifies that</p>
                   <h2 style={{ fontFamily: 'Georgia, serif', color: '#7c3aed', fontSize: '2.1rem', fontWeight: 'bold', borderBottom: '2px solid #ca8a04', display: 'inline-block', paddingBottom: '8px', marginBottom: '16px' }}>{user.name}</h2>

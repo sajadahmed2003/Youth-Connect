@@ -244,7 +244,7 @@ const TopNavbar = ({
                   onClick={() => setNotifTab('social')}
                   style={{ flex: 1, padding: '8px', border: 'none', background: 'none', borderBottom: notifTab === 'social' ? '2px solid var(--primary-light)' : 'none', color: notifTab === 'social' ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: '800', fontSize: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }}
                 >
-                  Social Grid ({unreadSocialCount})
+                  Social Requests ({unreadSocialCount})
                 </button>
               </div>
 

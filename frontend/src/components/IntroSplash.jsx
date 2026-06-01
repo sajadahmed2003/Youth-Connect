@@ -5,7 +5,7 @@ const IntroSplash = ({ onComplete }) => {
     const [visibleQuote, setVisibleQuote] = useState(0);
 
     const systemMessages = [
-        "Synchronizing Youth Connect Grid...",
+        "Synchronizing Youth Connect Network...",
         "Establishing Secure Real Database Stream...",
         "Fetching Active Campaigns...",
         "System Ready. Welcome."

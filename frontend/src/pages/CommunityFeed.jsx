@@ -128,7 +128,7 @@ const CommunityFeed = ({ user }) => {
         setNewPostVideoUrl('');
         setNewPostMediaType('post');
         if (fileInputRef.current) fileInputRef.current.value = '';
-        toast.success("Cyber post dispatched to the feed grid!");
+        toast.success("Post successfully shared to the feed!");
         fetchPosts(activeTab);
       } else {
         toast.error("Failed to post update to the database.");
@@ -269,7 +269,7 @@ const CommunityFeed = ({ user }) => {
     try {
       const shareUrl = `${window.location.origin}/post/${post._id}`;
       await navigator.clipboard.writeText(shareUrl);
-      toast.success("Link copied! Grid path synchronized.");
+      toast.success("Link copied successfully!");
       
       // Update share count in backend
       const res = await fetch(`${API_BASE}/api/posts/${post._id}/share`, {
@@ -315,7 +315,7 @@ const CommunityFeed = ({ user }) => {
         
       {/* HEADER */}
       <div style={{ maxWidth: '640px', margin: '0 auto', marginBottom: '32px' }}>
-        <div className="section-label" style={{ display: 'inline-flex', marginBottom: '12px' }}>Social Grid Engine</div>
+        <div className="section-label" style={{ display: 'inline-flex', marginBottom: '12px' }}>Social Feed & Requests</div>
         <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: '2.2rem', fontWeight: '900', color: 'var(--text-primary)', letterSpacing: '-0.5px', margin: 0 }}>
           Interactive <span style={{ color: 'var(--primary-light)' }}>Feed</span>
         </h1>
@@ -369,7 +369,7 @@ const CommunityFeed = ({ user }) => {
               </div>
 
               <textarea 
-                placeholder={newPostMediaType === 'post' ? "What's on your mind? Share your volunteer grid updates..." : "Share details for this reel clip..."}
+                placeholder={newPostMediaType === 'post' ? "What's on your mind? Share your updates..." : "Share details for this reel clip..."}
                 value={newPostContent}
                 onChange={(e) => setNewPostContent(e.target.value)}
                 rows="3"
@@ -627,7 +627,7 @@ const CommunityFeed = ({ user }) => {
                               <div style={{ marginLeft: '38px', marginTop: '8px', display: 'flex', gap: '8px' }}>
                                 <input 
                                   type="text"
-                                  placeholder="Post a nested reply link..."
+                                  placeholder="Post a nested reply..."
                                   value={replyInputs[comment._id] || ''}
                                   onChange={(e) => setReplyInputs({ ...replyInputs, [comment._id]: e.target.value })}
                                   style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: '6px', padding: '6px 10px', color: 'var(--text-primary)', fontSize: '0.8rem', outline: 'none' }}
@@ -647,7 +647,7 @@ const CommunityFeed = ({ user }) => {
                       })}
                     </div>
                   ) : (
-                    <div style={{ textAlign: 'center', padding: '16px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>No comments posted yet. Broadcast a reply grid!</div>
+                     <div style={{ textAlign: 'center', padding: '16px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>No comments posted yet. Add a reply!</div>
                   )}
 
                   {/* Top-Level Add Comment Form */}

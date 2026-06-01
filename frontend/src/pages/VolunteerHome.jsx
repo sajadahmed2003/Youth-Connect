@@ -113,6 +113,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
   const [pointsEarned, setPointsEarned] = useState(0);
   const [showGoalAchievedModal, setShowGoalAchievedModal] = useState(false);
   const [useAIMatches, setUseAIMatches] = useState(false);
+  const [loadingCampaigns, setLoadingCampaigns] = useState(true);
 
   const toggleReadMore = (id) => {
     setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
@@ -123,6 +124,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
   }, []);
 
   const fetchCampaigns = async (useAI = false) => {
+    setLoadingCampaigns(true);
     try {
       const token = localStorage.getItem('token');
       const url = (useAI && token) 
@@ -136,6 +138,9 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
         setCampaigns(data);
       }
     } catch (err) { console.error(err); }
+    finally {
+      setLoadingCampaigns(false);
+    }
   };
 
   const handleToggleAI = (val) => {
@@ -328,7 +333,15 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
 
       {/* 📦 CAMPAIGN GRID */}
       <div id="campaigns" style={{ padding: '60px 24px', maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px' }}>
-        {campaigns.length === 0 && (
+        {loadingCampaigns ? (
+          <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '80px 40px' }} className="cyber-card">
+            <div className="loader-glow" style={{ margin: '0 auto 24px auto' }}></div>
+            <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '1.25rem', margin: '0 0 8px 0', letterSpacing: '0.5px' }}>WAKING UP SECURE CLOUD SERVERS...</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto' }}>
+              Note: The secure API tier uses Render free hosting, which can take up to 50 seconds to spin up from sleep. Thank you for your patience!
+            </p>
+          </div>
+        ) : campaigns.length === 0 ? (
           <div className="cyber-card" style={{ textAlign: 'center', gridColumn: '1/-1', padding: '80px 40px' }}>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '20px' }}>No live campaigns found.</p>
             {(user?.role === 'ngo' || user?.role === 'admin') && (
@@ -340,8 +353,8 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
               </button>
             )}
           </div>
-        )}
-        {filtered.map(camp => {
+        ) : null}
+        {!loadingCampaigns && filtered.map(camp => {
           const myApp = applications?.find(app => (app.campaignId?._id === camp._id || app.campaignId === camp._id));
           
           // Crowdfunding targets definition

@@ -8,6 +8,7 @@ const CLOUDINARY_CLOUD_NAME = 'dgdqw7ael';
 
 const CommunityFeed = ({ user }) => {
   const [posts, setPosts] = useState([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'reel', 'video'
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostImagePreview, setNewPostImagePreview] = useState('');
@@ -40,6 +41,7 @@ const CommunityFeed = ({ user }) => {
   }, [user]);
 
   const fetchPosts = async (type = 'all') => {
+    setLoadingPosts(true);
     try {
       const url = type === 'all' 
         ? `${API_BASE}/api/posts` 
@@ -50,6 +52,9 @@ const CommunityFeed = ({ user }) => {
         setPosts(data);
       }
     } catch (err) { console.error(err); }
+    finally {
+      setLoadingPosts(false);
+    }
   };
 
   const handleImageUpload = (e) => {
@@ -660,13 +665,21 @@ const CommunityFeed = ({ user }) => {
           );
         })}
         
-        {posts.length === 0 && (
+        {loadingPosts ? (
+          <div style={{ textAlign: 'center', padding: '80px 40px' }} className="cyber-card">
+            <div className="loader-glow" style={{ margin: '0 auto 24px auto' }}></div>
+            <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '1.25rem', margin: '0 0 8px 0', letterSpacing: '0.5px' }}>WAKING UP SECURE CLOUD SERVERS...</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto' }}>
+              Note: The secure API tier uses Render free hosting, which can take up to 50 seconds to spin up from sleep. Thank you for your patience!
+            </p>
+          </div>
+        ) : posts.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 24px' }} className="cyber-card">
             <MessageCircle size={40} color="var(--text-muted)" style={{ marginBottom: '16px', margin: '0 auto' }} />
             <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '1.25rem', margin: '0 0 8px 0' }}>Silence on this coordinate...</h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>Be the first one to deploy a broadcast to this feed!</p>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );

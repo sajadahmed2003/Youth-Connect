@@ -153,6 +153,30 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
     const skillsArray = skillsText.split(',').map(s => s.trim()).filter(Boolean);
     
     try {
+      let finalAvatarUrl = avatar;
+      
+      // If a new photo was selected (it's a base64 data string)
+      if (avatar && typeof avatar === 'string' && avatar.startsWith('data:')) {
+        const formData = new FormData();
+        formData.append('file', avatar);
+        formData.append('upload_preset', 'pk1lq4vo'); // Verified upload preset
+        
+        const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/dgdqw7ael/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        const cloudData = await cloudRes.json();
+        
+        if (cloudData.secure_url) {
+          finalAvatarUrl = cloudData.secure_url;
+        } else {
+          console.error("Cloudinary profile upload error:", cloudData);
+          alert("Failed to upload profile photo to cloud storage.");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const token = localStorage.getItem('token');
       const response = await fetch(`${API_BASE}/api/profile`, {
         method: 'PUT',
@@ -167,7 +191,7 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
           phone, 
           location: locationStr, 
           website, 
-          avatar: (avatar && typeof avatar === 'string' && avatar.startsWith('data:')) ? avatar : undefined
+          avatar: finalAvatarUrl
         })
       });
       
@@ -180,7 +204,8 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
       } else {
         alert("Server rejected profile update request.");
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       alert("Network exception: Update transaction rejected.");
     } finally {
       setIsSubmitting(false);

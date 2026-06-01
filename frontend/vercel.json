@@ -1,3 +1,6 @@
 {
-  "name": "youth-connect"
+  "name": "youth-connect",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

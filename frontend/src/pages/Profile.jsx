@@ -21,6 +21,7 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
   // Photo Upload State
   const [avatar, setAvatar] = useState(user.avatar || '');
   const [avatarPreview, setAvatarPreview] = useState('');
+  const [avatarFile, setAvatarFile] = useState(null);
   
   const [myCampaigns, setMyCampaigns] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,6 +47,7 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
     setWebsite(user.website || '');
     setAvatar(user.avatar || '');
     setAvatarPreview('');
+    setAvatarFile(null);
     if (user.role === 'ngo') {
       fetchMyCampaigns();
     }
@@ -114,13 +116,8 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
         alert("Selected image is too large! Please upload a file smaller than 10MB.");
         return;
       }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const dataUrl = event.target.result;
-        setAvatarPreview(dataUrl);
-        setAvatar(dataUrl);
-      };
-      reader.readAsDataURL(file);
+      setAvatarFile(file);
+      setAvatarPreview(URL.createObjectURL(file));
     }
   };
 
@@ -132,10 +129,10 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
     try {
       let finalAvatarUrl = avatar;
       
-      // If a new photo was selected (it's a base64 data string)
-      if (avatar && typeof avatar === 'string' && avatar.startsWith('data:')) {
+      // If a new binary file was selected
+      if (avatarFile) {
         const formData = new FormData();
-        formData.append('file', avatar);
+        formData.append('file', avatarFile);
         formData.append('upload_preset', 'pk1lq4vo'); // Verified upload preset
         
         const cloudRes = await fetch(`https://api.cloudinary.com/v1_1/dgdqw7ael/image/upload`, {
@@ -177,6 +174,7 @@ const Profile = ({ user, setUser, hideHeader = false }) => {
         setUser(data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
         setAvatarPreview('');
+        setAvatarFile(null);
         alert("Profile credentials updated successfully!");
       } else {
         alert("Server rejected profile update request.");

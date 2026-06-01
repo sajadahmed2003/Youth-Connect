@@ -241,11 +241,25 @@ const TopNavbar = ({
             <Bell size={20} />
             {totalUnreadCount > 0 && (
               <span style={{
-                position: 'absolute', top: '4px', right: '4px',
-                background: '#ef4444', color: 'white', borderRadius: '50%',
-                width: '16px', height: '16px', fontSize: '0.6rem',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                border: '2px solid var(--bg-base)', fontWeight: '800',
+                position: 'absolute', 
+                top: '2px', 
+                right: '2px',
+                background: '#ef4444', 
+                color: 'white', 
+                borderRadius: '99px',
+                minWidth: '18px', 
+                height: '18px', 
+                padding: '0 4px',
+                fontSize: '0.72rem',
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                border: '1.5px solid var(--bg-surface)', 
+                fontWeight: '900',
+                lineHeight: 1,
+                boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)',
+                transform: 'translate(25%, -25%)',
+                fontFamily: 'var(--font-heading)'
               }}>{totalUnreadCount}</span>
             )}
           </button>

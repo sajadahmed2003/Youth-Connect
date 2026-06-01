@@ -686,20 +686,76 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
       </div>
 
       {/* FOOTER */}
-      <footer style={{ background: 'var(--bg-base)', borderTop: '1px solid var(--border)', padding: '80px 24px 40px 24px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '40px', marginBottom: '60px' }}>
+      <footer style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border)', padding: '80px 24px 40px 24px', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '40px', marginBottom: '60px' }}>
+          
+          {/* Column 1: Brand Info */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <div className="logo-icon" style={{ width: '32px', height: '32px', fontSize: '0.9rem', background: '#7c3aed', color: 'white', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>⚡</div>
-              <span style={{ fontWeight: '900', fontSize: '1.2rem', color: 'var(--text-primary)' }}>YOUTH CONNECT</span>
+              <div className="logo-icon" style={{ width: '32px', height: '32px', fontSize: '0.9rem', background: '#7c3aed', color: 'white', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)' }}>⚡</div>
+              <span style={{ fontWeight: '900', fontSize: '1.2rem', color: 'var(--text-primary)', letterSpacing: '0.5px' }}>YOUTH CONNECT</span>
             </div>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', fontSize: '0.9rem' }}>
-              Global platform connecting young volunteers with transformative social initiatives and NGOs worldwide.
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', fontSize: '0.88rem' }}>
+              Global platform connecting young volunteers with transformative social initiatives and NGOs worldwide. Join us to make a real impact!
             </p>
           </div>
+
+          {/* Column 2: Quick Navigation */}
+          <div>
+            <h4 style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: '800', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Quick Links</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li>
+                <span onClick={() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{ color: 'var(--text-secondary)', cursor: 'pointer', transition: 'color 0.2s', fontSize: '0.88rem' }} onMouseOver={e => e.currentTarget.style.color = '#7c3aed'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>Home Dashboard</span>
+              </li>
+              <li>
+                <span onClick={() => navigate('/campaigns')} style={{ color: 'var(--text-secondary)', cursor: 'pointer', transition: 'color 0.2s', fontSize: '0.88rem' }} onMouseOver={e => e.currentTarget.style.color = '#7c3aed'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>Explore Campaigns</span>
+              </li>
+              <li>
+                <span onClick={() => navigate('/feed')} style={{ color: 'var(--text-secondary)', cursor: 'pointer', transition: 'color 0.2s', fontSize: '0.88rem' }} onMouseOver={e => e.currentTarget.style.color = '#7c3aed'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>Activity Feed</span>
+              </li>
+              <li>
+                <span onClick={() => { const el = document.getElementById('about'); if(el) el.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: 'var(--text-secondary)', cursor: 'pointer', transition: 'color 0.2s', fontSize: '0.88rem' }} onMouseOver={e => e.currentTarget.style.color = '#7c3aed'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>About Our Mission</span>
+              </li>
+              <li>
+                <span onClick={() => { const el = document.getElementById('contact'); if(el) el.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: 'var(--text-secondary)', cursor: 'pointer', transition: 'color 0.2s', fontSize: '0.88rem' }} onMouseOver={e => e.currentTarget.style.color = '#7c3aed'} onMouseOut={e => e.currentTarget.style.color = 'var(--text-secondary)'}>Get In Touch</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 3: Feature Categories */}
+          <div>
+            <h4 style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: '800', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Impact Hub</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>🌱 Environment Preservation</li>
+              <li style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>📚 Quality Education</li>
+              <li style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>🏥 Health & Wellness</li>
+              <li style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>🆘 Crisis & Disaster Relief</li>
+              <li style={{ color: 'var(--text-secondary)', fontSize: '0.88rem' }}>👥 Community Building</li>
+            </ul>
+          </div>
+
+          {/* Column 4: Contact Info */}
+          <div>
+            <h4 style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '0.95rem', fontWeight: '800', marginBottom: '20px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Contact Details</h4>
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <li style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                📧 support@youthconnect.org
+              </li>
+              <li style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                📞 +91 98765 43210
+              </li>
+              <li style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                📍 New Delhi, India
+              </li>
+              <li style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                ⏰ Mon - Sat: 9am - 6pm IST
+              </li>
+            </ul>
+          </div>
+
         </div>
-        <div style={{ textAlign: 'center', borderTop: '1px solid var(--border)', paddingTop: '30px', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-          © 2026 Youth Connect. All Rights Reserved. Designed for Social Impact.
+        <div style={{ textAlign: 'center', borderTop: '1px solid var(--border)', paddingTop: '30px', color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: '500' }}>
+          © 2026 Youth Connect. All Rights Reserved. Designed for Social Impact & Voluntarism.
         </div>
       </footer>
 

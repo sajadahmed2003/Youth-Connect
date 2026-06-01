@@ -7,6 +7,29 @@ const CampaignDetail = ({ user, campaigns, applications, setApplications }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [requestSent, setRequestSent] = useState(false);
+  const [predictions, setPredictions] = useState(null);
+  const [loadingPredictions, setLoadingPredictions] = useState(false);
+
+  React.useEffect(() => {
+    const fetchPredictions = async () => {
+      setLoadingPredictions(true);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_BASE}/api/ai/predict-campaign/${id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setPredictions(data);
+        }
+      } catch (err) {
+        console.error("Failed to load predictions:", err);
+      } finally {
+        setLoadingPredictions(false);
+      }
+    };
+    fetchPredictions();
+  }, [id]);
 
   const campaign = campaigns.find(c => c._id === id);
   if (!campaign) return (
@@ -132,6 +155,34 @@ const CampaignDetail = ({ user, campaigns, applications, setApplications }) => {
                         </button>
                     )}
                 </div>
+
+                {predictions && (
+                  <div className="cyber-card" style={{ padding: '35px', background: 'rgba(12, 166, 166, 0.03)', border: '1px dashed rgba(12, 166, 166, 0.25)' }}>
+                    <h3 style={{ fontSize: '1rem', color: 'white', letterSpacing: '2px', marginBottom: '25px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span>🔮</span> PREDICTIVE LOGISTICS
+                    </h3>
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px' }}>
+                        <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Est. Recruitment Time</span>
+                        <span style={{ color: '#0ca6a6', fontWeight: 'bold', fontSize: '0.9rem' }}>{predictions.daysToRecruitFull}</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px' }}>
+                        <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>Est. Funding Completion</span>
+                        <span style={{ color: '#0ca6a6', fontWeight: 'bold', fontSize: '0.9rem' }}>{predictions.daysToFundFull}</span>
+                      </div>
+                    </div>
+                    
+                    <div style={{ color: '#cbd5e1', fontSize: '0.8rem', lineHeight: '1.5', background: 'rgba(12, 166, 166, 0.05)', padding: '12px 14px', borderRadius: '10px', border: '1px solid rgba(12, 166, 166, 0.15)' }}>
+                      <div style={{ fontWeight: '800', color: '#4ade80', marginBottom: '6px' }}>AI Advisor Insights:</div>
+                      <ul style={{ margin: 0, paddingLeft: '16px' }}>
+                        {predictions.recommendations?.map((rec, i) => (
+                          <li key={i} style={{ marginBottom: '8px' }}>{rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
 
                 <div className="cyber-card" style={{ padding: '35px' }}>
                     <h3 style={{ fontSize: '1rem', color: 'white', letterSpacing: '2px', marginBottom: '25px', fontWeight: 'bold' }}>ORGANIZER</h3>

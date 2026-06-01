@@ -443,7 +443,7 @@ const CommunityFeed = ({ user }) => {
                     
                     {/* MEDIA TAG BADGES */}
                     {post.mediaType === 'reel' && (
-                      <span className="badge" style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#f472b6', fontSize: '0.62rem', border: '1px solid rgba(236, 72, 1 pink53, 0.3)', padding: '2px 6px' }}>🎬 Reel</span>
+                      <span className="badge" style={{ background: 'rgba(236, 72, 153, 0.15)', color: '#f472b6', fontSize: '0.62rem', border: '1px solid rgba(236, 72, 153, 0.3)', padding: '2px 6px' }}>🎬 Reel</span>
                     )}
                     {post.mediaType === 'video' && (
                       <span className="badge" style={{ background: 'rgba(6, 182, 212, 0.15)', color: '#22d3ee', fontSize: '0.62rem', border: '1px solid rgba(6, 182, 212, 0.3)', padding: '2px 6px' }}>🎥 Video</span>
@@ -457,11 +457,11 @@ const CommunityFeed = ({ user }) => {
                       >
                         {isFollowed ? (
                           <>
-                            <Check size={10} /> Grid Sync
+                            <Check size={10} /> Connected
                           </>
                         ) : (
                           <>
-                            <Plus size={10} /> Link ID
+                            <Plus size={10} /> Connect
                           </>
                         )}
                       </button>

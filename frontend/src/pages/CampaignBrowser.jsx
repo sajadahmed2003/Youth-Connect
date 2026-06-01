@@ -62,7 +62,22 @@ const CampaignBrowser = ({ campaigns }) => {
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                 />
                 <div style={{ position: 'absolute', bottom: '16px', left: '20px', zIndex: 2 }}>
-                    <span className="badge badge-primary" style={{ fontSize: '0.62rem', padding: '4px 10px' }}>
+                    <span 
+                      style={{ 
+                        background: 'rgba(10, 10, 15, 0.85)',
+                        backdropFilter: 'blur(8px)',
+                        color: '#c084fc',
+                        border: '1px solid rgba(168, 85, 247, 0.4)',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
+                        fontSize: '0.62rem', 
+                        padding: '4px 10px',
+                        borderRadius: 'var(--radius-full)',
+                        fontWeight: '700',
+                        letterSpacing: '0.5px',
+                        textTransform: 'uppercase',
+                        display: 'inline-block'
+                      }}
+                    >
                         {(camp.categories?.[0] || 'GENERAL').toUpperCase()}
                     </span>
                 </div>

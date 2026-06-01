@@ -15,6 +15,8 @@ const commentSchema = new mongoose.Schema({
     text: { type: String, required: true },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     replies: [replySchema],
+    status: { type: String, default: 'approved' },
+    flagReason: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
 });
 
@@ -29,6 +31,8 @@ const postSchema = new mongoose.Schema({
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     comments: [commentSchema],
     shareCount: { type: Number, default: 0 },
+    status: { type: String, default: 'approved' },
+    flagReason: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
 });
 

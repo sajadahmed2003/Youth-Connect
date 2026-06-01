@@ -18,10 +18,53 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
   const [activeContactReplyId, setActiveContactReplyId] = useState(null);
   const [contactReplyText, setContactReplyText] = useState('');
 
+  const [flaggedPosts, setFlaggedPosts] = useState([]);
+  const [flaggedComments, setFlaggedComments] = useState([]);
+  const [loadingFlagged, setLoadingFlagged] = useState(false);
+
   React.useEffect(() => {
     fetchQueries();
     fetchContacts();
+    fetchFlaggedContent();
   }, []);
+
+  const fetchFlaggedContent = async () => {
+    setLoadingFlagged(true);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/admin/flagged-content`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFlaggedPosts(data.posts || []);
+        setFlaggedComments(data.comments || []);
+      }
+    } catch (err) {
+      console.error("Flagged content load error:", err);
+    } finally {
+      setLoadingFlagged(false);
+    }
+  };
+
+  const handleModerateContent = async (type, contentId, postId, action) => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/admin/moderate-content`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ type, contentId, postId, action })
+      });
+      if (res.ok) {
+        fetchFlaggedContent();
+      }
+    } catch (err) {
+      console.error("Content moderation action error:", err);
+    }
+  };
 
   const fetchContacts = async () => {
     try {
@@ -195,12 +238,13 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
         </div>
         
         <div className="admin-tabs-container" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '8px', borderRadius: 'var(--radius-full)', border: '1px solid var(--border)' }}>
-          {['overview', 'users', 'campaigns', 'apps', 'support', 'donations', 'contacts'].map(tab => (
+          {['overview', 'users', 'campaigns', 'apps', 'support', 'donations', 'contacts', 'moderation'].map(tab => (
             <button 
               key={tab}
               onClick={() => {
                 setActiveTab(tab);
                 if (tab === 'contacts') fetchContacts();
+                if (tab === 'moderation') fetchFlaggedContent();
               }} 
               className="btn btn-ghost"
               style={{ 
@@ -213,7 +257,7 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
                 fontSize: '0.78rem'
               }}
             >
-              {tab === 'apps' ? 'JOIN REQUESTS' : tab === 'support' ? 'SUPPORT DESK' : tab === 'donations' ? 'LEDGER' : tab === 'contacts' ? 'CONTACT BOX' : tab.toUpperCase()}
+              {tab === 'apps' ? 'JOIN REQUESTS' : tab === 'support' ? 'SUPPORT DESK' : tab === 'donations' ? 'LEDGER' : tab === 'contacts' ? 'CONTACT BOX' : tab === 'moderation' ? '🛡️ MODERATION' : tab.toUpperCase()}
             </button>
           ))}
         </div>
@@ -762,6 +806,78 @@ const AdminDashboard = ({ user, stats, refreshData }) => {
                 {selectedUser.skills && selectedUser.skills.length > 0 ? selectedUser.skills.map((s, i) => (
                   <span key={i} className="badge badge-primary" style={{ fontSize: '0.65rem', padding: '3px 8px' }}>{s}</span>
                 )) : <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontStyle: 'italic' }}>No skills specified.</div>}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'moderation' && (
+        <div className="animate-fadeIn">
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.4rem', color: 'var(--text-primary)', marginBottom: '32px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '1.6rem' }}>🛡️</span> Real-Time Safety Moderation Queue
+          </h2>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+            {/* Flagged Posts */}
+            <div className="cyber-card" style={{ padding: '32px' }}>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', color: 'var(--text-primary)', marginBottom: '24px', fontWeight: '800' }}>Flagged Posts ({flaggedPosts.length})</h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {flaggedPosts.length === 0 ? (
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', padding: '32px 0' }}>No flagged posts currently quarantined.</p>
+                ) : (
+                  flaggedPosts.map(post => (
+                    <div key={post._id} style={{ background: 'rgba(255,255,255,0.01)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-primary)' }}>{post.userName}</span>
+                        <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>{new Date(post.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: '1.4' }}>{post.content}</p>
+                      {post.image && <img src={post.image} style={{ maxHeight: '100px', borderRadius: '8px', marginBottom: '12px' }} />}
+                      
+                      <div style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.15)', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem', color: 'var(--danger)', marginBottom: '14px', fontWeight: '500' }}>
+                        ⚠️ {post.flagReason || 'Flagged by safety engine'}
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <button onClick={() => handleModerateContent('post', post._id, null, 'approve')} className="btn btn-primary" style={{ padding: '6px 14px', background: 'var(--success)', border: 'none', color: 'white', fontSize: '0.78rem' }}>Restore</button>
+                        <button onClick={() => handleModerateContent('post', post._id, null, 'delete')} className="btn btn-ghost" style={{ padding: '6px 14px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.78rem' }}>Delete</button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Flagged Comments */}
+            <div className="cyber-card" style={{ padding: '32px' }}>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.15rem', color: 'var(--text-primary)', marginBottom: '24px', fontWeight: '800' }}>Flagged Comments ({flaggedComments.length})</h3>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {flaggedComments.length === 0 ? (
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', textAlign: 'center', padding: '32px 0' }}>No flagged comments currently quarantined.</p>
+                ) : (
+                  flaggedComments.map(comment => (
+                    <div key={comment._id} style={{ background: 'rgba(255,255,255,0.01)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-primary)' }}>{comment.userName}</span>
+                        <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>{new Date(comment.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '6px' }}>On Post: "{comment.postTitle.substring(0, 30)}..."</div>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: '1.4' }}>{comment.text}</p>
+                      
+                      <div style={{ background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.15)', padding: '8px 12px', borderRadius: '8px', fontSize: '0.78rem', color: 'var(--danger)', marginBottom: '14px', fontWeight: '500' }}>
+                        ⚠️ {comment.flagReason || 'Flagged by safety engine'}
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '10px' }}>
+                        <button onClick={() => handleModerateContent('comment', comment._id, comment.postId, 'approve')} className="btn btn-primary" style={{ padding: '6px 14px', background: 'var(--success)', border: 'none', color: 'white', fontSize: '0.78rem' }}>Restore</button>
+                        <button onClick={() => handleModerateContent('comment', comment._id, comment.postId, 'delete')} className="btn btn-ghost" style={{ padding: '6px 14px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.78rem' }}>Delete</button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

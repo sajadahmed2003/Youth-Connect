@@ -28,6 +28,50 @@ const ManagerDashboard = ({ user, setUser, refreshCamps }) => {
     fundingReason: ''
   });
 
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [generatingCampaign, setGeneratingCampaign] = useState(false);
+  const [aiError, setAiError] = useState('');
+
+  const handleGenerateCampaignAI = async () => {
+    if (!aiPrompt || aiPrompt.trim() === '') return;
+    setGeneratingCampaign(true);
+    setAiError('');
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${API_BASE}/api/ai/generate-campaign`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ prompt: aiPrompt })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({
+          title: data.title || '',
+          category: (data.categories?.[0] || 'Social'),
+          location: data.location || '',
+          description: data.description || '',
+          skills: data.requiredSkills ? data.requiredSkills.join(', ') : 'Volunteering',
+          neededPositions: data.neededPositions || 10,
+          targetAmount: data.targetAmount || 30000,
+          fundingReason: data.fundingReason || '',
+          image: '',
+          videoUrl: ''
+        });
+        setAiPrompt('');
+      } else {
+        const err = await res.json();
+        setAiError(err.error || 'AI generation failed.');
+      }
+    } catch(err) {
+      setAiError('Connection error.');
+    } finally {
+      setGeneratingCampaign(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
     if (location.state?.activeTab) {
@@ -371,6 +415,51 @@ const ManagerDashboard = ({ user, setUser, refreshCamps }) => {
             <div className="cyber-card" style={{ padding: '32px', height: 'fit-content' }}>
               <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.2rem', fontWeight: '800', marginBottom: '24px', color: 'var(--primary-light)' }}>Launch New Campaign</h2>
               {success && <div style={{ background: 'rgba(16,185,129,0.1)', color: 'var(--success)', padding: '12px', borderRadius: '8px', marginBottom: '20px', border: '1px solid rgba(16,185,129,0.25)', fontSize: '0.8rem', fontWeight: '700' }}>CAMPAIGN POSTED: AWAITING ADMIN APPROVAL</div>}
+              
+              {/* ⚡ AI ASSISTANT CO-PILOT */}
+              <div style={{
+                background: 'rgba(124, 58, 237, 0.04)',
+                border: '1px dashed rgba(124, 58, 237, 0.25)',
+                borderRadius: '12px',
+                padding: '16px',
+                marginBottom: '24px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                  <span style={{ fontSize: '1.1rem' }}>⚡</span>
+                  <span style={{ fontSize: '0.82rem', fontWeight: '800', color: 'var(--text-primary)', letterSpacing: '0.5px' }}>AI CAMPAIGN CO-PILOT</span>
+                </div>
+                <p style={{ fontSize: '0.74rem', color: 'var(--text-secondary)', margin: '0 0 12px 0', lineHeight: '1.4' }}>
+                  Type a simple one-sentence campaign idea. Our AI will automatically construct a complete, professional draft (milestones, budgets, and descriptions)!
+                </p>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Ex: Tree plantation drive this Sunday in Delhi..."
+                    value={aiPrompt}
+                    onChange={e => setAiPrompt(e.target.value)}
+                    className="cyber-input"
+                    style={{ flex: 1, height: '42px', fontSize: '0.82rem' }}
+                    disabled={generatingCampaign}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={handleGenerateCampaignAI}
+                    disabled={generatingCampaign || !aiPrompt.trim()}
+                    className="btn btn-primary"
+                    style={{ 
+                      padding: '0 16px', 
+                      height: '42px', 
+                      fontSize: '0.8rem', 
+                      background: 'var(--gradient-primary)',
+                      border: 'none',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {generatingCampaign ? 'Drafting...' : 'AI Assist'}
+                  </button>
+                </div>
+                {aiError && <div style={{ color: 'var(--danger)', fontSize: '0.72rem', marginTop: '6px', fontWeight: '700' }}>{aiError}</div>}
+              </div>
               <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <input type="text" placeholder="Campaign Title" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="cyber-input" />
                 <select value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="cyber-input" style={{ background: 'var(--bg-input)' }}>

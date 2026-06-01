@@ -112,6 +112,7 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
   const [cardCvv, setCardCvv] = useState('');
   const [pointsEarned, setPointsEarned] = useState(0);
   const [showGoalAchievedModal, setShowGoalAchievedModal] = useState(false);
+  const [useAIMatches, setUseAIMatches] = useState(false);
 
   const toggleReadMore = (id) => {
     setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
@@ -121,14 +122,26 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
     fetchCampaigns();
   }, []);
 
-  const fetchCampaigns = async () => {
+  const fetchCampaigns = async (useAI = false) => {
     try {
-      const res = await fetch(`${API_BASE}/api/campaigns`);
+      const token = localStorage.getItem('token');
+      const url = (useAI && token) 
+        ? `${API_BASE}/api/ai/recommended-campaigns` 
+        : `${API_BASE}/api/campaigns`;
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+      
+      const res = await fetch(url, { headers });
       if (res.ok) {
         const data = await res.json();
         setCampaigns(data);
       }
     } catch (err) { console.error(err); }
+  };
+
+  const handleToggleAI = (val) => {
+    setUseAIMatches(val);
+    if (val) setActiveFilter('All');
+    fetchCampaigns(val);
   };
 
   const categories = ['All', 'Environment', 'Education', 'Health', 'Social'];
@@ -269,18 +282,42 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
 
       {/* 🧬 FILTERS */}
       <div className="filters-container" style={{ padding: '50px 24px 0 24px', display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
-        {categories.map(cat => (
+        {localStorage.getItem('token') && (
           <button 
-            key={cat}
-            onClick={() => setActiveFilter(cat)}
+            onClick={() => handleToggleAI(!useAIMatches)}
             className="btn"
             style={{
               padding: '10px 24px',
               borderRadius: 'var(--radius-full)',
-              background: activeFilter === cat ? 'var(--gradient-primary)' : 'rgba(0, 0, 0, 0.03)',
-              color: activeFilter === cat ? 'white' : 'var(--text-secondary)',
-              border: activeFilter === cat ? 'none' : '1px solid var(--border)',
-              boxShadow: activeFilter === cat ? 'var(--shadow-glow)' : 'none',
+              background: useAIMatches ? 'linear-gradient(135deg, #7c3aed, #06b6d4)' : 'rgba(124, 58, 237, 0.05)',
+              color: useAIMatches ? 'white' : '#7c3aed',
+              border: useAIMatches ? 'none' : '1px solid rgba(124, 58, 237, 0.25)',
+              boxShadow: useAIMatches ? 'var(--shadow-glow)' : 'none',
+              fontWeight: '800',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            🧠 AI RECOMMENDED
+          </button>
+        )}
+        {categories.map(cat => (
+          <button 
+            key={cat}
+            onClick={() => {
+              setActiveFilter(cat);
+              setUseAIMatches(false);
+              fetchCampaigns(false);
+            }}
+            className="btn"
+            style={{
+              padding: '10px 24px',
+              borderRadius: 'var(--radius-full)',
+              background: (!useAIMatches && activeFilter === cat) ? 'var(--gradient-primary)' : 'rgba(0, 0, 0, 0.03)',
+              color: (!useAIMatches && activeFilter === cat) ? 'white' : 'var(--text-secondary)',
+              border: (!useAIMatches && activeFilter === cat) ? 'none' : '1px solid var(--border)',
+              boxShadow: (!useAIMatches && activeFilter === cat) ? 'var(--shadow-glow)' : 'none',
               fontWeight: '700'
             }}
           >
@@ -317,13 +354,51 @@ const VolunteerHome = ({ user, applications = [], setApplications }) => {
             <div key={camp._id} className="cyber-card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
                 <img src={camp.image || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800'} alt={camp.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <div style={{ position: 'absolute', top: '16px', left: '16px' }} className="badge badge-primary">
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    top: '16px', 
+                    left: '16px',
+                    background: 'rgba(10, 10, 15, 0.85)',
+                    backdropFilter: 'blur(8px)',
+                    color: '#c084fc',
+                    border: '1px solid rgba(168, 85, 247, 0.4)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.35)',
+                    padding: '4px 12px',
+                    borderRadius: 'var(--radius-full)',
+                    fontSize: '0.72rem',
+                    fontWeight: '700',
+                    letterSpacing: '0.5px',
+                    textTransform: 'uppercase',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
                   {(camp.categories?.[0] || 'GENERAL').toUpperCase()}
                 </div>
+                {camp.matchScore && (
+                  <div style={{ position: 'absolute', top: '16px', right: '16px', background: 'rgba(5, 5, 8, 0.75)', backdropFilter: 'blur(4px)' }} className="badge badge-accent">
+                    🧠 {camp.matchScore}% Match
+                  </div>
+                )}
               </div>
               
               <div style={{ padding: '28px', flex: 1, display: 'flex', flexDirection: 'column', justifyBetween: 'space-between' }}>
                 <div>
+                  {camp.aiReason && (
+                    <div style={{ 
+                      background: 'rgba(124, 58, 237, 0.04)', 
+                      border: '1px dashed rgba(124, 58, 237, 0.15)', 
+                      padding: '10px 14px', 
+                      borderRadius: '10px', 
+                      fontSize: '0.78rem', 
+                      color: 'var(--text-primary)', 
+                      lineHeight: '1.4', 
+                      marginBottom: '14px' 
+                    }}>
+                      <span style={{ fontWeight: '800', color: '#7c3aed' }}>AI Insight:</span> {camp.aiReason}
+                    </div>
+                  )}
                   <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.35rem', fontWeight: '800', color: 'var(--text-primary)', marginBottom: '10px' }}>{camp.title}</h2>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '14px' }}>
                     <MapPin size={14} className="text-accent" style={{ color: 'var(--accent)' }} /> {camp.location}

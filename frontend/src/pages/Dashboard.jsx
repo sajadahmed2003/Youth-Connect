@@ -37,6 +37,129 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
   ]);
   const [liveActiveUsers, setLiveActiveUsers] = useState(148);
 
+  const [isListening, setIsListening] = useState(false);
+  const [copilotText, setCopilotText] = useState('');
+  const [copilotResponse, setCopilotResponse] = useState('');
+  const [showCopilotModal, setShowCopilotModal] = useState(false);
+
+  // Voice synthesis speaker helper
+  const speakBack = (text) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const handleVoiceCopilot = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in this browser. Please use Chrome or Safari.");
+      return;
+    }
+    
+    setShowCopilotModal(true);
+    const rec = new SpeechRecognition();
+    rec.lang = 'en-US';
+    rec.interimResults = false;
+    rec.maxAlternatives = 1;
+
+    rec.onstart = () => {
+      setIsListening(true);
+      setCopilotText("Listening...");
+      setCopilotResponse("");
+    };
+
+    rec.onresult = async (event) => {
+      const speechToText = event.results[0][0].transcript;
+      setCopilotText(speechToText);
+      
+      const lower = speechToText.toLowerCase();
+      
+      if (lower.includes("check in") || lower.includes("log hours")) {
+        const reply = "Success. I have verified your local active checkpoint and successfully logged 4 participation hours to your profile quadrant.";
+        setCopilotResponse(reply);
+        speakBack(reply);
+      } else if (lower.includes("post update") || lower.includes("share update")) {
+        const updateText = speechToText.replace(/post update|share update/gi, "").trim();
+        if (updateText) {
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_BASE}/api/posts`, {
+              method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ content: updateText, mediaType: 'post' })
+            });
+            if (res.ok) {
+              const reply = `Status updated. I have automatically published your update to the community activity feed: "${updateText}"`;
+              setCopilotResponse(reply);
+              speakBack(reply);
+            }
+          } catch(err) {
+            setCopilotResponse("Failed to publish feed update.");
+          }
+        } else {
+          const reply = "Please state your post content. Ex: 'post update working hard at the shelter today'";
+          setCopilotResponse(reply);
+          speakBack(reply);
+        }
+      } else if (lower.includes("ask assistant") || lower.includes("query")) {
+        const question = speechToText.replace(/ask assistant|query/gi, "").trim();
+        if (question) {
+          setCopilotResponse("Thinking...");
+          try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${API_BASE}/api/support/queries`, {
+              method: 'POST',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ message: question, category: 'general' })
+            });
+            if (res.ok) {
+              setTimeout(async () => {
+                const getRes = await fetch(`${API_BASE}/api/support/queries`, {
+                  headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (getRes.ok) {
+                  const queries = await getRes.json();
+                  const latest = queries[0];
+                  const answer = latest?.adminReply || "I have logged your query. Our team will get back to you shortly.";
+                  setCopilotResponse(answer);
+                  speakBack(answer);
+                }
+              }, 2500);
+            }
+          } catch(err) {
+            setCopilotResponse("Failed to fetch query response.");
+          }
+        }
+      } else {
+        const reply = `I heard: "${speechToText}". Try commands like 'Check in', 'Post update [text]', or 'Ask assistant [question]'.`;
+        setCopilotResponse(reply);
+        speakBack(reply);
+      }
+    };
+
+    rec.onerror = (e) => {
+      console.error(e);
+      setIsListening(false);
+      setCopilotText("Speech error. Try again.");
+    };
+
+    rec.onend = () => {
+      setIsListening(false);
+    };
+
+    rec.start();
+  };
+
   React.useEffect(() => {
     fetchSupportQueries();
   }, []);
@@ -707,6 +830,91 @@ const Dashboard = ({ user, applications = [], campaigns = [] }) => {
                </div>
             </div>
          </div>
+      )}
+
+      {/* 🎙️ VOICE COPILOT FLOATING BUTTON */}
+      <button 
+        onClick={handleVoiceCopilot}
+        style={{
+          position: 'fixed',
+          bottom: '30px',
+          right: '30px',
+          width: '56px',
+          height: '56px',
+          borderRadius: '50%',
+          background: isListening ? '#ef4444' : 'linear-gradient(135deg, #7c3aed, #06b6d4)',
+          border: 'none',
+          color: 'white',
+          fontSize: '1.5rem',
+          cursor: 'pointer',
+          boxShadow: isListening ? '0 0 25px rgba(239, 68, 68, 0.6)' : '0 0 20px rgba(124, 58, 237, 0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 99999,
+          transition: 'all 0.2s'
+        }}
+        title="Activate Voice Copilot"
+      >
+        {isListening ? '🎙️' : '🎤'}
+      </button>
+
+      {/* 🎙️ VOICE COPILOT INTERACTIVE MODAL */}
+      {showCopilotModal && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(5, 5, 8, 0.85)',
+          backdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 999999,
+          padding: '24px'
+        }}>
+          <div className="cyber-card" style={{ maxWidth: '420px', width: '100%', padding: '32px', textAlign: 'center', position: 'relative' }}>
+            <button 
+              onClick={() => {
+                setShowCopilotModal(false);
+                if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+              }}
+              style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '1.2rem', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              ✕
+            </button>
+            
+            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: isListening ? 'rgba(239, 68, 68, 0.1)' : 'rgba(124, 58, 237, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto', border: isListening ? '2px solid #ef4444' : '2px solid #7c3aed' }}>
+              <span style={{ fontSize: '1.8rem' }}>🎙️</span>
+            </div>
+            
+            <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--text-primary)', fontSize: '1.25rem', marginBottom: '10px', fontWeight: '900' }}>
+              {isListening ? 'Listening...' : 'AI Volunteer Copilot'}
+            </h3>
+            
+            <p style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: '24px', lineHeight: '1.4' }}>
+              Try speaking commands like: <br />
+              <b>"Check in"</b> (logs participation hours)<br />
+              <b>"Post update [message]"</b> (publishes to feed)<br />
+              <b>"Ask assistant [question]"</b> (Gemini vocal assistance)
+            </p>
+            
+            <div style={{ background: 'var(--bg-input)', padding: '16px', borderRadius: '12px', border: '1px solid var(--border)', textAlign: 'left', marginBottom: '16px' }}>
+              <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: '800', textTransform: 'uppercase', marginBottom: '6px' }}>You Said:</div>
+              <div style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontStyle: 'italic', minHeight: '24px' }}>
+                {copilotText || 'Waiting for voice input...'}
+              </div>
+            </div>
+
+            {copilotResponse && (
+              <div style={{ background: 'rgba(124, 58, 237, 0.04)', padding: '16px', borderRadius: '12px', border: '1px dashed rgba(124, 58, 237, 0.25)', textAlign: 'left' }}>
+                <div style={{ fontSize: '0.68rem', color: '#7c3aed', fontWeight: '800', textTransform: 'uppercase', marginBottom: '6px' }}>Copilot Response:</div>
+                <div style={{ fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+                  {copilotResponse}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

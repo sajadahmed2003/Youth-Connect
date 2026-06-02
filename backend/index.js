@@ -3,7 +3,6 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const dns = require('dns').promises;
 const nodemailer = require('nodemailer');
 const { sendEmail } = require('./utils/email');
 
@@ -42,62 +41,6 @@ const transporter = nodemailer.createTransport({
     pass: EMAIL_PASS
   }
 });
-
-// --- EMAIL VALIDATION HELPER ---
-async function validateEmailDomain(email) {
-  if (!email) {
-    return { valid: false, error: "Bhai, email address enter karna zaroori hai!" };
-  }
-  
-  // 1. Basic format validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return { valid: false, error: "Bhai, please enter a valid email format!" };
-  }
-  
-  const domain = email.split('@')[1].toLowerCase();
-  
-  // 2. Common domain typos suggestion
-  const typos = {
-    'gamil.com': 'gmail.com',
-    'gmal.com': 'gmail.com',
-    'gail.com': 'gmail.com',
-    'gamil.co': 'gmail.com',
-    'gml.co': 'gmail.com',
-    'gml.com': 'gmail.com',
-    'gmail.co': 'gmail.com',
-    'mail.com': 'gmail.com',
-    'yaho.com': 'yahoo.com',
-    'hotmal.com': 'hotmail.com',
-    'hotmial.com': 'hotmail.com',
-    'outlok.com': 'outlook.com',
-    'iclud.com': 'icloud.com'
-  };
-  if (typos[domain]) {
-    return { valid: false, error: `Bhai, aapka email domain "${domain}" invalid ya typo lag raha hai. Kya aapka matlab "${typos[domain]}" tha? Please correct karke try karein!` };
-  }
-
-  // 3. Block well-known temporary/fake domains
-  const fakeDomains = ['test.com', 'example.com', 'tempmail.com', 'mailinator.com', 'yopmail.com', 'fake.com', 'trashmail.com'];
-  if (fakeDomains.includes(domain)) {
-    return { valid: false, error: `Bhai, ye temporary ya fake email domain "${domain}" allowed nahi hai. Please original active email use karein!` };
-  }
-
-  // 4. DNS MX Record lookup to ensure domain actually exists and receives mail!
-  try {
-    const mxRecords = await dns.resolveMx(domain);
-    if (!mxRecords || mxRecords.length === 0) {
-      return { valid: false, error: "Bhai, ye email domain (domain name) exist nahi karta ya is par mail receive nahi ho sakti!" };
-    }
-  } catch (dnsErr) {
-    if (dnsErr.code === 'ENOTFOUND' || dnsErr.code === 'ENODATA') {
-      return { valid: false, error: "Bhai, ye email domain exist nahi karta hai! Please valid aur active email address use karein." };
-    }
-    console.warn("DNS MX validation warning:", dnsErr.message);
-  }
-
-  return { valid: true };
-}
 
 const sendStatusEmail = async (volunteerEmail, volunteerName, campaignTitle, status) => {
   const mailOptions = {
@@ -208,12 +151,6 @@ app.post('/api/auth/register', async (req, res) => {
     const { name, email, password, role } = req.body;
     if (!email) return res.status(400).json({ error: "Email is required." });
     
-    // Validate email format, suspicious typos, fake domains, and DNS MX records
-    const validation = await validateEmailDomain(email);
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.error });
-    }
-    
     const emailLower = email.toLowerCase();
     const existing = await User.findOne({ email: emailLower });
     
@@ -230,6 +167,7 @@ app.post('/api/auth/register', async (req, res) => {
       existing.verificationOtp = otp;
       existing.verificationOtpExpires = Date.now() + 15 * 60 * 1000;
       await existing.save();
+      console.log(`🔑 [LOCAL OTP CODE] -> Verification code generated for unverified user ${emailLower}: ${otp}`);
 
       try {
         const mailOptions = {
@@ -272,6 +210,7 @@ app.post('/api/auth/register', async (req, res) => {
       verificationOtp: otp,
       verificationOtpExpires: Date.now() + 15 * 60 * 1000
     });
+    console.log(`🔑 [LOCAL OTP CODE] -> Verification code generated for new user ${emailLower}: ${otp}`);
     
     // Send Email
     try {
@@ -367,6 +306,7 @@ app.post('/api/auth/login', async (req, res) => {
       user.verificationOtp = otp;
       user.verificationOtpExpires = Date.now() + 15 * 60 * 1000;
       await user.save();
+      console.log(`🔑 [LOCAL OTP CODE] -> Verification code generated for login verification ${user.email}: ${otp}`);
 
       try {
         const mailOptions = {
@@ -408,12 +348,6 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: "Email is required." });
 
-    // Validate email format and suspicious typos
-    const validation = await validateEmailDomain(email);
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.error });
-    }
-
     const emailLower = email.trim().toLowerCase();
     const user = await User.findOne({ email: emailLower });
 
@@ -426,6 +360,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     user.resetOtp = otp;
     user.resetOtpExpires = Date.now() + 15 * 60 * 1000;
     await user.save();
+    console.log(`🔑 [LOCAL OTP CODE] -> Verification code generated for password reset ${user.email}: ${otp}`);
 
     // Send Mail
     try {

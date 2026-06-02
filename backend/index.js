@@ -552,12 +552,18 @@ async function checkContentSafety(text) {
       });
       if (response.ok) {
         const result = await response.json();
-        const cleanText = result.candidates[0].content.parts[0].text;
-        const parsed = JSON.parse(cleanText.substring(cleanText.indexOf('{'), cleanText.lastIndexOf('}') + 1));
-        return {
-          toxic: !!parsed.toxic,
-          reason: parsed.reason || "Content safety violation"
-        };
+        const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText) {
+          const startIdx = rawText.indexOf('{');
+          const endIdx = rawText.lastIndexOf('}');
+          if (startIdx !== -1 && endIdx !== -1) {
+            const parsed = JSON.parse(rawText.substring(startIdx, endIdx + 1));
+            return {
+              toxic: !!parsed.toxic,
+              reason: parsed.reason || "Content safety violation"
+            };
+          }
+        }
       }
     } catch (err) {
       console.error("Safety AI check error:", err);
@@ -1139,12 +1145,18 @@ app.post('/api/ai/match', async (req, res) => {
 
           if(response.ok) {
              const result = await response.json();
-             const cleanText = result.candidates[0].content.parts[0].text;
-             const parsed = JSON.parse(cleanText.substring(cleanText.indexOf('{'), cleanText.lastIndexOf('}') + 1));
-             aiResult = {
-                matchScore: parsed.matchScore || 50,
-                reason: parsed.reason || "Matched dynamically based on skills alignment."
-             };
+             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+             if (rawText) {
+                const startIdx = rawText.indexOf('{');
+                const endIdx = rawText.lastIndexOf('}');
+                if (startIdx !== -1 && endIdx !== -1) {
+                   const parsed = JSON.parse(rawText.substring(startIdx, endIdx + 1));
+                   aiResult = {
+                      matchScore: parsed.matchScore || 50,
+                      reason: parsed.reason || "Matched dynamically based on skills alignment."
+                   };
+                }
+             }
           }
        } catch(aiErr) {
           console.error("🔥 Gemini REST Engine error:", aiErr.message);
@@ -1444,15 +1456,21 @@ app.get('/api/ai/recommended-campaigns', async (req, res) => {
 
           if(response.ok) {
              const result = await response.json();
-             const cleanText = result.candidates[0].content.parts[0].text;
-             const parsed = JSON.parse(cleanText.substring(cleanText.indexOf('['), cleanText.lastIndexOf(']') + 1));
-             if (Array.isArray(parsed)) {
-               parsed.forEach(item => {
-                 recommendationMap[item.campaignId] = {
-                   matchScore: item.matchScore || 50,
-                   reason: item.reason || "Matched dynamically based on skills."
-                 };
-               });
+             const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+             if (rawText) {
+                const startIdx = rawText.indexOf('[');
+                const endIdx = rawText.lastIndexOf(']');
+                if (startIdx !== -1 && endIdx !== -1) {
+                   const parsed = JSON.parse(rawText.substring(startIdx, endIdx + 1));
+                   if (Array.isArray(parsed)) {
+                     parsed.forEach(item => {
+                       recommendationMap[item.campaignId] = {
+                         matchScore: item.matchScore || 50,
+                         reason: item.reason || "Matched dynamically based on skills."
+                       };
+                     });
+                   }
+                }
              }
           }
        } catch(aiErr) {
@@ -1540,8 +1558,14 @@ app.post('/api/ai/generate-campaign', async (req, res) => {
 
         if (response.ok) {
           const result = await response.json();
-          const cleanText = result.candidates[0].content.parts[0].text;
-          generated = JSON.parse(cleanText.substring(cleanText.indexOf('{'), cleanText.lastIndexOf('}') + 1));
+          const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawText) {
+             const startIdx = rawText.indexOf('{');
+             const endIdx = rawText.lastIndexOf('}');
+             if (startIdx !== -1 && endIdx !== -1) {
+                generated = JSON.parse(rawText.substring(startIdx, endIdx + 1));
+             }
+          }
         }
       } catch (aiErr) {
         console.error("🔥 Campaign generator AI error:", aiErr);

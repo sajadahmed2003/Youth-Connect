@@ -616,7 +616,7 @@ function App() {
           </main>
         </>
       ) : (
-        <Auth onLogin={handleLogin} />
+        <Auth onLogin={handleLogin} onClose={() => setShowSplash(true)} />
       )}
     </div>
   );

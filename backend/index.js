@@ -342,7 +342,6 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 4. Forgot Password (Sends OTP to Email)
 app.post('/api/auth/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;

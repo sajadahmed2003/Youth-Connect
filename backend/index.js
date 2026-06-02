@@ -31,14 +31,11 @@ const ContactInquiry = require('./models/ContactInquiry');
 const Notification = require('./models/Notification');
 
 // --- NODEMAILER EMAIL ENGINE ---
-const EMAIL_USER = process.env.SMTP_EMAIL || process.env.EMAIL_USER || 'youthconnect.verify@gmail.com';
-const EMAIL_PASS = process.env.SMTP_PASS || process.env.EMAIL_PASS || 'mockpassword123';
-
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: EMAIL_USER,
-    pass: EMAIL_PASS
+    user: process.env.EMAIL_USER || 'youthconnect.verify@gmail.com',
+    pass: process.env.EMAIL_PASS || 'mockpassword123'
   }
 });
 
@@ -144,8 +141,6 @@ mongoose.connect(MONGO_URI)
   .catch(err => console.error('❌ MONGODB CONNECTION REFUSED:', err));
 
 // --- AUTHENTICATION ENGINE ---
-
-// 1. Sign Up Endpoint (Sends OTP)
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -153,132 +148,16 @@ app.post('/api/auth/register', async (req, res) => {
     
     const emailLower = email.toLowerCase();
     const existing = await User.findOne({ email: emailLower });
+    if (existing) return res.status(400).json({ error: "This email is already registered. Please log in instead." });
+
+    const newUser = await User.create({ name, email: emailLower, password, role, avatar: `https://i.pravatar.cc/150?u=${email}` });
     
-    if (existing) {
-      if (existing.isVerified) {
-        return res.status(400).json({ error: "This email is already registered. Please log in instead." });
-      }
-      // If user exists but is unverified, we can update their details and re-send OTP
-      existing.name = name;
-      existing.password = password;
-      existing.role = role || 'volunteer';
-      
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      existing.verificationOtp = otp;
-      existing.verificationOtpExpires = Date.now() + 15 * 60 * 1000;
-      await existing.save();
-      console.log(`🔑 [LOCAL OTP CODE] -> Verification code generated for unverified user ${emailLower}: ${otp}`);
-
-      try {
-        const mailOptions = {
-          from: `"Youth Connect" <${EMAIL_USER}>`,
-          to: emailLower,
-          subject: "Verify Your Email - Youth Connect",
-          html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px;">
-              <h2 style="color: #7c3aed; font-size: 1.5rem; margin-bottom: 16px;">Youth Connect - Email Verification</h2>
-              <p>Hello <strong>${name}</strong>,</p>
-              <p>Thank you for signing up on Youth Connect! Please verify your email to unlock your volunteering profile.</p>
-              <div style="background: #f3e8ff; color: #7c3aed; padding: 18px; border-radius: 12px; font-weight: bold; margin: 24px 0; text-align: center; font-size: 2rem; letter-spacing: 6px;">
-                ${otp}
-              </div>
-              <p style="color: #475569;">This code is valid for 15 minutes. If you did not request this, you can safely ignore this email.</p>
-              <br/>
-              <p style="font-size: 0.8rem; color: #64748b;">Youth Connect automated verification engine.</p>
-            </div>
-          `
-        };
-        await transporter.sendMail(mailOptions);
-        console.log(`✉️ Verification OTP resent to unverified user: ${emailLower}`);
-      } catch (mailErr) {
-        console.error("Mail send error:", mailErr);
-      }
-
-      return res.json({ otpSent: true, email: emailLower, message: "Verification OTP resent to your email." });
-    }
-
-    // Generate new OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    const newUser = await User.create({ 
-      name, 
-      email: emailLower, 
-      password, 
-      role: role || 'volunteer', 
-      avatar: `https://i.pravatar.cc/150?u=${emailLower}`,
-      isVerified: false,
-      verificationOtp: otp,
-      verificationOtpExpires: Date.now() + 15 * 60 * 1000
-    });
-    console.log(`🔑 [LOCAL OTP CODE] -> Verification code generated for new user ${emailLower}: ${otp}`);
+    await ActivityLog.create({ type: 'SIGNUP', message: `New ${role} [${name}] has entered the network.` });
     
-    // Send Email
-    try {
-      const mailOptions = {
-        from: `"Youth Connect" <${EMAIL_USER}>`,
-        to: emailLower,
-        subject: "Verify Your Email - Youth Connect",
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px;">
-            <h2 style="color: #7c3aed; font-size: 1.5rem; margin-bottom: 16px;">Youth Connect - Email Verification</h2>
-            <p>Hello <strong>${name}</strong>,</p>
-            <p>Thank you for signing up on Youth Connect! Please verify your email to unlock your volunteering profile.</p>
-            <div style="background: #f3e8ff; color: #7c3aed; padding: 18px; border-radius: 12px; font-weight: bold; margin: 24px 0; text-align: center; font-size: 2rem; letter-spacing: 6px;">
-              ${otp}
-            </div>
-            <p style="color: #475569;">This code is valid for 15 minutes. If you did not request this, you can safely ignore this email.</p>
-            <br/>
-            <p style="font-size: 0.8rem; color: #64748b;">Youth Connect automated verification engine.</p>
-          </div>
-        `
-      };
-      await transporter.sendMail(mailOptions);
-      console.log(`✉️ Verification OTP dispatched to new user: ${emailLower}`);
-    } catch (mailErr) {
-      console.error("Mail send error:", mailErr);
-    }
-
-    res.json({ otpSent: true, email: emailLower, message: "Verification OTP sent to your email." });
+    res.json({ message: "Access Authorized" });
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// 2. Sign Up OTP Verification Endpoint
-app.post('/api/auth/verify-signup-otp', async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    if (!email || !otp) {
-      return res.status(400).json({ error: "Email and OTP code are required." });
-    }
-
-    const emailLower = email.trim().toLowerCase();
-    const user = await User.findOne({ email: emailLower });
-
-    if (!user) {
-      return res.status(404).json({ error: "User account not found." });
-    }
-
-    if (user.isVerified) {
-      return res.status(400).json({ error: "Account is already verified. Please log in instead." });
-    }
-
-    if (user.verificationOtp !== otp || user.verificationOtpExpires < Date.now()) {
-      return res.status(400).json({ error: "Invalid or expired verification code." });
-    }
-
-    // Mark as Verified
-    user.isVerified = true;
-    user.verificationOtp = null;
-    user.verificationOtpExpires = null;
-    await user.save();
-
-    await ActivityLog.create({ type: 'SIGNUP', message: `New ${user.role} [${user.name}] has successfully verified email and entered the network.` });
-
-    const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '10d' });
-    res.json({ token, user });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// 3. Log In Endpoint (Blocks unverified users)
 app.post('/api/auth/login', async (req, res) => {
   try {
     const emailInput = req.body.email?.trim().toLowerCase();
@@ -296,174 +175,10 @@ app.post('/api/auth/login', async (req, res) => {
 
     const user = await User.findOne({ email: emailInput });
     if (!user || user.password !== passwordInput) {
-        return res.status(401).json({ error: "Invalid email or password." });
-    }
-
-    // Check Verification Status
-    if (user.isVerified === false) {
-      // Re-trigger OTP code for ease of access
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      user.verificationOtp = otp;
-      user.verificationOtpExpires = Date.now() + 15 * 60 * 1000;
-      await user.save();
-      console.log(`🔑 [LOCAL OTP CODE] -> Verification code generated for login verification ${user.email}: ${otp}`);
-
-      try {
-        const mailOptions = {
-          from: `"Youth Connect" <${EMAIL_USER}>`,
-          to: user.email,
-          subject: "Verify Your Email - Youth Connect",
-          html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px;">
-              <h2 style="color: #7c3aed; font-size: 1.5rem; margin-bottom: 16px;">Youth Connect - Email Verification Required</h2>
-              <p>Hello <strong>${user.name}</strong>,</p>
-              <p>Your account is registered but unverified. Please verify your email using this OTP code:</p>
-              <div style="background: #f3e8ff; color: #7c3aed; padding: 18px; border-radius: 12px; font-weight: bold; margin: 24px 0; text-align: center; font-size: 2rem; letter-spacing: 6px;">
-                ${otp}
-              </div>
-              <p style="color: #475569;">This code is valid for 15 minutes.</p>
-              <br/>
-              <p style="font-size: 0.8rem; color: #64748b;">Youth Connect automated verification engine.</p>
-            </div>
-          `
-        };
-        await transporter.sendMail(mailOptions);
-      } catch (mailErr) {
-        console.error("Mail send error:", mailErr);
-      }
-
-      return res.status(403).json({ error: "Your email is unverified. We have sent a verification code to your email.", unverified: true });
+        return res.status(401).json({ error: "CRITICAL: NODE REJECTION" });
     }
 
     await ActivityLog.create({ type: 'LOGIN', message: `${user.role.toUpperCase()} [${user.name}] identity verified.` });
-
-    const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '10d' });
-    res.json({ token, user });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-app.post('/api/auth/forgot-password', async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: "Email is required." });
-
-    const emailLower = email.trim().toLowerCase();
-    const user = await User.findOne({ email: emailLower });
-
-    if (!user) {
-      return res.status(404).json({ error: "Bhai, is email se koi account nahi mila!" });
-    }
-
-    // Generate 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.resetOtp = otp;
-    user.resetOtpExpires = Date.now() + 15 * 60 * 1000;
-    await user.save();
-    console.log(`🔑 [LOCAL OTP CODE] -> Verification code generated for password reset ${user.email}: ${otp}`);
-
-    // Send Mail
-    try {
-      const mailOptions = {
-        from: `"Youth Connect" <${EMAIL_USER}>`,
-        to: user.email,
-        subject: "Reset Your Password - Youth Connect",
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 16px;">
-            <h2 style="color: #7c3aed; font-size: 1.5rem; margin-bottom: 16px;">Youth Connect - Password Reset</h2>
-            <p>Hello <strong>${user.name}</strong>,</p>
-            <p>We received a request to reset your password on Youth Connect. Use the OTP code below to verify your identity:</p>
-            <div style="background: #f3e8ff; color: #7c3aed; padding: 18px; border-radius: 12px; font-weight: bold; margin: 24px 0; text-align: center; font-size: 2rem; letter-spacing: 6px;">
-              ${otp}
-            </div>
-            <p style="color: #475569;">This code is valid for 15 minutes. If you did not request this, you can safely ignore this email.</p>
-            <br/>
-            <p style="font-size: 0.8rem; color: #64748b;">Youth Connect automated verification engine.</p>
-          </div>
-        `
-      };
-      await transporter.sendMail(mailOptions);
-      console.log(`✉️ Password reset OTP sent to ${user.email}`);
-    } catch (mailErr) {
-      console.error("Mail send error:", mailErr);
-    }
-
-    res.json({ success: true, message: "Password reset OTP sent to your email." });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// 5. Reset Password using OTP
-app.post('/api/auth/reset-password', async (req, res) => {
-  try {
-    const { email, otp, newPassword } = req.body;
-    if (!email || !otp || !newPassword) {
-      return res.status(400).json({ error: "Email, OTP and new password are required." });
-    }
-
-    const emailLower = email.trim().toLowerCase();
-    const user = await User.findOne({ email: emailLower });
-
-    if (!user) {
-      return res.status(404).json({ error: "User account not found." });
-    }
-
-    if (user.resetOtp !== otp || user.resetOtpExpires < Date.now()) {
-      return res.status(400).json({ error: "Invalid or expired password reset code." });
-    }
-
-    // Update password (storing as plain text for compatibility)
-    user.password = newPassword;
-    user.resetOtp = null;
-    user.resetOtpExpires = null;
-    await user.save();
-
-    await ActivityLog.create({ type: 'LOG', message: `User [${user.name}] successfully reset their password.` });
-    res.json({ success: true, message: "Password successfully updated. You can now log in." });
-  } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-// 6. Google Sign In/Sign Up Endpoint
-app.post('/api/auth/google-login', async (req, res) => {
-  try {
-    const { credential } = req.body;
-    if (!credential) {
-      return res.status(400).json({ error: "Google credentials credential token is required." });
-    }
-
-    // Official way to verify Google OAuth credential without google-auth-library
-    const verifyRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
-    if (!verifyRes.ok) {
-      return res.status(400).json({ error: "Google login validation failed. Invalid token signature." });
-    }
-
-    const payload = await verifyRes.json();
-    const emailLower = payload.email.toLowerCase();
-    
-    let user = await User.findOne({ email: emailLower });
-
-    if (user) {
-      // User exists, log them in!
-      if (!user.isVerified) {
-        user.isVerified = true;
-      }
-      if (!user.avatar || user.avatar.includes('pravatar')) {
-        user.avatar = payload.picture;
-      }
-      await user.save();
-      
-      await ActivityLog.create({ type: 'LOGIN', message: `${user.role.toUpperCase()} [${user.name}] logged in via Google.` });
-    } else {
-      // User does not exist, create a new verified volunteer!
-      user = await User.create({
-        name: payload.name,
-        email: emailLower,
-        password: Math.random().toString(36).slice(-10), // secure random password
-        role: 'volunteer',
-        avatar: payload.picture,
-        isVerified: true
-      });
-
-      await ActivityLog.create({ type: 'SIGNUP', message: `New volunteer [${user.name}] has registered via Google.` });
-    }
 
     const token = jwt.sign({ userId: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '10d' });
     res.json({ token, user });

@@ -72,29 +72,7 @@ const userSchema = new mongoose.Schema({
   }],
   // 👥 Social Connection Fields
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-
-  // 🛡️ Security & Verification Engine
-  isVerified: {
-    type: Boolean,
-    default: true // Default to true so existing users are not locked out
-  },
-  verificationOtp: {
-    type: String,
-    default: null
-  },
-  verificationOtpExpires: {
-    type: Date,
-    default: null
-  },
-  resetOtp: {
-    type: String,
-    default: null
-  },
-  resetOtpExpires: {
-    type: Date,
-    default: null
-  }
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

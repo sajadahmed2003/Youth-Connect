@@ -525,11 +525,11 @@ const CommunityFeed = ({ user }) => {
 
               {/* POST IMAGE OR VIDEO */}
               {post.image && (
-                <div style={{ width: '100%', maxHeight: '420px', overflow: 'hidden', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', marginBottom: '16px', background: '#000' }}>
+                <div style={{ width: '100%', borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border)', marginBottom: '16px', background: 'var(--bg-card)', display: 'flex', justifyContent: 'center', cursor: 'pointer' }} onClick={() => window.open(post.image, '_blank')}>
                   {isVideoUrl(post.image) ? (
-                    <video src={post.image} controls style={{ width: '100%', maxHeight: '400px', display: 'block' }} />
+                    <video src={post.image} controls style={{ width: '100%', maxHeight: '600px', display: 'block' }} onClick={(e) => e.stopPropagation()} />
                   ) : (
-                    <img src={post.image} alt="Post Attachment" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={post.image} alt="Post Attachment" style={{ maxWidth: '100%', maxHeight: '600px', objectFit: 'contain', display: 'block' }} />
                   )}
                 </div>
               )}

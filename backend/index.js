@@ -239,9 +239,14 @@ app.delete('/api/campaigns/:id', async (req, res) => {
 app.get('/api/my-campaigns', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
     
     const campaigns = await Campaign.find({ 
         $or: [
@@ -295,9 +300,14 @@ app.post('/api/applications', async (req, res) => {
 app.get('/api/applications/manage', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     let apps;
     if (decoded.role === 'admin') {
@@ -478,7 +488,12 @@ app.get('/api/admin/contacts', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         if (decoded.role !== 'admin') return res.status(403).json({ error: "Forbidden: Super Admin access required." });
 
@@ -492,7 +507,12 @@ app.put('/api/admin/contacts/:id/reply', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         if (decoded.role !== 'admin') return res.status(403).json({ error: "Forbidden: Super Admin access required." });
 
@@ -595,7 +615,12 @@ app.post('/api/posts', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         const user = await User.findById(decoded.userId);
         if (!user) return res.status(404).json({ error: "User identity not found." });
@@ -631,7 +656,12 @@ app.delete('/api/posts/:id', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ error: "Not found" });
@@ -650,7 +680,12 @@ app.post('/api/posts/:id/like', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
         
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ error: "Post not found" });
@@ -685,7 +720,12 @@ app.post('/api/posts/:id/comment', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         const user = await User.findById(decoded.userId);
         if (!user) return res.status(404).json({ error: "User identity not found." });
@@ -743,7 +783,12 @@ app.put('/api/posts/:id/comment/:cid/like', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         const user = await User.findById(decoded.userId);
         if (!user) return res.status(404).json({ error: "User identity not found." });
@@ -784,7 +829,12 @@ app.post('/api/posts/:id/comment/:cid/reply', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         const user = await User.findById(decoded.userId);
         if (!user) return res.status(404).json({ error: "User identity not found." });
@@ -833,7 +883,12 @@ app.delete('/api/posts/:id/comment/:cid', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         const post = await Post.findById(req.params.id);
         if (!post) return res.status(404).json({ error: "Post not found" });
@@ -867,7 +922,12 @@ app.post('/api/users/:id/follow', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         if (decoded.userId === req.params.id) {
             return res.status(400).json({ error: "You cannot follow yourself." });
@@ -939,7 +999,12 @@ app.get('/api/notifications', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         const notifications = await Notification.find({ recipient: decoded.userId })
             .sort({ createdAt: -1 })
@@ -953,7 +1018,12 @@ app.get('/api/notifications/unread-count', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         const count = await Notification.countDocuments({ recipient: decoded.userId, isRead: false });
         const latest = await Notification.findOne({ recipient: decoded.userId, isRead: false })
@@ -968,7 +1038,12 @@ app.put('/api/notifications/read-all', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         await Notification.updateMany({ recipient: decoded.userId }, { isRead: true });
         res.json({ success: true });
@@ -980,7 +1055,12 @@ app.put('/api/notifications/:id/read', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         const notif = await Notification.findOneAndUpdate(
             { _id: req.params.id, recipient: decoded.userId },
@@ -996,7 +1076,12 @@ app.delete('/api/notifications/:id', async (req, res) => {
         const authHeader = req.headers.authorization;
         if(!authHeader) return res.status(401).json({ error: "Access Denied" });
         const token = authHeader.split(' ')[1];
-        const decoded = jwt.verify(token, JWT_SECRET);
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
         await Notification.findOneAndDelete({ _id: req.params.id, recipient: decoded.userId });
         res.json({ success: true });
@@ -1044,9 +1129,14 @@ app.post('/api/campaigns/:id/comment', async (req, res) => {
 app.get('/api/profile', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
     
     const user = await User.findById(decoded.userId)
       .populate('followers', 'name avatar points')
@@ -1058,9 +1148,14 @@ app.get('/api/profile', async (req, res) => {
 app.put('/api/profile', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
     
     const { name, skills, bio, phone, location, website, avatar } = req.body;
     console.log("🚀 Incoming profile update avatar exists:", !!avatar, avatar ? avatar.substring(0, 40) : "none");
@@ -1095,9 +1190,14 @@ app.get('/api/leaderboard', async (req, res) => {
 app.post('/api/ai/match', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     const { campaignId } = req.body;
     const userObj = await User.findById(decoded.userId);
@@ -1189,9 +1289,14 @@ app.post('/api/ai/match', async (req, res) => {
 app.post('/api/campaigns/:id/donate', async (req, res) => {
   try {
      const authHeader = req.headers.authorization;
-     if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-     const token = authHeader.split(' ')[1];
-     const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
      const { amount, transactionId } = req.body;
      const campaign = await Campaign.findById(req.params.id);
@@ -1246,9 +1351,14 @@ app.post('/api/campaigns/:id/donate', async (req, res) => {
 app.post('/api/support/query', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     const { queryText, campaignId, campaignTitle } = req.body;
     if (!queryText || !queryText.trim()) {
@@ -1349,9 +1459,14 @@ app.post('/api/support/query', async (req, res) => {
 app.get('/api/support/my-queries', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     const queries = await SupportQuery.find({ userId: decoded.userId, campaignId: null }).sort({ createdAt: -1 });
     res.json(queries);
@@ -1361,9 +1476,14 @@ app.get('/api/support/my-queries', async (req, res) => {
 app.get('/api/support/campaign-queries/:campaignId', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     const queries = await SupportQuery.find({ 
       userId: decoded.userId, 
@@ -1377,9 +1497,14 @@ app.get('/api/support/campaign-queries/:campaignId', async (req, res) => {
 app.get('/api/support/queries', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     if (decoded.role !== 'admin') return res.status(403).json({ error: "Forbidden: Super Admin access required." });
 
@@ -1391,9 +1516,14 @@ app.get('/api/support/queries', async (req, res) => {
 app.put('/api/support/queries/:id/reply', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     if (decoded.role !== 'admin') return res.status(403).json({ error: "Forbidden" });
 
@@ -1411,9 +1541,14 @@ app.put('/api/support/queries/:id/reply', async (req, res) => {
 app.get('/api/ai/recommended-campaigns', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     const userObj = await User.findById(decoded.userId);
     if(!userObj) return res.status(404).json({ error: "User not found." });
@@ -1516,9 +1651,14 @@ app.get('/api/ai/recommended-campaigns', async (req, res) => {
 app.post('/api/ai/generate-campaign', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     if (decoded.role !== 'ngo' && decoded.role !== 'admin') {
       return res.status(403).json({ error: "Forbidden: NGO access required." });
@@ -1594,9 +1734,14 @@ app.post('/api/ai/generate-campaign', async (req, res) => {
 app.get('/api/admin/flagged-content', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     if (decoded.role !== 'admin') return res.status(403).json({ error: "Forbidden: Super Admin access required." });
 
@@ -1630,9 +1775,14 @@ app.get('/api/admin/flagged-content', async (req, res) => {
 app.post('/api/admin/moderate-content', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     if (decoded.role !== 'admin') return res.status(403).json({ error: "Forbidden: Super Admin access required." });
 
@@ -1665,9 +1815,14 @@ app.post('/api/admin/moderate-content', async (req, res) => {
 app.get('/api/ai/predict-campaign/:id', async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
-    if(!authHeader) return res.status(401).json({ error: "Access Denied" });
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, JWT_SECRET);
+        if(!authHeader) return res.status(401).json({ error: "Access Denied" });
+        const token = authHeader.split(' ')[1];
+        let decoded;
+        try {
+            decoded = jwt.verify(token, JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ error: "Invalid or expired token" });
+        }
 
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ error: "Campaign not found" });

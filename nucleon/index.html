@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nucleon Infotech | Premium Computer Repair, Custom PC & CCTV in Jammu</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Nucleon Infotech is Jammu's leading computer sales & repair expert. Specializing in laptop repair, Custom PC building, CCTV installations, and IT peripherals in Gandhi Nagar, Jammu. Fast diagnostic, premium service.">
+    <meta name="keywords" content="computer repair Jammu, laptop repair Jammu, custom PC builder Jammu, CCTV installation Jammu, Nucleon Infotech Gandhi Nagar, Dell laptops Jammu, computer sales Jammu">
+    <meta name="author" content="Nucleon Infotech">
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="Nucleon Infotech | Premium Computer Services in Jammu">
+    <meta property="og:description" content="Expert computer sales, laptop repair, CCTV installation, and custom gaming PCs in Gandhi Nagar, Jammu.">
+    <meta property="og:image" content="assets/hero_banner.png">
+    <meta property="og:url" content="https://nucleoninfotech.com">
+    <meta property="og:type" content="website">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css?v=1.2">
+    
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Interactive Particle Background Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="main-header" id="site-header">
+        <div class="container header-container">
+            <a href="#" class="logo" id="header-logo">
+                <span class="logo-icon"><i data-lucide="atom"></i></span>
+                <span class="logo-text">NUCLEON <span class="logo-highlight">INFOTECH</span></span>
+            </a>
+            
+            <nav class="nav-menu" id="nav-menu">
+                <ul class="nav-list">
+                    <li><a href="#hero" class="nav-link active">Home</a></li>
+                    <li><a href="#services" class="nav-link">Services</a></li>
+                    <li><a href="#pc-builder" class="nav-link">PC Builder</a></li>
+                    <li><a href="#products" class="nav-link">Showcase</a></li>
+                    <li><a href="#tracker" class="nav-link">Track Repair</a></li>
+                    <li><a href="#reviews" class="nav-link">Reviews</a></li>
+                    <li><a href="#faq" class="nav-link">FAQs</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <a href="#booking-section" class="cta-btn" id="nav-booking-cta">
+                    <span>Book Service</span>
+                    <i data-lucide="calendar"></i>
+                </a>
+                <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section">
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <div class="badge fade-in">
+                        <span class="badge-dot"></span>
+                        <span class="badge-text">Jammu's Premier Tech Service Hub</span>
+                    </div>
+                    <h1 class="hero-title fade-in">
+                        Elevate Your Tech. <br>
+                        <span class="text-glow">Power Your Vision.</span>
+                    </h1>
+                    <p class="hero-subtitle fade-in">
+                        Nucleon Infotech delivers next-generation computer sales, elite laptop repair, custom PC builds, and commercial CCTV surveillance solutions in Gandhi Nagar, Jammu. Experience unparalleled precision and expert care.
+                    </p>
+                    <div class="hero-ctas fade-in">
+                        <a href="#booking-section" class="btn btn-primary" id="hero-book-btn">
+                            <span>Book Repair</span>
+                            <i data-lucide="wrench"></i>
+                        </a>
+                        <a href="#pc-builder" class="btn btn-secondary" id="hero-builder-btn">
+                            <span>Customize PC</span>
+                            <i data-lucide="cpu"></i>
+                        </a>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="hero-stats fade-in">
+                        <div class="stat-item">
+                            <div class="stat-num" id="stat-repairs">15K+</div>
+                            <div class="stat-label">Repairs Completed</div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="stat-item">
+                            <div class="stat-num" id="stat-rating">4.7★</div>
+                            <div class="stat-label">Customer Rating</div>
+                        </div>
+                        <div class="divider"></div>
+                        <div class="stat-item">
+                            <div class="stat-num" id="stat-cctv">800+</div>
+                            <div class="stat-label">CCTVs Installed</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-visual fade-in">
+                    <div class="image-wrapper glass">
+                        <img src="assets/hero_banner.png" alt="Nucleon Infotech Lab Store Jammu" id="hero-img-banner">
+                        <div class="glow-overlay"></div>
+                        
+                        <!-- Floating Glass Cards -->
+                        <div class="floating-card card-top glass">
+                            <div class="fc-icon icon-cyan"><i data-lucide="shield-check"></i></div>
+                            <div class="fc-text">
+                                <span class="fc-title">100% Genuine Parts</span>
+                                <span class="fc-desc">Certified replacements only</span>
+                            </div>
+                        </div>
+                        
+                        <div class="floating-card card-bottom glass">
+                            <div class="fc-icon icon-purple"><i data-lucide="zap"></i></div>
+                            <div class="fc-text">
+                                <span class="fc-title">Express Turnaround</span>
+                                <span class="fc-desc">Same-day service available</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-wave">
+                <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V0C26.9,8.75,57.05,18.3,90.43,26.85,180.59,50,263.66,64.28,321.39,56.44Z" class="shape-fill"></path>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Live Repair Tracker Widget -->
+        <section id="tracker" class="tracker-section section-padding">
+            <div class="container">
+                <div class="glass tracker-box">
+                    <div class="tracker-header">
+                        <div class="section-title-wrapper">
+                            <div class="section-tag"><i data-lucide="search"></i> Live Tracking</div>
+                            <h2 class="section-title">Track Your Repair Order</h2>
+                            <p class="section-desc">Enter your order ID below to check the real-time diagnosis, repair progress, and pickup status of your device.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tracker-body">
+                        <form id="tracker-form" class="tracker-form">
+                            <div class="input-group">
+                                <i data-lucide="ticket" class="input-icon"></i>
+                                <input type="text" id="tracker-order-id" placeholder="Enter Order ID (e.g. NC-1001, NC-1002)" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="tracker-search-btn">
+                                <span>Track Order</span>
+                                <i data-lucide="chevron-right"></i>
+                            </button>
+                        </form>
+
+                        <div id="tracker-result" class="tracker-result hidden">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="services-section section-padding">
+            <div class="container">
+                <div class="section-header text-center">
+                    <div class="section-tag"><i data-lucide="settings"></i> What We Do</div>
+                    <h2 class="section-title">Our Premium IT Services</h2>
+                    <p class="section-desc mx-auto">We provide comprehensive hardware and software solutions. From screen replacements to high-level security cameras, we have Jammu covered.</p>
+                </div>
+
+                <div class="services-grid">
+                    <!-- Service 1 -->
+                    <div class="service-card glass hover-glow" id="service-laptop-repair">
+                        <div class="service-icon"><i data-lucide="laptop"></i></div>
+                        <h3 class="service-title">Laptop & Computer Repair</h3>
+                        <p class="service-text">Expert diagnosis and repair of motherboard failures, screen damage, liquid damage, battery issues, and software crashes on all major brands (Dell, HP, Lenovo, Apple, Asus).</p>
+                        <ul class="service-features">
+                            <li><i data-lucide="check-circle-2"></i> Chip-Level Repairing</li>
+                            <li><i data-lucide="check-circle-2"></i> Screen & Battery Replacement</li>
+                            <li><i data-lucide="check-circle-2"></i> Liquid Damage Recovery</li>
+                        </ul>
+                    </div>
+
+                    <!-- Service 2 -->
+                    <div class="service-card glass hover-glow" id="service-pc-build">
+                        <div class="service-icon"><i data-lucide="cpu"></i></div>
+                        <h3 class="service-title">Custom PC Building</h3>
+                        <p class="service-text">Custom gaming, rendering, and office PC workstations tailormade for your budget and requirements. Perfect cooling, premium cable management, and benchmarking.</p>
+                        <ul class="service-features">
+                            <li><i data-lucide="check-circle-2"></i> Gaming & Rendering Rigs</li>
+                            <li><i data-lucide="check-circle-2"></i> High-End Liquid Cooling</li>
+                            <li><i data-lucide="check-circle-2"></i> Stress Testing & Overclocking</li>
+                        </ul>
+                    </div>
+
+                    <!-- Service 3 -->
+                    <div class="service-card glass hover-glow" id="service-cctv">
+                        <div class="service-icon"><i data-lucide="video"></i></div>
+                        <h3 class="service-title">CCTV Surveillance Systems</h3>
+                        <p class="service-text">Professional design and installation of IP cameras, analog high-definition setups, and remote cloud viewing configurations for residential, retail, and commercial complexes.</p>
+                        <ul class="service-features">
+                            <li><i data-lucide="check-circle-2"></i> Full HD & Night-Vision IP Cameras</li>
+                            <li><i data-lucide="check-circle-2"></i> Mobile Remote Live View</li>
+                            <li><i data-lucide="check-circle-2"></i> Office & Home CCTV Solutions</li>
+                        </ul>
+                    </div>
+
+                    <!-- Service 4 -->
+                    <div class="service-card glass hover-glow" id="service-hardware-upgrades">
+                        <div class="service-icon"><i data-lucide="hard-drive"></i></div>
+                        <h3 class="service-title">Hardware Upgrades</h3>
+                        <p class="service-text">Supercharge your slow computer. We install ultra-fast SSDs, expand RAM, upgrade processors, and replace graphics cards to breathe new life into older hardware.</p>
+                        <ul class="service-features">
+                            <li><i data-lucide="check-circle-2"></i> High-Speed NVMe/SATA SSDs</li>
+                            <li><i data-lucide="check-circle-2"></i> DDR4 & DDR5 RAM Upgrades</li>
+                            <li><i data-lucide="check-circle-2"></i> GPU & CPU Replacements</li>
+                        </ul>
+                    </div>
+
+                    <!-- Service 5 -->
+                    <div class="service-card glass hover-glow" id="service-networking">
+                        <div class="service-icon"><i data-lucide="network"></i></div>
+                        <h3 class="service-title">Network & Server Setup</h3>
+                        <p class="service-text">Robust wired and wireless networking solutions for offices, schools, and homes. LAN cabling, high-performance router configuration, and NAS server systems setup.</p>
+                        <ul class="service-features">
+                            <li><i data-lucide="check-circle-2"></i> Office LAN/Wi-Fi Cabling</li>
+                            <li><i data-lucide="check-circle-2"></i> Dual-WAN Router Configurations</li>
+                            <li><i data-lucide="check-circle-2"></i> Local Data Backup Servers</li>
+                        </ul>
+                    </div>
+
+                    <!-- Service 6 -->
+                    <div class="service-card glass hover-glow" id="service-data-recovery">
+                        <div class="service-icon"><i data-lucide="database"></i></div>
+                        <h3 class="service-title">Data Recovery Services</h3>
+                        <p class="service-text">Critical data extraction and recovery from corrupted hard drives, faulty solid-state drives, formatted USB drives, and malfunctioning SD memory cards.</p>
+                        <ul class="service-features">
+                            <li><i data-lucide="check-circle-2"></i> Formatted Disk Recovery</li>
+                            <li><i data-lucide="check-circle-2"></i> Dead SSD Data Salvage</li>
+                            <li><i data-lucide="check-circle-2"></i> Auto Backup Setup</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive PC Customizer (PC Builder) -->
+        <section id="pc-builder" class="pc-builder-section section-padding">
+            <div class="container">
+                <div class="section-header text-center">
+                    <div class="section-tag"><i data-lucide="sliders"></i> Tech Customizer</div>
+                    <h2 class="section-title">Interactive Custom PC Configurator</h2>
+                    <p class="section-desc mx-auto">Build your dream PC system live. Choose parts to suit your style, check real-time compatibility and pricing, and send us your build for assembly.</p>
+                </div>
+
+                <div class="pc-builder-container glass">
+                    <!-- Left: Configuration Panels -->
+                    <div class="builder-panels">
+                        <!-- Step: CPU -->
+                        <div class="builder-group" data-component="cpu">
+                            <h4 class="group-title"><i data-lucide="cpu"></i> Select Processor (CPU)</h4>
+                            <div class="options-grid">
+                                <button class="option-btn active" data-name="Intel Core i5-13400" data-price="18500" data-tier="Mid">
+                                    <span class="opt-name">Intel Core i5-13400</span>
+                                    <span class="opt-price">₹18,500</span>
+                                </button>
+                                <button class="option-btn" data-name="AMD Ryzen 5 7600X" data-price="21000" data-tier="Mid">
+                                    <span class="opt-name">AMD Ryzen 5 7600X</span>
+                                    <span class="opt-price">₹21,000</span>
+                                </button>
+                                <button class="option-btn" data-name="Intel Core i7-14700K" data-price="38000" data-tier="High">
+                                    <span class="opt-name">Intel Core i7-14700K</span>
+                                    <span class="opt-price">₹38,000</span>
+                                </button>
+                                <button class="option-btn" data-name="AMD Ryzen 7 7800X3D" data-price="42000" data-tier="High">
+                                    <span class="opt-name">AMD Ryzen 7 7800X3D</span>
+                                    <span class="opt-price">₹42,000</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step: GPU -->
+                        <div class="builder-group" data-component="gpu">
+                            <h4 class="group-title"><i data-lucide="monitor"></i> Select Graphics Card (GPU)</h4>
+                            <div class="options-grid">
+                                <button class="option-btn" data-name="NVIDIA GTX 1650 (Budget)" data-price="12500" data-tier="Budget">
+                                    <span class="opt-name">NVIDIA GTX 1650</span>
+                                    <span class="opt-price">₹12,500</span>
+                                </button>
+                                <button class="option-btn active" data-name="NVIDIA RTX 4060 8GB" data-price="29500" data-tier="Mid">
+                                    <span class="opt-name">NVIDIA RTX 4060 8GB</span>
+                                    <span class="opt-price">₹29,500</span>
+                                </button>
+                                <button class="option-btn" data-name="NVIDIA RTX 4070 Super 12GB" data-price="59000" data-tier="High">
+                                    <span class="opt-name">NVIDIA RTX 4070 Super</span>
+                                    <span class="opt-price">₹59,000</span>
+                                </button>
+                                <button class="option-btn" data-name="NVIDIA RTX 4080 Super 16GB" data-price="105000" data-tier="Ultra">
+                                    <span class="opt-name">RTX 4080 Super 16GB</span>
+                                    <span class="opt-price">₹1,05,000</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step: RAM -->
+                        <div class="builder-group" data-component="ram">
+                            <h4 class="group-title"><i data-lucide="layers"></i> System Memory (RAM)</h4>
+                            <div class="options-grid">
+                                <button class="option-btn" data-name="16GB DDR4 3200MHz" data-price="3800" data-tier="Budget">
+                                    <span class="opt-name">16GB DDR4 3200MHz</span>
+                                    <span class="opt-price">₹3,800</span>
+                                </button>
+                                <button class="option-btn active" data-name="16GB DDR5 5600MHz RGB" data-price="5500" data-tier="Mid">
+                                    <span class="opt-name">16GB DDR5 5600MHz</span>
+                                    <span class="opt-price">₹5,500</span>
+                                </button>
+                                <button class="option-btn" data-name="32GB DDR5 6000MHz RGB" data-price="10500" data-tier="High">
+                                    <span class="opt-name">32GB DDR5 Dual Channel</span>
+                                    <span class="opt-price">₹10,500</span>
+                                </button>
+                                <button class="option-btn" data-name="64GB DDR5 6000MHz RGB" data-price="21000" data-tier="Ultra">
+                                    <span class="opt-name">64GB DDR5 Quad Kit</span>
+                                    <span class="opt-price">₹21,000</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step: Storage -->
+                        <div class="builder-group" data-component="storage">
+                            <h4 class="group-title"><i data-lucide="hard-drive"></i> Primary Storage (SSD)</h4>
+                            <div class="options-grid">
+                                <button class="option-btn" data-name="512GB NVMe M.2 SSD" data-price="3200" data-tier="Budget">
+                                    <span class="opt-name">512GB NVMe M.2 SSD</span>
+                                    <span class="opt-price">₹3,200</span>
+                                </button>
+                                <button class="option-btn active" data-name="1TB NVMe Gen4 SSD" data-price="6500" data-tier="Mid">
+                                    <span class="opt-name">1TB NVMe Gen4 SSD</span>
+                                    <span class="opt-price">₹6,500</span>
+                                </button>
+                                <button class="option-btn" data-name="2TB NVMe Gen4 SSD (Fast)" data-price="12000" data-tier="High">
+                                    <span class="opt-name">2TB Gen4 SSD (7000MB/s)</span>
+                                    <span class="opt-price">₹12,000</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step: Cooler -->
+                        <div class="builder-group" data-component="cooler">
+                            <h4 class="group-title"><i data-lucide="thermometer-snowflake"></i> Cooling System</h4>
+                            <div class="options-grid">
+                                <button class="option-btn active" data-name="Stock Air Cooler" data-price="0" data-tier="Budget">
+                                    <span class="opt-name">Stock Cooler</span>
+                                    <span class="opt-price">Included</span>
+                                </button>
+                                <button class="option-btn" data-name="High-Performance Tower Air Cooler" data-price="2800" data-tier="Mid">
+                                    <span class="opt-name">Deepcool AK400 Air</span>
+                                    <span class="opt-price">₹2,800</span>
+                                </button>
+                                <button class="option-btn" data-name="240mm ARGB AIO Liquid Cooler" data-price="6200" data-tier="High">
+                                    <span class="opt-name">240mm Liquid AIO</span>
+                                    <span class="opt-price">₹6,200</span>
+                                </button>
+                                <button class="option-btn" data-name="360mm ARGB AIO Liquid Cooler" data-price="9500" data-tier="Ultra">
+                                    <span class="opt-name">360mm Premium Liquid</span>
+                                    <span class="opt-price">₹9,500</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Build Summary & Estimation -->
+                    <div class="builder-summary glass">
+                        <h3 class="summary-title">Configuration Summary</h3>
+                        
+                        <div class="summary-specs">
+                            <div class="spec-line" id="sum-cpu">
+                                <span class="spec-label">CPU:</span>
+                                <span class="spec-val">Intel Core i5-13400</span>
+                            </div>
+                            <div class="spec-line" id="sum-gpu">
+                                <span class="spec-label">GPU:</span>
+                                <span class="spec-val">NVIDIA RTX 4060 8GB</span>
+                            </div>
+                            <div class="spec-line" id="sum-ram">
+                                <span class="spec-label">RAM:</span>
+                                <span class="spec-val">16GB DDR5 5600MHz RGB</span>
+                            </div>
+                            <div class="spec-line" id="sum-storage">
+                                <span class="spec-label">Storage:</span>
+                                <span class="spec-val">1TB NVMe Gen4 SSD</span>
+                            </div>
+                            <div class="spec-line" id="sum-cooler">
+                                <span class="spec-label">Cooling:</span>
+                                <span class="spec-val">Stock Air Cooler</span>
+                            </div>
+                            <div class="spec-line" id="sum-cabinet">
+                                <span class="spec-label">Cabinet & PSU:</span>
+                                <span class="spec-val">Nucleon Standard Package (Cabinet + 650W PSU)</span>
+                            </div>
+                        </div>
+
+                        <div class="price-box">
+                            <span class="price-label">Estimated Total Price:</span>
+                            <div class="price-val" id="builder-total-price">₹70,000</div>
+                            <span class="price-tax-note">*Includes installation, thermal paste application, and OS loading.</span>
+                        </div>
+
+                        <button class="btn btn-primary btn-full" id="btn-request-build">
+                            <span>Request Custom Build</span>
+                            <i data-lucide="shopping-cart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Gallery/Showcase Section -->
+        <section id="products" class="products-section section-padding">
+            <div class="container">
+                <div class="section-header text-between">
+                    <div class="sh-left">
+                        <div class="section-tag"><i data-lucide="shopping-bag"></i> Tech Store</div>
+                        <h2 class="section-title">Featured Products & Inventory</h2>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="products-filters" id="products-filters">
+                        <button class="filter-btn active" data-category="all">All Items</button>
+                        <button class="filter-btn" data-category="laptops">Laptops</button>
+                        <button class="filter-btn" data-category="desktops">Custom PCs</button>
+                        <button class="filter-btn" data-category="cctv">Surveillance</button>
+                        <button class="filter-btn" data-category="accessories">Peripherals</button>
+                    </div>
+                </div>
+
+                <div class="products-grid" id="products-grid">
+                    <!-- Products dynamically loaded by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Service Scheduler & Quote Estimator -->
+        <section id="booking-section" class="booking-section section-padding">
+            <div class="container">
+                <div class="booking-wrapper glass">
+                    <!-- Left Column: Branding/Context -->
+                    <div class="booking-info">
+                        <div class="section-tag"><i data-lucide="calendar-clock"></i> Quick Booking</div>
+                        <h2 class="booking-title text-glow">Book a Repair or Consultant Slot</h2>
+                        <p class="booking-desc">
+                            Select your issues, calculate prices dynamically, and reserve a diagnostics slot. Pay nothing today—payment is made only after the repair is completed.
+                        </p>
+                        
+                        <div class="booking-features-list">
+                            <div class="bf-item">
+                                <div class="bf-icon"><i data-lucide="check"></i></div>
+                                <span>Free basic diagnostics & quote estimation</span>
+                            </div>
+                            <div class="bf-item">
+                                <div class="bf-icon"><i data-lucide="check"></i></div>
+                                <span>No upfront payments required</span>
+                            </div>
+                            <div class="bf-item">
+                                <div class="bf-icon"><i data-lucide="check"></i></div>
+                                <span>Pick up and drop service within Jammu city limits</span>
+                            </div>
+                        </div>
+
+                        <div class="jammu-badge">
+                            <i data-lucide="map-pin"></i>
+                            <span>Serving Gandhi Nagar, Trikuta Nagar, Channi Himmat & Jammu Outskirts</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Interactive Wizard -->
+                    <div class="booking-wizard">
+                        <div class="wizard-progress">
+                            <div class="progress-step active" id="prog-step-1">1<span>Category</span></div>
+                            <div class="progress-step" id="prog-step-2">2<span>Options</span></div>
+                            <div class="progress-step" id="prog-step-3">3<span>Details</span></div>
+                            <div class="progress-step" id="prog-step-4">4<span>Booked</span></div>
+                        </div>
+
+                        <!-- Step 1: Select Category -->
+                        <div class="wizard-panel active" id="panel-step-1">
+                            <h3 class="panel-heading">Choose Service Category</h3>
+                            <div class="category-options">
+                                <div class="cat-select-card" data-category="laptop-repair">
+                                    <div class="cat-icon"><i data-lucide="laptop"></i></div>
+                                    <div class="cat-name">Laptop/PC Repair</div>
+                                    <div class="cat-desc">Broken screens, OS crashes, motherboard fixes</div>
+                                </div>
+                                <div class="cat-select-card" data-category="pc-upgrade">
+                                    <div class="cat-icon"><i data-lucide="trending-up"></i></div>
+                                    <div class="cat-name">SSD & RAM Upgrades</div>
+                                    <div class="cat-desc">Boost storage speed and multitasking capability</div>
+                                </div>
+                                <div class="cat-select-card" data-category="cctv-setup">
+                                    <div class="cat-icon"><i data-lucide="shield"></i></div>
+                                    <div class="cat-name">CCTV Installation</div>
+                                    <div class="cat-desc">Dome, bullet, or IP cameras setup for safety</div>
+                                </div>
+                                <div class="cat-select-card" data-category="pc-assembly">
+                                    <div class="cat-icon"><i data-lucide="package"></i></div>
+                                    <div class="cat-name">Custom PC Assembly</div>
+                                    <div class="cat-desc">We build PCs with your parts or parts we source</div>
+                                </div>
+                            </div>
+                            
+                            <div class="wizard-navigation text-right">
+                                <button type="button" class="btn btn-primary" id="wizard-to-step-2" disabled>
+                                    <span>Next Step</span>
+                                    <i data-lucide="arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Specific Services & Quote -->
+                        <div class="wizard-panel" id="panel-step-2">
+                            <h3 class="panel-heading" id="step-2-heading">Select Issues & Options</h3>
+                            <div class="issues-list" id="issues-list-container">
+                                <!-- Populated dynamically based on category selection in JS -->
+                            </div>
+                            
+                            <div class="quote-calculator glass">
+                                <div class="qc-row">
+                                    <span>Base Diagnostic Fee:</span>
+                                    <span class="qc-val" id="qc-base-fee">₹300</span>
+                                </div>
+                                <div class="qc-row">
+                                    <span>Estimated Service Fee:</span>
+                                    <span class="qc-val" id="qc-issue-fee">₹0</span>
+                                </div>
+                                <hr class="qc-divider">
+                                <div class="qc-row total-row">
+                                    <span>Total Estimated Quote:</span>
+                                    <span class="qc-val text-glow" id="qc-total-val">₹300</span>
+                                </div>
+                                <span class="qc-disclaimer">*Final quote provided after physical inspection of device.</span>
+                            </div>
+
+                            <div class="wizard-navigation">
+                                <button type="button" class="btn btn-secondary" id="wizard-back-to-1">
+                                    <i data-lucide="arrow-left"></i>
+                                    <span>Back</span>
+                                </button>
+                                <button type="button" class="btn btn-primary" id="wizard-to-step-3">
+                                    <span>Next Step</span>
+                                    <i data-lucide="arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Client Details & Date -->
+                        <div class="wizard-panel" id="panel-step-3">
+                            <h3 class="panel-heading">Schedule Appointment & Details</h3>
+                            <form id="booking-form" class="booking-form">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="b-name">Full Name *</label>
+                                        <input type="text" id="b-name" required placeholder="Enter your full name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="b-phone">Phone Number *</label>
+                                        <input type="tel" id="b-phone" required placeholder="10-digit mobile number">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="b-email">Email Address</label>
+                                        <input type="email" id="b-email" placeholder="Optional email for invoice copy">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="b-date">Preferred Date *</label>
+                                        <input type="date" id="b-date" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="b-time">Preferred Time Slot *</label>
+                                        <select id="b-time" required>
+                                            <option value="" disabled selected>Select time range</option>
+                                            <option value="10:00 AM - 01:00 PM">10:00 AM - 01:00 PM (Morning)</option>
+                                            <option value="01:00 PM - 04:00 PM">01:00 PM - 04:00 PM (Afternoon)</option>
+                                            <option value="04:00 PM - 07:00 PM">04:00 PM - 07:00 PM (Evening)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="b-service-mode">Service Delivery Mode *</label>
+                                        <select id="b-service-mode" required>
+                                            <option value="in-store">Visit Gandhi Nagar Store (In-person)</option>
+                                            <option value="pickup">Request Pickup & Drop (Within Jammu City)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-top: 1rem;">
+                                    <label for="b-notes">Problem Details / Custom Hardware Specs</label>
+                                    <textarea id="b-notes" rows="3" placeholder="Briefly describe what's wrong or any custom requirements..."></textarea>
+                                </div>
+
+                                <div class="wizard-navigation" style="margin-top: 1.5rem;">
+                                    <button type="button" class="btn btn-secondary" id="wizard-back-to-2">
+                                        <i data-lucide="arrow-left"></i>
+                                        <span>Back</span>
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="wizard-submit">
+                                        <span>Confirm Booking</span>
+                                        <i data-lucide="check"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Step 4: Success/Confirmation -->
+                        <div class="wizard-panel" id="panel-step-4">
+                            <div class="success-screen">
+                                <div class="success-icon"><i data-lucide="party-popper"></i></div>
+                                <h3 class="success-title">Booking Confirmed!</h3>
+                                <p class="success-desc">We have received your appointment request. A technician from Nucleon Infotech will call you shortly to confirm the pickup or schedule.</p>
+                                
+                                <div class="booking-receipt glass">
+                                    <div class="receipt-row">
+                                        <span class="r-label">Order ID:</span>
+                                        <span class="r-val highlight-cyan" id="rec-order-id">NC-1025</span>
+                                    </div>
+                                    <div class="receipt-row">
+                                        <span class="r-label">Category:</span>
+                                        <span class="r-val" id="rec-category">Laptop Repair</span>
+                                    </div>
+                                    <div class="receipt-row">
+                                        <span class="r-label">Date & Time:</span>
+                                        <span class="r-val" id="rec-datetime">July 1, 2026 at 10:00 AM</span>
+                                    </div>
+                                    <div class="receipt-row">
+                                        <span class="r-label">Estimated Quote:</span>
+                                        <span class="r-val text-glow" id="rec-quote">₹1,500</span>
+                                    </div>
+                                </div>
+
+                                <p class="receipt-note">Copy your Order ID. You can use it in the tracker section to check repair updates live!</p>
+
+                                <button type="button" class="btn btn-secondary" id="btn-restart-booking">
+                                    <span>New Appointment</span>
+                                    <i data-lucide="refresh-cw"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customer Reviews Section -->
+        <section id="reviews" class="reviews-section section-padding">
+            <div class="container">
+                <div class="section-header text-center">
+                    <div class="section-tag"><i data-lucide="star"></i> User Reviews</div>
+                    <h2 class="section-title">What Our Customers Say</h2>
+                    <p class="section-desc mx-auto">We take pride in our hardware expertise and customer service. Read verified reviews from Google and local business listings in Jammu.</p>
+                </div>
+
+                <div class="reviews-container">
+                    <!-- Carousel Slides -->
+                    <div class="reviews-carousel" id="reviews-carousel">
+                        <div class="review-slide glass active">
+                            <div class="review-header">
+                                <div class="user-meta">
+                                    <h4 class="user-name">Rahul Sharma</h4>
+                                    <span class="user-location"><i data-lucide="map-pin"></i> Trikuta Nagar, Jammu</span>
+                                </div>
+                                <div class="rating-stars">
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                </div>
+                            </div>
+                            <p class="review-text">"Got my Dell gaming laptop repaired from Nucleon Infotech last week. The motherboard had a short circuit due to high voltage. Other repair shops told me it couldn't be repaired, but their chip-level engineer fixed it perfectly in 2 days. Highly recommended in Jammu!"</p>
+                            <div class="review-tag">Service: Motherboard Chip-Level Repair</div>
+                        </div>
+
+                        <div class="review-slide glass">
+                            <div class="review-header">
+                                <div class="user-meta">
+                                    <h4 class="user-name">Vikramjeet Singh</h4>
+                                    <span class="user-location"><i data-lucide="map-pin"></i> Channi Himmat, Jammu</span>
+                                </div>
+                                <div class="rating-stars">
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                </div>
+                            </div>
+                            <p class="review-text">"Contacted Nucleon for office CCTV setup. They designed the full coverage plan with 8 high-definition IP cameras, NVR, and mobile remote app. Very neat cabling. The clarity is excellent, even in complete darkness. Very professional team."</p>
+                            <div class="review-tag">Service: Commercial CCTV Setup</div>
+                        </div>
+
+                        <div class="review-slide glass">
+                            <div class="review-header">
+                                <div class="user-meta">
+                                    <h4 class="user-name">Pooja Mahajan</h4>
+                                    <span class="user-location"><i data-lucide="map-pin"></i> Gandhi Nagar, Jammu</span>
+                                </div>
+                                <div class="rating-stars">
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star" class="fill-star"></i>
+                                    <i data-lucide="star"></i>
+                                </div>
+                            </div>
+                            <p class="review-text">"My iMac was running incredibly slow. Visited their Gandhi Nagar store, and they suggested a RAM and 1TB SSD upgrade. My computer is now super fast—it boots up in 10 seconds flat. Professional service, fair pricing, and transparency."</p>
+                            <div class="review-tag">Service: iMac SSD & Memory Upgrade</div>
+                        </div>
+                    </div>
+
+                    <!-- Carousel Controls -->
+                    <div class="carousel-controls">
+                        <button class="control-btn" id="prev-review" aria-label="Previous Review"><i data-lucide="chevron-left"></i></button>
+                        <div class="carousel-dots" id="carousel-dots">
+                            <span class="dot active"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                        <button class="control-btn" id="next-review" aria-label="Next Review"><i data-lucide="chevron-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Review Badge -->
+                <div class="google-badge glass mx-auto">
+                    <div class="badge-title"><i data-lucide="verified" class="icon-cyan"></i> Google Review Rating</div>
+                    <div class="rating-flex">
+                        <span class="rating-number">4.7</span>
+                        <div class="stars">
+                            <i data-lucide="star" class="fill-star"></i>
+                            <i data-lucide="star" class="fill-star"></i>
+                            <i data-lucide="star" class="fill-star"></i>
+                            <i data-lucide="star" class="fill-star"></i>
+                            <i data-lucide="star" class="fill-star"></i>
+                        </div>
+                        <span class="reviews-count">(150+ Verified Reviews)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQs Section (Accordion) -->
+        <section id="faq" class="faq-section section-padding">
+            <div class="container">
+                <div class="section-header text-center">
+                    <div class="section-tag"><i data-lucide="help-circle"></i> Got Questions?</div>
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <p class="section-desc mx-auto">Here are some of the common questions our clients in Jammu ask. If you have any other queries, feel free to contact us.</p>
+                </div>
+
+                <div class="faq-list mx-auto" style="max-width: 800px;">
+                    <div class="faq-item glass active">
+                        <button class="faq-question">
+                            <span>How long does a typical laptop repair take?</span>
+                            <i data-lucide="chevron-down" class="faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Basic repairs such as SSD installations, keyboard swaps, and RAM upgrades are completed within a few hours. Chip-level motherboard fixes or water damage recovery usually take 2 to 3 working days depending on the availability of components.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item glass">
+                        <button class="faq-question">
+                            <span>Do you charge diagnostic fees if I decide not to get the laptop repaired?</span>
+                            <i data-lucide="chevron-down" class="faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>We charge a basic diagnosis fee of ₹300 for laptops and computers to cover the technician's time in finding the fault. If you choose to go ahead with our repair recommendation, this diagnostic fee is fully waived off!</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item glass">
+                        <button class="faq-question">
+                            <span>Do you offer home pickup and delivery service in Jammu?</span>
+                            <i data-lucide="chevron-down" class="faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes! We offer convenient home pickup and delivery for device repairs within Jammu city limits (including Gandhi Nagar, Trikuta Nagar, Channi Himmat, Shastri Nagar, and Greater Kailash). You can select this option in our booking wizard.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item glass">
+                        <button class="faq-question">
+                            <span>Are the computer parts you sell genuine? Do they carry a warranty?</span>
+                            <i data-lucide="chevron-down" class="faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Yes, we sell only 100% brand-new and genuine replacement parts sourced directly from authorized brand distributors. All hardware (SSDs, RAM, screens, motherboards) comes with the official manufacturer warranty ranging from 1 to 5 years.</p>
+                        </div>
+                    </div>
+
+                    <div class="faq-item glass">
+                        <button class="faq-question">
+                            <span>Can I monitor the cameras on my mobile phone remotely?</span>
+                            <i data-lucide="chevron-down" class="faq-icon"></i>
+                        </button>
+                        <div class="faq-answer">
+                            <p>Absolutely. All CCTV systems we install are fully network-integrated. We configure remote viewing applications on your smartphones, tablets, or laptops, enabling you to stream high-definition live feeds and playback recorded videos from anywhere in the world.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact & Footer Section -->
+        <section id="contact" class="contact-section section-padding">
+            <div class="container">
+                <div class="contact-grid">
+                    <!-- Left: Contact Information -->
+                    <div class="contact-info-panel">
+                        <div class="section-tag"><i data-lucide="map-pin"></i> Visit Store</div>
+                        <h2 class="contact-title text-glow">Get In Touch With Us</h2>
+                        <p class="contact-intro">Have a computer query, need a custom PC quote, or planning a security setup? Reach out to us or drop by our store in Jammu.</p>
+                        
+                        <div class="contact-details">
+                            <div class="cd-item">
+                                <div class="cd-icon"><i data-lucide="map-pin"></i></div>
+                                <div class="cd-content">
+                                    <h4>Store Address</h4>
+                                    <p>421-A, Gandhi Nagar, Jammu - 180004, Jammu & Kashmir (India)</p>
+                                </div>
+                            </div>
+
+                            <div class="cd-item">
+                                <div class="cd-icon"><i data-lucide="phone"></i></div>
+                                <div class="cd-content">
+                                    <h4>Call / WhatsApp</h4>
+                                    <p><a href="tel:+919419110751" class="hover-cyan">+91 94191 10751</a></p>
+                                </div>
+                            </div>
+
+                            <div class="cd-item">
+                                <div class="cd-icon"><i data-lucide="mail"></i></div>
+                                <div class="cd-content">
+                                    <h4>Email Support</h4>
+                                    <p><a href="mailto:support@nucleoninfotech.com" class="hover-cyan">support@nucleoninfotech.com</a></p>
+                                </div>
+                            </div>
+
+                            <div class="cd-item">
+                                <div class="cd-icon"><i data-lucide="clock"></i></div>
+                                <div class="cd-content">
+                                    <h4>Business Hours</h4>
+                                    <p>Monday - Saturday: 10:00 AM - 08:00 PM<br>Sunday: Closed</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Map Placeholder visual (styled premiumly) -->
+                        <div class="map-container glass">
+                            <div class="map-overlay">
+                                <i data-lucide="navigation"></i>
+                                <span>Gandhi Nagar, Near Gole Market, Jammu</span>
+                            </div>
+                            <!-- Mock Map Representation -->
+                            <div class="mock-map">
+                                <div class="map-pin-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Contact Form -->
+                    <div class="contact-form-panel glass">
+                        <h3 class="form-title">Send a Quick Message</h3>
+                        <p class="form-desc">Fill out the form, and our tech support team will respond to your query within 2 hours.</p>
+                        
+                        <form id="contact-form" class="contact-form">
+                            <div class="form-group">
+                                <label for="c-name">Your Name *</label>
+                                <input type="text" id="c-name" required placeholder="Enter your name">
+                            </div>
+                            <div class="form-group">
+                                <label for="c-email">Email Address</label>
+                                <input type="email" id="c-email" placeholder="Enter your email">
+                            </div>
+                            <div class="form-group">
+                                <label for="c-phone">Phone Number *</label>
+                                <input type="tel" id="c-phone" required placeholder="10-digit phone number">
+                            </div>
+                            <div class="form-group">
+                                <label for="c-subject">Subject *</label>
+                                <select id="c-subject" required>
+                                    <option value="" disabled selected>Select subject</option>
+                                    <option value="Laptop Repair">Laptop / PC Repair</option>
+                                    <option value="Custom PC Quote">Custom Gaming PC Quote</option>
+                                    <option value="CCTV Installation">CCTV Installation Setup</option>
+                                    <option value="Product Inquiry">Product Inquiry</option>
+                                    <option value="Other Support">Other Technical Support</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="c-message">Message *</label>
+                                <textarea id="c-message" rows="4" required placeholder="Describe your query in detail..."></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-full" id="contact-submit-btn">
+                                <span>Send Message</span>
+                                <i data-lucide="send"></i>
+                            </button>
+                        </form>
+                        
+                        <div id="contact-form-success" class="contact-success hidden">
+                            <div class="cs-icon"><i data-lucide="check-circle-2"></i></div>
+                            <h4>Message Sent Successfully!</h4>
+                            <p>Thank you for contacting Nucleon Infotech. We will get back to you shortly.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Copyright -->
+    <footer class="site-footer">
+        <div class="container footer-content text-center">
+            <p>&copy; 2026 Nucleon Infotech. All Rights Reserved. Built for speed, security, and SEO rank in Jammu.</p>
+            <div class="footer-links">
+                <a href="#services">Services</a>
+                <a href="#products">Inventory</a>
+                <a href="#tracker">Tracker</a>
+                <a href="#booking-section">Booking</a>
+                <a href="#contact">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Product Details Modal (Dynamic) -->
+    <div class="modal-overlay hidden" id="product-modal">
+        <div class="modal-content glass">
+            <button class="modal-close" id="modal-close" aria-label="Close details"><i data-lucide="x"></i></button>
+            <div class="modal-body" id="modal-body">
+                <!-- Populated dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
